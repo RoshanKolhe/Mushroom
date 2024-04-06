@@ -31,7 +31,7 @@ export class JWTService {
 
     let userProfile: UserProfile;
     try {
-      const decryptedToken = await verifyAsync(token, 'wolfizer');
+      const decryptedToken = await verifyAsync(token, 'mushroom');
       userProfile = Object.assign(
         {id: '', name: '', [securityId]: '', permissions: ''},
         {
