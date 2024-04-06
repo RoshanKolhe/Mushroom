@@ -175,6 +175,9 @@ export class UserController {
       if (!user) {
         throw new HttpErrors.BadRequest("User doesn't exists");
       }
+      if (!user.isActive) {
+        throw new HttpErrors.BadRequest("User is Inactive");
+      }
       validateCredentialsForPhoneLogin(phoneNumber);
       const result = await this.twilioService.startVerification(phoneNumber);
       return {
