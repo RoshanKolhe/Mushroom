@@ -10,5 +10,6 @@ export interface CurrentUser {
   id: string;
   email: string;
   name: string;
+  phoneNumber: string;
   permissions: String[];
 }

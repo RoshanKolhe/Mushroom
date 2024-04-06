@@ -1,5 +1,4 @@
 import {Entity, model, property, hasOne, hasMany} from '@loopback/repository';
-import {UserProfile} from './user-profile.model';
 
 @model()
 export class User extends Entity {
@@ -13,12 +12,7 @@ export class User extends Entity {
   @property({
     type: 'string',
   })
-  userName: string;
-
-  @property({
-    type: 'string',
-  })
-  name: string;
+  fullName: string;
 
   @property({
     type: 'string',
@@ -34,7 +28,12 @@ export class User extends Entity {
     type: 'string',
     required: true,
   })
-  contactNo: string;
+  phoneNumber: string;
+
+  @property({
+    type: 'object',
+  })
+  avatar?: object;
 
   @property.array(String, {
     name: 'permissions',
@@ -66,9 +65,6 @@ export class User extends Entity {
     type: 'date',
   })
   updatedAt?: Date;
-
-  @hasOne(() => UserProfile)
-  userProfile: UserProfile;
 
   constructor(data?: Partial<User>) {
     super(data);

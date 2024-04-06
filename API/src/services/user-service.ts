@@ -42,8 +42,9 @@ export class MyUserService implements UserService<User, Credentials> {
   convertToUserProfile(user: User): UserProfile {
     return {
       id: `${user.id}`,
-      name: `${user.name}`,
+      name: `${user.fullName}`,
       email: user.email,
+      phoneNumber:user.phoneNumber,
       [securityId]: `${user.id}`,
       permissions: user.permissions,
     };

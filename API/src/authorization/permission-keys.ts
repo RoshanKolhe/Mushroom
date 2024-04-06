@@ -1,6 +1,6 @@
 export const enum PermissionKeys {
-  ADMIN = 'admin',
-  INFLUENCER = 'influencer',
-  BRAND = 'brand',
+  SUPER_ADMIN = 'super_admin',
+  CLUSTER_ADMIN = 'cluster_admin',
+  HUT_ADMIN = 'hut_admin',
   CUSTOMER = 'customer'
 }

@@ -23,32 +23,31 @@ import * as _ from 'lodash';
 import {PermissionKeys} from '../authorization/permission-keys';
 import {EmailManagerBindings} from '../keys';
 import {User} from '../models';
-import {
-  Credentials,
-  UserProfileRepository,
-  UserRepository,
-} from '../repositories';
+import {Credentials, UserRepository} from '../repositories';
 import {EmailManager} from '../services/email.service';
 import {BcryptHasher} from '../services/hash.password.bcrypt';
 import {JWTService} from '../services/jwt-service';
 import {TwilioService} from '../services/twilio.service';
 import {MyUserService} from '../services/user-service';
-import {validateCredentials} from '../services/validator';
+import {
+  validateCredentials,
+  validateCredentialsForPhoneLogin,
+} from '../services/validator';
 import generateOtpTemplate from '../templates/otp.template';
 import SITE_SETTINGS from '../utils/config';
 import {CredentialsRequestBody} from './specs/user-controller-spec';
-import { MushroomDataSource } from '../datasources';
+import {MushroomDataSource} from '../datasources';
+import {all} from 'axios';
 
 export class UserController {
   constructor(
-    @inject('datasources.fanseb')
+    @inject('datasources.mushroom')
     public dataSource: MushroomDataSource,
     @inject(EmailManagerBindings.SEND_MAIL)
     public emailManager: EmailManager,
     @repository(UserRepository)
     public userRepository: UserRepository,
-    @repository(UserProfileRepository)
-    public userProfileRepository: UserProfileRepository,
+
     @inject('service.hasher')
     public hasher: BcryptHasher,
     @inject('service.user.service')
@@ -86,25 +85,23 @@ export class UserController {
     try {
       const user = await this.userRepository.findOne({
         where: {
-          or: [{email: userData.email}, {userName: userData.userName}],
+          or: [{phoneNumber: userData.phoneNumber}],
         },
       });
       if (user) {
-        throw new HttpErrors.BadRequest('User Name or Email Already Exists');
+        throw new HttpErrors.BadRequest('User Already Exists');
       }
 
-      validateCredentials(_.pick(userData, ['email', 'password']));
+      validateCredentialsForPhoneLogin(userData.phoneNumber);
       // userData.permissions = [PermissionKeys.ADMIN];
-      userData.password = await this.hasher.hashPassword(userData.password);
       const savedUser = await this.userRepository.create(userData, {
         transaction: tx,
       });
-      const savedUserData = _.omit(savedUser, 'password');
       tx.commit();
       return Promise.resolve({
         success: true,
-        userData: savedUserData,
-        message: `User with mail ${userData.email} is registered successfully`,
+        userData: savedUser,
+        message: `User registered successfully`,
       });
     } catch (err) {
       tx.rollback();
@@ -138,13 +135,120 @@ export class UserController {
     const userProfile = this.userService.convertToUserProfile(user);
     const userData = _.omit(user, 'password');
     const token = await this.jwtService.generateToken(userProfile);
-    const allUserData = await this.userRepository.findById(userData.id, {
-      include: [{relation: 'userProfile'}, {relation: 'influencerBalances'}],
-    });
+    const allUserData = await this.userRepository.findById(userData.id);
     return Promise.resolve({
       accessToken: token,
       user: allUserData,
     });
+  }
+
+  @post('/send-otp-customer-login')
+  async sendOTPForMoblileUser(
+    @requestBody({
+      description: 'Request body description',
+      required: true,
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            properties: {
+              phoneNumber: {
+                type: 'string',
+                description: 'User phone number',
+              },
+            },
+          },
+        },
+      },
+    })
+    requestBody: {
+      phoneNumber: string;
+    },
+  ): Promise<any> {
+    const {phoneNumber} = requestBody;
+    try {
+      const user = await this.userRepository.findOne({
+        where: {
+          or: [{phoneNumber: phoneNumber}],
+        },
+      });
+      if (!user) {
+        throw new HttpErrors.BadRequest("User doesn't exists");
+      }
+      validateCredentialsForPhoneLogin(phoneNumber);
+      const result = await this.twilioService.startVerification(phoneNumber);
+      return {
+        success: true,
+        message: 'OTP sent successfully',
+        verificationSid: result.sid,
+      };
+    } catch (error) {
+      return {success: false, message: error.message};
+    }
+  }
+
+  @post('/verify-otp-customer-login')
+  async verifyOTPForMoblileUser(
+    @requestBody({
+      description: 'Request body description',
+      required: true,
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            properties: {
+              id: {
+                type: 'string',
+                description: 'Verification ID',
+              },
+              code: {
+                type: 'string',
+                description: 'Verification code',
+              },
+              phoneNumber: {
+                type: 'string',
+                description: 'User phone number',
+              },
+            },
+          },
+        },
+      },
+    })
+    requestBody: {
+      id: string;
+      code: string;
+      phoneNumber: string;
+    },
+  ): Promise<any> {
+    const {id, code, phoneNumber} = requestBody;
+    try {
+      const result = await this.twilioService.checkVerification(
+        id,
+        code,
+        phoneNumber,
+      );
+      const allUserData = await this.userRepository.findOne({
+        where: {
+          phoneNumber: phoneNumber,
+        },
+      });
+      if (allUserData) {
+        const userProfile = this.userService.convertToUserProfile(allUserData);
+        const userData = _.omit(userProfile, 'password');
+        const token = await this.jwtService.generateToken(userProfile);
+        return {
+          success: true,
+          accessToken: token,
+          user: userData,
+          verificationSid: result.sid,
+        };
+      }
+      throw new HttpErrors.BadRequest(
+        `User with phone number ${phoneNumber}} not found`,
+      );
+    } catch (error) {
+      return {success: false, message: error.message};
+    }
   }
 
   @get('/me')
@@ -156,18 +260,17 @@ export class UserController {
       where: {
         id: currnetUser.id,
       },
-      include: [{relation: 'userProfile'}, {relation: 'influencerBalances'}],
     });
     const userData = _.omit(user, 'password');
     return Promise.resolve({
       ...userData,
-      displayName: userData?.name,
+      displayName: userData?.fullName,
     });
   }
 
   @authenticate({
     strategy: 'jwt',
-    options: {required: [PermissionKeys.ADMIN]},
+    options: {required: [PermissionKeys.SUPER_ADMIN]},
   })
   @get('/api/users/list')
   @response(200, {
@@ -194,7 +297,7 @@ export class UserController {
 
   @authenticate({
     strategy: 'jwt',
-    options: {required: [PermissionKeys.ADMIN]},
+    options: {required: [PermissionKeys.SUPER_ADMIN]},
   })
   @get('/api/users/{id}', {
     responses: {
@@ -218,7 +321,6 @@ export class UserController {
         otp: false,
         otpExpireAt: false,
       },
-      include: ['brands'],
     });
     return Promise.resolve({
       ...user,
@@ -249,18 +351,6 @@ export class UserController {
                   isActive: {type: 'boolean'},
                 },
               },
-              // Include properties from the UserProfile model
-              userProfile: {
-                type: 'object',
-                properties: {
-                  avatar: {type: 'object'},
-                  bio: {type: 'string'},
-                  paymentInfo: {type: 'object'},
-                  socials: {type: 'object'},
-                  address: {type: 'array'},
-                  // Include other properties from UserProfile if needed
-                },
-              },
             },
           },
         },
@@ -277,49 +367,17 @@ export class UserController {
         otp?: string;
         otpExpireAt: string;
       };
-      userProfile?: {
-        avatar?: object;
-        bio?: string;
-        contact?: string;
-        contact_verified_at?: string;
-        gallery: object;
-        paymentInfo?: object;
-        socials?: object;
-        address?: object[];
-        // Include other properties from UserProfile if needed
-      };
     },
   ): Promise<any> {
     // Fetch the user information before updating
-    const existingUser = await this.userRepository.findById(id, {
-      include: [{relation: 'userProfile'}],
-    });
+    const existingUser = await this.userRepository.findById(id);
     if (!existingUser) {
-      // Handle the case where the user doesn't exist
-      // You may want to return an error response or handle it based on your requirements
       return;
     }
 
     // Update user information
     if (user.user) {
       await this.userRepository.updateById(id, user.user);
-    }
-
-    // Update or create user profile information
-    if (user.userProfile) {
-      if (existingUser.userProfile) {
-        // If user already has a profile, update it
-        await this.userProfileRepository.updateById(
-          existingUser.userProfile.id,
-          user.userProfile,
-        );
-      } else {
-        // If user doesn't have a profile, create a new one
-        await this.userProfileRepository.create({
-          userId: id,
-          ...user.userProfile,
-        });
-      }
     }
 
     return Promise.resolve({
@@ -442,44 +500,5 @@ export class UserController {
 
   addMinutesToDate(date: any, minutes: any) {
     return new Date(date.getTime() + minutes * 60000);
-  }
-
-
-  @post('/send-otp-guest-checkout')
-  async sendOTP(
-    @requestBody() requestBody: {phoneNumber: string},
-  ): Promise<any> {
-    const {phoneNumber} = requestBody;
-    try {
-      const result = await this.twilioService.startVerification(phoneNumber);
-      return {
-        success: true,
-        message: 'OTP sent successfully',
-        verificationSid: result.sid,
-      };
-    } catch (error) {
-      return {success: false, message: error.message};
-    }
-  }
-
-  @post('/verify-otp-guest-checkout')
-  async verifyOTP(
-    @requestBody() requestBody: {id: string; code: string; phoneNumber: string},
-  ): Promise<any> {
-    const {id, code, phoneNumber} = requestBody;
-    try {
-      const result = await this.twilioService.checkVerification(
-        id,
-        code,
-        phoneNumber,
-      );
-      return {
-        success: true,
-        message: 'OTP verified successfully',
-        verificationSid: result.sid,
-      };
-    } catch (error) {
-      return {success: false, message: error.message};
-    }
   }
 }

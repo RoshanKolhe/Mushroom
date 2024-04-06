@@ -13,7 +13,7 @@ export class JWTService {
     }
     let token = '';
     try {
-      token = await signAsync(userProfile, 'wolfizer', {
+      token = await signAsync(userProfile, 'mushroom', {
         expiresIn: '7h',
       });
     } catch (err) {
