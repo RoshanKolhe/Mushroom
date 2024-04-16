@@ -332,7 +332,6 @@ export class UserController {
   async find(@param.filter(User) filter?: Filter<User>): Promise<User[]> {
     filter = {
       ...filter,
-      include: ['brands'],
       fields: {password: false, otp: false, otpExpireAt: false},
     };
     return this.userRepository.find(filter);
@@ -399,18 +398,7 @@ export class UserController {
         },
       },
     })
-    user: {
-      user: {
-        name: string;
-        email: string;
-        password: string;
-        contactNo: string;
-        permissions: string[];
-        isActive: boolean;
-        otp?: string;
-        otpExpireAt: string;
-      };
-    },
+    user: User,
   ): Promise<any> {
     // Fetch the user information before updating
     const existingUser = await this.userRepository.findById(id);
@@ -419,8 +407,8 @@ export class UserController {
     }
 
     // Update user information
-    if (user.user) {
-      await this.userRepository.updateById(id, user.user);
+    if (user) {
+      await this.userRepository.updateById(id, user);
     }
 
     return Promise.resolve({
