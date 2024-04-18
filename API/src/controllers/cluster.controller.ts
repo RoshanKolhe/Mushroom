@@ -6,6 +6,7 @@ import {
   repository,
   Where,
 } from '@loopback/repository';
+import {UserProfile} from '@loopback/security';
 import {
   post,
   param,
@@ -20,6 +21,9 @@ import {
 } from '@loopback/rest';
 import {Cluster} from '../models';
 import {ClusterRepository, UserRepository} from '../repositories';
+import {authenticate, AuthenticationBindings} from '@loopback/authentication';
+import {PermissionKeys} from '../authorization/permission-keys';
+import {inject} from '@loopback/core';
 
 export class ClusterController {
   constructor(
@@ -29,6 +33,10 @@ export class ClusterController {
     public userRepository: UserRepository,
   ) {}
 
+  @authenticate({
+    strategy: 'jwt',
+    options: {required: [PermissionKeys.SUPER_ADMIN]},
+  })
   @post('/clusters')
   @response(200, {
     description: 'Cluster model instance',
@@ -56,6 +64,12 @@ export class ClusterController {
     return this.clusterRepository.create(cluster);
   }
 
+  @authenticate({
+    strategy: 'jwt',
+    options: {
+      required: [PermissionKeys.SUPER_ADMIN, PermissionKeys.CLUSTER_ADMIN],
+    },
+  })
   @get('/clusters')
   @response(200, {
     description: 'Array of Cluster model instances',
@@ -69,11 +83,25 @@ export class ClusterController {
     },
   })
   async find(
+    @inject(AuthenticationBindings.CURRENT_USER) currnetUser: UserProfile,
     @param.filter(Cluster) filter?: Filter<Cluster>,
   ): Promise<Cluster[]> {
-    return this.clusterRepository.find({...filter, include: ['user']});
+    const currentUserPermission = currnetUser.permissions;
+    if (currentUserPermission.includes('super_admin')) {
+      return this.clusterRepository.find({...filter, include: ['user']});
+    } else {
+      return this.clusterRepository.find({
+        ...filter,
+        include: ['user'],
+        where: {userId: currnetUser.id},
+      });
+    }
   }
 
+  @authenticate({
+    strategy: 'jwt',
+    options: {required: [PermissionKeys.SUPER_ADMIN]},
+  })
   @get('/clusters/{id}')
   @response(200, {
     description: 'Cluster model instance',
@@ -91,6 +119,10 @@ export class ClusterController {
     return this.clusterRepository.findById(id, {...filter, include: ['user']});
   }
 
+  @authenticate({
+    strategy: 'jwt',
+    options: {required: [PermissionKeys.SUPER_ADMIN]},
+  })
   @patch('/clusters/{id}')
   @response(204, {
     description: 'Cluster PATCH success',
@@ -109,6 +141,10 @@ export class ClusterController {
     await this.clusterRepository.updateById(id, cluster);
   }
 
+  @authenticate({
+    strategy: 'jwt',
+    options: {required: [PermissionKeys.SUPER_ADMIN]},
+  })
   @del('/clusters/{id}')
   @response(204, {
     description: 'Cluster DELETE success',
