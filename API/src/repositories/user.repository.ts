@@ -5,8 +5,9 @@ import {
   HasOneRepositoryFactory,
 } from '@loopback/repository';
 import {MushroomDataSource} from '../datasources';
-import {User, UserRelations} from '../models';
+import {User, UserRelations, Hut} from '../models';
 import {TimeStampRepositoryMixin} from '../mixins/timestamp-repository-mixin';
+import {HutRepository} from './hut.repository';
 
 export type Credentials = {
   email: string;
@@ -20,7 +21,12 @@ export class UserRepository extends TimeStampRepositoryMixin<
     DefaultCrudRepository<User, typeof User.prototype.id, UserRelations>
   >
 >(DefaultCrudRepository) {
-  constructor(@inject('datasources.mushroom') dataSource: MushroomDataSource) {
+
+  public readonly hut: HasOneRepositoryFactory<Hut, typeof User.prototype.id>;
+
+  constructor(@inject('datasources.mushroom') dataSource: MushroomDataSource, @repository.getter('HutRepository') protected hutRepositoryGetter: Getter<HutRepository>,) {
     super(User, dataSource);
+    this.hut = this.createHasOneRepositoryFactoryFor('hut', hutRepositoryGetter);
+    this.registerInclusionResolver('hut', this.hut.inclusionResolver);
   }
 }

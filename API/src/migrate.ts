@@ -6,7 +6,10 @@ export async function migrate(args: string[]) {
 
   const app = new MushroomApplication();
   await app.boot();
-  await app.migrateSchema({existingSchema, models: ['User', 'Cluster', 'Hut','Faq']});
+  await app.migrateSchema({
+    existingSchema,
+    models: ['User', 'Cluster', 'Hut', 'Faq', 'EnvironmentData'],
+  });
 
   // Connectors usually keep a pool of opened connections,
   // this keeps the process running even after all work is done.

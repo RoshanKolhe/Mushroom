@@ -1,8 +1,9 @@
-import {Constructor, inject} from '@loopback/core';
-import {DefaultCrudRepository} from '@loopback/repository';
+import {Constructor, inject, Getter} from '@loopback/core';
+import {DefaultCrudRepository, repository, BelongsToAccessor} from '@loopback/repository';
 import {MushroomDataSource} from '../datasources';
-import {EnvironmentData, EnvironmentDataRelations} from '../models';
+import {EnvironmentData, EnvironmentDataRelations, Hut} from '../models';
 import {TimeStampRepositoryMixin} from '../mixins/timestamp-repository-mixin';
+import {HutRepository} from './hut.repository';
 
 export class EnvironmentDataRepository extends TimeStampRepositoryMixin<
   EnvironmentData,
@@ -15,7 +16,12 @@ export class EnvironmentDataRepository extends TimeStampRepositoryMixin<
     >
   >
 >(DefaultCrudRepository) {
-  constructor(@inject('datasources.mushroom') dataSource: MushroomDataSource) {
+
+  public readonly hut: BelongsToAccessor<Hut, typeof EnvironmentData.prototype.id>;
+
+  constructor(@inject('datasources.mushroom') dataSource: MushroomDataSource, @repository.getter('HutRepository') protected hutRepositoryGetter: Getter<HutRepository>,) {
     super(EnvironmentData, dataSource);
+    this.hut = this.createBelongsToAccessorFor('hut', hutRepositoryGetter,);
+    this.registerInclusionResolver('hut', this.hut.inclusionResolver);
   }
 } 

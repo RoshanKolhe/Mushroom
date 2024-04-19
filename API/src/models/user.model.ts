@@ -1,4 +1,5 @@
 import {Entity, model, property, hasOne, hasMany} from '@loopback/repository';
+import {Hut} from './hut.model';
 
 @model()
 export class User extends Entity {
@@ -65,6 +66,9 @@ export class User extends Entity {
     type: 'date',
   })
   updatedAt?: Date;
+
+  @hasOne(() => Hut)
+  hut: Hut;
 
   constructor(data?: Partial<User>) {
     super(data);

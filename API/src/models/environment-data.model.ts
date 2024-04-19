@@ -1,4 +1,5 @@
-import {Entity, model, property} from '@loopback/repository';
+import {Entity, model, property, belongsTo} from '@loopback/repository';
+import {Hut} from './hut.model';
 
 @model()
 export class EnvironmentData extends Entity {
@@ -72,6 +73,9 @@ export class EnvironmentData extends Entity {
     type: 'date',
   })
   updatedAt?: Date;
+
+  @belongsTo(() => Hut)
+  hutId: number;
 
   constructor(data?: Partial<EnvironmentData>) {
     super(data);
