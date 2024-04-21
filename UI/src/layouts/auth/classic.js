@@ -17,7 +17,6 @@ import { useResponsive } from 'src/hooks/use-responsive';
 import { bgGradient } from 'src/theme/css';
 // components
 import Logo from 'src/components/logo';
-
 // ----------------------------------------------------------------------
 
 const METHODS = [
@@ -45,6 +44,12 @@ const METHODS = [
     path: paths.auth.auth0.login,
     icon: '/assets/icons/auth/ic_auth0.svg',
   },
+  {
+    id: 'SignIn',
+    label: 'SignIn',
+    path: paths.auth.signIn.login,
+    icon: '/assets/icons/auth/ic_auth0.svg',
+  },
 ];
 
 export default function AuthClassicLayout({ children, image, title }) {
@@ -55,12 +60,19 @@ export default function AuthClassicLayout({ children, image, title }) {
   const upMd = useResponsive('up', 'md');
 
   const renderLogo = (
-    <Logo
-      sx={{
-        zIndex: 9,
-        position: 'absolute',
-        m: { xs: 2, md: 5 },
-      }}
+    <img
+    src='/assets/images/logo/gravityLogo.png'
+    alt='logo'
+    style={{
+      width:'90px',
+      height:'90px',
+      position:'absolute',
+      top:'3%',
+      left:'3%',
+      zIndex:9,
+
+
+    }}
     />
   );
 
@@ -71,7 +83,7 @@ export default function AuthClassicLayout({ children, image, title }) {
         mx: 'auto',
         maxWidth: 480,
         px: { xs: 2, md: 8 },
-        py: { xs: 15, md: 30 },
+        py: { xs: 15, md: 25 },
       }}
     >
       {children}
@@ -94,18 +106,14 @@ export default function AuthClassicLayout({ children, image, title }) {
         }),
       }}
     >
-      <Typography variant="h3" sx={{ maxWidth: 480, textAlign: 'center' }}>
-        {title || 'Hi, Welcome back'}
-      </Typography>
-
       <Box
         component="img"
         alt="auth"
-        src={image || '/assets/illustrations/illustration_dashboard.png'}
-        sx={{ maxWidth: 720 }}
+        src={image || '/assets/images/login/loginImage.jpeg'}
+        sx={{ maxWidth: 1000, maxHeight:'100%' }}
       />
 
-      <Stack direction="row" spacing={2}>
+     <Stack direction="row" spacing={2}>
         {METHODS.map((option) => (
           <Tooltip key={option.label} title={option.label}>
             <Link component={RouterLink} href={option.path}>
@@ -138,9 +146,10 @@ export default function AuthClassicLayout({ children, image, title }) {
     >
       {renderLogo}
 
+      {renderContent}
+
       {upMd && renderSection}
 
-      {renderContent}
     </Stack>
   );
 }

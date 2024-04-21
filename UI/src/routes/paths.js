@@ -1,6 +1,6 @@
 // utils
-import { paramCase } from 'src/utils/change-case';
 import { _id, _postTitles } from 'src/_mock/assets';
+import { paramCase } from 'src/utils/change-case';
 
 // ----------------------------------------------------------------------
 
@@ -62,6 +62,7 @@ export const paths = {
     jwt: {
       login: `${ROOTS.AUTH}/jwt/login`,
       register: `${ROOTS.AUTH}/jwt/register`,
+      otp: `${ROOTS.AUTH}/jwt/otp`,
     },
     firebase: {
       login: `${ROOTS.AUTH}/firebase/login`,
@@ -71,6 +72,9 @@ export const paths = {
     },
     auth0: {
       login: `${ROOTS.AUTH}/auth0/login`,
+    },
+    signIn: {
+      login: `${ROOTS.AUTH}/OTP_login/SignIn`,
     },
   },
   authDemo: {

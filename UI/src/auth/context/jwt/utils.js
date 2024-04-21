@@ -5,7 +5,7 @@ import axios from 'src/utils/axios';
 
 // ----------------------------------------------------------------------
 
-function jwtDecode(token) {
+export const jwtDecode = (token) => {
   const base64Url = token.split('.')[1];
   const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
   const jsonPayload = decodeURIComponent(
@@ -17,7 +17,7 @@ function jwtDecode(token) {
   );
 
   return JSON.parse(jsonPayload);
-}
+};
 
 // ----------------------------------------------------------------------
 
@@ -36,14 +36,15 @@ export const isValidToken = (accessToken) => {
 // ----------------------------------------------------------------------
 
 export const tokenExpired = (exp) => {
+  console.log('🚀 ~ exp:', exp);
   // eslint-disable-next-line prefer-const
   let expiredTimer;
 
   const currentTime = Date.now();
 
   // Test token expires after 10s
-  // const timeLeft = currentTime + 10000 - currentTime; // ~10s
-  const timeLeft = exp * 1000 - currentTime;
+  const timeLeft = currentTime + 86400000 - currentTime; // ~24hrs
+  // const timeLeft = exp * 1000 - currentTime;
 
   clearTimeout(expiredTimer);
 

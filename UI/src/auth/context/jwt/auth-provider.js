@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useEffect, useReducer, useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useReducer } from 'react';
 // utils
 import axios, { endpoints } from 'src/utils/axios';
 //
@@ -94,14 +94,19 @@ export function AuthProvider({ children }) {
     initialize();
   }, [initialize]);
 
-  // LOGIN
-  const login = useCallback(async (email, password) => {
+  // Verify OtP
+  const verifyOtp = useCallback(async (code, id, phoneNumber) => {
     const data = {
-      email,
-      password,
+      code,
+      id,
+      phoneNumber,
     };
 
-    const response = await axios.post(endpoints.auth.login, data);
+    const response = await axios.post(endpoints.auth.verifyOtp, data);
+
+    if (response.data.success === false) {
+      return response;
+    }
 
     const { accessToken, user } = response.data;
 
@@ -113,27 +118,25 @@ export function AuthProvider({ children }) {
         user,
       },
     });
+    return response;
   }, []);
 
-  // REGISTER
-  const register = useCallback(async (email, password, firstName, lastName) => {
+  // Send OtP
+  const sendOtp = useCallback(async (phoneNumber) => {
     const data = {
-      email,
-      password,
-      firstName,
-      lastName,
+      phoneNumber,
     };
 
-    const response = await axios.post(endpoints.auth.register, data);
+    const response = await axios.post(endpoints.auth.sendOtp, data);
 
-    const { accessToken, user } = response.data;
+    const { verificationSid } = response.data;
 
-    sessionStorage.setItem(STORAGE_KEY, accessToken);
+    sessionStorage.setItem('verificationSid', verificationSid);
 
     dispatch({
       type: 'REGISTER',
       payload: {
-        user,
+        verificationSid,
       },
     });
   }, []);
@@ -160,11 +163,11 @@ export function AuthProvider({ children }) {
       authenticated: status === 'authenticated',
       unauthenticated: status === 'unauthenticated',
       //
-      login,
-      register,
+      sendOtp,
+      verifyOtp,
       logout,
     }),
-    [login, logout, register, state.user, status]
+    [logout, sendOtp, state.user, status, verifyOtp]
   );
 
   return <AuthContext.Provider value={memoizedValue}>{children}</AuthContext.Provider>;

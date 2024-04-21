@@ -3,10 +3,11 @@ import { Outlet } from 'react-router-dom';
 // auth
 import { GuestGuard } from 'src/auth/guard';
 // layouts
-import CompactLayout from 'src/layouts/compact';
 import AuthClassicLayout from 'src/layouts/auth/classic';
+import CompactLayout from 'src/layouts/compact';
 // components
 import { SplashScreen } from 'src/components/loading-screen';
+import AuthModernLayout from 'src/layouts/auth/modern';
 
 // ----------------------------------------------------------------------
 
@@ -30,6 +31,10 @@ const FirebaseForgotPasswordPage = lazy(() => import('src/pages/auth/firebase/fo
 // AUTH0
 const Auth0LoginPage = lazy(() => import('src/pages/auth/auth0/login'));
 const Auth0Callback = lazy(() => import('src/pages/auth/auth0/callback'));
+
+// OTP sign in
+const SignInView = lazy(() => import('src/pages/auth/OTP_login/SignIn'));
+const OtpPage = lazy(() => import('src/pages/auth/OTP_login/OtpPage'));
 
 // ----------------------------------------------------------------------
 
@@ -87,9 +92,17 @@ const authJwt = {
     {
       path: 'login',
       element: (
-        <AuthClassicLayout>
-          <JwtLoginPage />
-        </AuthClassicLayout>
+        <AuthModernLayout>
+          <SignInView />
+        </AuthModernLayout>
+      ),
+    },
+    {
+      path: 'otp',
+      element: (
+        <AuthModernLayout title="Manage the job more effectively with Minimal">
+          <OtpPage />
+        </AuthModernLayout>
       ),
     },
     {
@@ -168,9 +181,30 @@ const authAuth0 = {
   ],
 };
 
+const signIn = {
+  path: 'signIn',
+  element: (
+    <GuestGuard>
+      <Suspense fallback={<SplashScreen />}>
+        <Outlet />
+      </Suspense>
+    </GuestGuard>
+  ),
+  children: [
+    {
+      path: 'login',
+      element: (
+        <AuthClassicLayout>
+          <SignInView />
+        </AuthClassicLayout>
+      ),
+    },
+  ],
+};
+
 export const authRoutes = [
   {
     path: 'auth',
-    children: [authAmplify, authJwt, authFirebase, authAuth0],
+    children: [authAmplify, authAuth0, authFirebase, authJwt, signIn],
   },
 ];

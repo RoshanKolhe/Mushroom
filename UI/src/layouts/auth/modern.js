@@ -4,9 +4,9 @@ import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 // hooks
+import Image from 'src/components/image';
 import { useResponsive } from 'src/hooks/use-responsive';
 // components
-import Logo from 'src/components/logo';
 
 // ----------------------------------------------------------------------
 
@@ -22,7 +22,13 @@ export default function AuthModernLayout({ children, image }) {
         px: { xs: 2, md: 8 },
       }}
     >
-      <Logo
+      <Image
+        src="/assets/images/logo/gravityLogo.png"
+        alt="logo"
+        style={{
+          width: '90px',
+          height: '90px',
+        }}
         sx={{
           mt: { xs: 2, md: 8 },
           mb: { xs: 10, md: 8 },
@@ -48,7 +54,7 @@ export default function AuthModernLayout({ children, image }) {
       <Box
         component="img"
         alt="auth"
-        src={image || '/assets/background/overlay_3.jpg'}
+        src={image || '/assets/images/login/login_image.jpeg'}
         sx={{
           top: 16,
           left: 16,

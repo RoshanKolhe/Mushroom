@@ -13,6 +13,7 @@ const loginPaths = {
   auth0: paths.auth.auth0.login,
   amplify: paths.auth.amplify.login,
   firebase: paths.auth.firebase.login,
+  signIn: paths.auth.signIn.login,              
 };
 
 // ----------------------------------------------------------------------
