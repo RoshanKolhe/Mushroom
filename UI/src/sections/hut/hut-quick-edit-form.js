@@ -21,38 +21,43 @@ import { useSnackbar } from 'src/components/snackbar';
 import FormProvider, { RHFSelect, RHFTextField } from 'src/components/hook-form';
 import axiosInstance from 'src/utils/axios';
 import { useGetUsersWithFilter } from 'src/api/user';
+import { useGetClusters } from 'src/api/cluster';
 
 // ----------------------------------------------------------------------
 
-export default function ClusterQuickEditForm({ currentCluster, open, onClose, onRefreshClusters }) {
+export default function HutQuickEditForm({ currentHut, open, onClose, onRefreshHuts }) {
+  console.log(currentHut);
   const { enqueueSnackbar } = useSnackbar();
 
   const { filteredUsers, filteredUsersLoading, filteredUsersEmpty, refreshFilterUsers } =
-    useGetUsersWithFilter('filter={"where":{"permissions":["cluster_admin"]}}');
+    useGetUsersWithFilter('filter={"where":{"permissions":["hut_admin"]}}');
+
+  const { clusters, clustersLoading, clustersEmpty, refreshClusters } = useGetClusters();
 
   const [userOptions, setUserOption] = useState([]);
+  const [clusterOptions, setClusterOption] = useState([]);
 
-  const NewClusterSchema = Yup.object().shape({
+  const NewHutSchema = Yup.object().shape({
     name: Yup.string().required('Name is required'),
     user: Yup.string().required('User is required'),
-    noOfHuts: Yup.string().required('No of huts is required'),
+    cluster: Yup.string().required('Cluster is required'),
     totalCultivation: Yup.string().required('Total Cultivation required'),
     isActive: Yup.boolean(),
   });
 
   const defaultValues = useMemo(
     () => ({
-      name: currentCluster?.name || '',
-      user: currentCluster?.userId || '',
-      noOfHuts: currentCluster?.noOfHuts || '',
-      totalCultivation: currentCluster?.totalCultivation || '',
-      isActive: currentCluster?.isActive ? '1' : '0' || '',
+      name: currentHut?.name || '',
+      user: currentHut?.userId || '',
+      cluster: currentHut?.clusterId || '',
+      totalCultivation: currentHut?.totalCultivation || '',
+      isActive: currentHut?.isActive ? '1' : '0' || '',
     }),
-    [currentCluster]
+    [currentHut]
   );
 
   const methods = useForm({
-    resolver: yupResolver(NewClusterSchema),
+    resolver: yupResolver(NewHutSchema),
     defaultValues,
   });
 
@@ -72,9 +77,9 @@ export default function ClusterQuickEditForm({ currentCluster, open, onClose, on
         isActive: data.isActive,
         userId: Number(data.user),
       };
-      await axiosInstance.patch(`/clusters/${currentCluster.id}`, inputData);
+      await axiosInstance.patch(`/huts/${currentHut.id}`, inputData);
       // reset();
-      onRefreshClusters();
+      onRefreshHuts();
       onClose();
       enqueueSnackbar('Update success!');
     } catch (error) {
@@ -91,6 +96,12 @@ export default function ClusterQuickEditForm({ currentCluster, open, onClose, on
     }
   }, [filteredUsers]);
 
+  useEffect(() => {
+    if (clusters.length) {
+      setClusterOption(clusters);
+    }
+  }, [clusters]);
+
   return (
     <Dialog
       fullWidth
@@ -105,9 +116,9 @@ export default function ClusterQuickEditForm({ currentCluster, open, onClose, on
         <DialogTitle>Quick Update</DialogTitle>
 
         <DialogContent>
-          {!currentCluster.isActive && (
+          {!currentHut.isActive && (
             <Alert variant="outlined" severity="error" sx={{ mb: 3 }}>
-              Cluster is In-Active
+              Hut is In-Active
             </Alert>
           )}
 
@@ -133,15 +144,21 @@ export default function ClusterQuickEditForm({ currentCluster, open, onClose, on
             </RHFSelect>
 
             <Box sx={{ display: { xs: 'none', sm: 'block' } }} />
-            <RHFTextField name="name" label="Cluster Name" />
-            <RHFSelect fullWidth name="user" label="Cluster User">
+            <RHFTextField name="name" label="Hut Name" />
+            <RHFSelect fullWidth name="user" label="Hut User">
               {userOptions.map((option) => (
                 <MenuItem key={option.id} value={option.id}>
                   {option.fullName}
                 </MenuItem>
               ))}
             </RHFSelect>
-            <RHFTextField name="noOfHuts" label="No of huts" />
+            <RHFSelect fullWidth name="cluster" label="Cluster User">
+              {clusterOptions.map((option) => (
+                <MenuItem key={option.id} value={option.id}>
+                  {option.name}
+                </MenuItem>
+              ))}
+            </RHFSelect>
             <RHFTextField name="totalCultivation" label="Total Cultivation" />
           </Box>
         </DialogContent>
@@ -175,9 +192,9 @@ export default function ClusterQuickEditForm({ currentCluster, open, onClose, on
   );
 }
 
-ClusterQuickEditForm.propTypes = {
-  currentCluster: PropTypes.object,
+HutQuickEditForm.propTypes = {
+  currentHut: PropTypes.object,
   onClose: PropTypes.func,
-  onRefreshClusters: PropTypes.func,
+  onRefreshHuts: PropTypes.func,
   open: PropTypes.bool,
 };

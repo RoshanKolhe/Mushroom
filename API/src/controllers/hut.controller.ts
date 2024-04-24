@@ -141,6 +141,16 @@ export class HutController {
     })
     hut: Hut,
   ): Promise<void> {
+    const existingHut = await this.hutRepository.findOne({
+      where: {
+        and: [{id: {neq: id}}, {userId: hut.userId}],
+      },
+    });
+    if (existingHut) {
+      throw new HttpErrors.BadRequest(
+        'This user is already assigned to another hut',
+      );
+    }
     await this.hutRepository.updateById(id, hut);
   }
 

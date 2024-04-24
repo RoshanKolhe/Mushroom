@@ -125,6 +125,12 @@ export const paths = {
       new: `${ROOTS.DASHBOARD}/cluster/new`,
       edit: (id) => `${ROOTS.DASHBOARD}/cluster/${id}/edit`,
     },
+    hut: {
+      root: `${ROOTS.DASHBOARD}/hut`,
+      list: `${ROOTS.DASHBOARD}/hut/list`,
+      new: `${ROOTS.DASHBOARD}/hut/new`,
+      edit: (id) => `${ROOTS.DASHBOARD}/hut/${id}/edit`,
+    },
     product: {
       root: `${ROOTS.DASHBOARD}/product`,
       new: `${ROOTS.DASHBOARD}/product/new`,

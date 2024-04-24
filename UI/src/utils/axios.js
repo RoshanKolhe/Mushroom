@@ -61,4 +61,8 @@ export const endpoints = {
     list: '/clusters',
     details: (id) => `/clusters/${id}`,
   },
+  hut: {
+    list: '/huts',
+    details: (id) => `/huts/${id}`,
+  },
 };

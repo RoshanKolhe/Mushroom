@@ -25,6 +25,10 @@ const ProductEditPage = lazy(() => import('src/pages/dashboard/product/edit'));
 const ClusterListPage = lazy(() => import('src/pages/dashboard/cluster/list'));
 const ClusterCreatePage = lazy(() => import('src/pages/dashboard/cluster/new'));
 const ClusterEditPage = lazy(() => import('src/pages/dashboard/cluster/edit'));
+// HUT
+const HutListPage = lazy(() => import('src/pages/dashboard/hut/list'));
+const HutCreatePage = lazy(() => import('src/pages/dashboard/hut/new'));
+const HutEditPage = lazy(() => import('src/pages/dashboard/hut/edit'));
 // ORDER
 const OrderListPage = lazy(() => import('src/pages/dashboard/order/list'));
 const OrderDetailsPage = lazy(() => import('src/pages/dashboard/order/details'));
@@ -106,6 +110,15 @@ export const dashboardRoutes = [
           { path: 'list', element: <ClusterListPage /> },
           { path: 'new', element: <ClusterCreatePage /> },
           { path: ':id/edit', element: <ClusterEditPage /> },
+        ],
+      },
+      {
+        path: 'hut',
+        children: [
+          { element: <HutListPage />, index: true },
+          { path: 'list', element: <HutListPage /> },
+          { path: 'new', element: <HutCreatePage /> },
+          { path: ':id/edit', element: <HutEditPage /> },
         ],
       },
       {

@@ -18,6 +18,18 @@ export class Hut extends Entity {
   name: string;
 
   @property({
+    type: 'string',
+    required: true,
+  })
+  totalCultivation: string;
+
+  @property({
+    type: 'boolean',
+    required: true,
+  })
+  isActive: boolean;
+
+  @property({
     type: 'date',
   })
   createdAt?: Date;

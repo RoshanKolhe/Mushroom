@@ -25,6 +25,7 @@ const ICONS = {
   mail: icon('ic_mail'),
   user: icon('ic_user'),
   cluster: icon('ic_cluster'),
+  hut: icon('ic_hut'),
   file: icon('ic_file'),
   lock: icon('ic_lock'),
   tour: icon('ic_tour'),
@@ -82,6 +83,16 @@ export function useNavData() {
             children: [
               { title: t('list'), path: paths.dashboard.cluster.list },
               { title: t('create'), path: paths.dashboard.cluster.new },
+            ],
+          },
+          // HUT
+          {
+            title: 'Manage Huts',
+            path: paths.dashboard.hut.root,
+            icon: ICONS.hut,
+            children: [
+              { title: t('list'), path: paths.dashboard.hut.list },
+              { title: t('create'), path: paths.dashboard.hut.new },
             ],
           },
         ],
