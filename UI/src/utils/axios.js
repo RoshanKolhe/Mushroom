@@ -52,8 +52,13 @@ export const endpoints = {
   },
   user: {
     list: '/api/users/list',
+    filterList: (filter) => `/api/users/list?${filter}`,
     details: (id) => `/api/users/${id}`,
     search: '/api/user/search',
     company: '/api/getActiveCompany',
+  },
+  cluster: {
+    list: '/clusters',
+    details: (id) => `/clusters/${id}`,
   },
 };

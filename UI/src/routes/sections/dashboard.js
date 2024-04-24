@@ -21,6 +21,10 @@ const ProductDetailsPage = lazy(() => import('src/pages/dashboard/product/detail
 const ProductListPage = lazy(() => import('src/pages/dashboard/product/list'));
 const ProductCreatePage = lazy(() => import('src/pages/dashboard/product/new'));
 const ProductEditPage = lazy(() => import('src/pages/dashboard/product/edit'));
+// CLUSTER
+const ClusterListPage = lazy(() => import('src/pages/dashboard/cluster/list'));
+const ClusterCreatePage = lazy(() => import('src/pages/dashboard/cluster/new'));
+const ClusterEditPage = lazy(() => import('src/pages/dashboard/cluster/edit'));
 // ORDER
 const OrderListPage = lazy(() => import('src/pages/dashboard/order/list'));
 const OrderDetailsPage = lazy(() => import('src/pages/dashboard/order/details'));
@@ -93,6 +97,15 @@ export const dashboardRoutes = [
           { path: 'new', element: <UserCreatePage /> },
           { path: ':id/edit', element: <UserEditPage /> },
           { path: 'account', element: <UserAccountPage /> },
+        ],
+      },
+      {
+        path: 'cluster',
+        children: [
+          { element: <ClusterListPage />, index: true },
+          { path: 'list', element: <ClusterListPage /> },
+          { path: 'new', element: <ClusterCreatePage /> },
+          { path: ':id/edit', element: <ClusterEditPage /> },
         ],
       },
       {

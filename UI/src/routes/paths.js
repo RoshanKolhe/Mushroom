@@ -72,7 +72,6 @@ export const paths = {
     auth0: {
       login: `${ROOTS.AUTH}/auth0/login`,
     },
-    
   },
   authDemo: {
     classic: {
@@ -119,6 +118,12 @@ export const paths = {
       demo: {
         edit: `${ROOTS.DASHBOARD}/user/${MOCK_ID}/edit`,
       },
+    },
+    cluster: {
+      root: `${ROOTS.DASHBOARD}/cluster`,
+      list: `${ROOTS.DASHBOARD}/cluster/list`,
+      new: `${ROOTS.DASHBOARD}/cluster/new`,
+      edit: (id) => `${ROOTS.DASHBOARD}/cluster/${id}/edit`,
     },
     product: {
       root: `${ROOTS.DASHBOARD}/product`,

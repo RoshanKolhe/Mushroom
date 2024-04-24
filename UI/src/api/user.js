@@ -46,3 +46,24 @@ export function useGetUser(userId) {
   return memoizedValue;
 }
 
+// ----------------------------------------------------------------------
+
+export function useGetUsersWithFilter(filter) {
+  const URL = endpoints.user.filterList(filter);
+
+  const { data, isLoading, error, isValidating, mutate } = useSWR(URL, fetcher);
+
+  const refreshFilterUsers = () => {
+    // Use the `mutate` function to trigger a revalidation
+    mutate();
+  };
+
+  return {
+    filteredUsers: data || [],
+    filteredUsersLoading: isLoading,
+    filteredUsersError: error,
+    filteredUsersValidating: isValidating,
+    filteredUsersEmpty: !isLoading && !data?.length,
+    refreshFilterUsers, // Include the refresh function separately
+  };
+}

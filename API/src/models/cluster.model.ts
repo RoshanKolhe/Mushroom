@@ -23,6 +23,18 @@ export class Cluster extends Entity {
   noOfHuts: string;
 
   @property({
+    type: 'string',
+    required: true,
+  })
+  totalCultivation: string;
+
+  @property({
+    type: 'boolean',
+    required: true,
+  })
+  isActive: boolean;
+
+  @property({
     type: 'date',
   })
   createdAt?: Date;

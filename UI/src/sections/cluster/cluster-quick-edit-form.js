@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import * as Yup from 'yup';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
@@ -20,33 +20,39 @@ import PhoneInput from 'react-phone-input-2';
 import { useSnackbar } from 'src/components/snackbar';
 import FormProvider, { RHFSelect, RHFTextField } from 'src/components/hook-form';
 import axiosInstance from 'src/utils/axios';
+import { useGetUsersWithFilter } from 'src/api/user';
 
 // ----------------------------------------------------------------------
 
-export default function UserQuickEditForm({ currentUser, open, onClose, onRefreshUsers }) {
+export default function ClusterQuickEditForm({ currentCluster, open, onClose, onRefreshClusters }) {
   const { enqueueSnackbar } = useSnackbar();
 
-  const NewUserSchema = Yup.object().shape({
+  const { filteredUsers, filteredUsersLoading, filteredUsersEmpty, refreshFilterUsers } =
+    useGetUsersWithFilter('filter={"where":{"permissions":["cluster_admin"]}}');
+
+  const [userOptions, setUserOption] = useState([]);
+
+  const NewClusterSchema = Yup.object().shape({
     name: Yup.string().required('Name is required'),
-    email: Yup.string().required('Email is required').email('Email must be a valid email address'),
-    phoneNumber: Yup.string().required('Phone number is required'),
-    role: Yup.string().required('Role is required'),
+    user: Yup.string().required('User is required'),
+    noOfHuts: Yup.string().required('No of huts is required'),
+    totalCultivation: Yup.string().required('Total Cultivation required'),
     isActive: Yup.boolean(),
   });
 
   const defaultValues = useMemo(
     () => ({
-      name: currentUser?.fullName || '',
-      email: currentUser?.email || '',
-      phoneNumber: currentUser?.phoneNumber || '',
-      isActive: currentUser?.isActive ? '1' : '0' || '',
-      role: currentUser?.permissions[0] || '',
+      name: currentCluster?.name || '',
+      user: currentCluster?.userId || '',
+      noOfHuts: currentCluster?.noOfHuts || '',
+      totalCultivation: currentCluster?.totalCultivation || '',
+      isActive: currentCluster?.isActive ? '1' : '0' || '',
     }),
-    [currentUser]
+    [currentCluster]
   );
 
   const methods = useForm({
-    resolver: yupResolver(NewUserSchema),
+    resolver: yupResolver(NewClusterSchema),
     defaultValues,
   });
 
@@ -60,20 +66,27 @@ export default function UserQuickEditForm({ currentUser, open, onClose, onRefres
     try {
       console.log(data);
       const inputData = {
-        fullName: data.name,
-        permissions: [data.role],
-        email: data.email,
+        name: data.name,
+        noOfHuts: data.noOfHuts,
+        totalCultivation: data.totalCultivation,
         isActive: data.isActive,
+        userId: Number(data.user),
       };
-      await axiosInstance.patch(`/api/users/${currentUser.id}`, inputData);
+      await axiosInstance.patch(`/clusters/${currentCluster.id}`, inputData);
       // reset();
-      onRefreshUsers();
+      onRefreshClusters();
       onClose();
       enqueueSnackbar('Update success!');
     } catch (error) {
       console.error(error);
     }
   });
+
+  useEffect(() => {
+    if (filteredUsers.length) {
+      setUserOption(filteredUsers);
+    }
+  }, [filteredUsers]);
 
   return (
     <Dialog
@@ -89,9 +102,9 @@ export default function UserQuickEditForm({ currentUser, open, onClose, onRefres
         <DialogTitle>Quick Update</DialogTitle>
 
         <DialogContent>
-          {!currentUser.isActive && (
+          {!currentCluster.isActive && (
             <Alert variant="outlined" severity="error" sx={{ mb: 3 }}>
-              Account is In-Active
+              Cluster is In-Active
             </Alert>
           )}
 
@@ -106,7 +119,10 @@ export default function UserQuickEditForm({ currentUser, open, onClose, onRefres
             }}
           >
             <RHFSelect name="isActive" label="Status">
-              {USER_STATUS_OPTIONS.map((status) => (
+              {[
+                { value: '1', label: 'Active' },
+                { value: '0', label: 'In-Active' },
+              ].map((status) => (
                 <MenuItem key={status.value} value={status.value}>
                   {status.label}
                 </MenuItem>
@@ -114,42 +130,16 @@ export default function UserQuickEditForm({ currentUser, open, onClose, onRefres
             </RHFSelect>
 
             <Box sx={{ display: { xs: 'none', sm: 'block' } }} />
-
-            <RHFTextField name="name" label="Full Name" />
-            <RHFTextField name="email" label="Email Address" />
-            <div>
-              <Controller
-                name="phoneNumber"
-                control={methods.control}
-                render={({ field }) => (
-                  <PhoneInput
-                    country="in"
-                    value={field.value}
-                    onChange={(phoneNumber) => field.onChange(phoneNumber)}
-                    inputProps={{
-                      autoComplete: 'on',
-                    }}
-                    inputStyle={{
-                      width: '100%',
-                      height: '50px',
-                      border: '1px solid #ced4da',
-                    }}
-                    disabled
-                  />
-                )}
-              />
-            </div>
-
-            <RHFSelect fullWidth name="role" label="Role">
-              {[
-                { value: 'hut_admin', name: 'Hut Admin' },
-                { value: 'cluster_admin', name: 'Cluster Admin' },
-              ].map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.name}
+            <RHFTextField name="name" label="Cluster Name" />
+            <RHFSelect fullWidth name="user" label="Cluster User">
+              {userOptions.map((option) => (
+                <MenuItem key={option.id} value={option.id}>
+                  {option.fullName}
                 </MenuItem>
               ))}
             </RHFSelect>
+            <RHFTextField name="noOfHuts" label="No of huts" />
+            <RHFTextField name="totalCultivation" label="Total Cultivation" />
           </Box>
         </DialogContent>
 
@@ -182,9 +172,9 @@ export default function UserQuickEditForm({ currentUser, open, onClose, onRefres
   );
 }
 
-UserQuickEditForm.propTypes = {
-  currentUser: PropTypes.object,
+ClusterQuickEditForm.propTypes = {
+  currentCluster: PropTypes.object,
   onClose: PropTypes.func,
-  onRefreshUsers: PropTypes.func,
+  onRefreshClusters: PropTypes.func,
   open: PropTypes.bool,
 };
