@@ -57,13 +57,12 @@ export function AuthProvider({ children }) {
   const initialize = useCallback(async () => {
     try {
       const accessToken = sessionStorage.getItem(STORAGE_KEY);
-
       if (accessToken && isValidToken(accessToken)) {
         setSession(accessToken);
 
         const response = await axios.get(endpoints.auth.me);
 
-        const { user } = response.data;
+        const  user  = response.data;
 
         dispatch({
           type: 'INITIAL',
@@ -95,16 +94,17 @@ export function AuthProvider({ children }) {
   }, [initialize]);
 
   // LOGIN
-  const login = useCallback(async (email, password) => {
+  const login = useCallback(async (phoneNumber, otp, verificationsid) => {
     const data = {
-      email,
-      password,
+      id: verificationsid,
+      code: otp,
+      phoneNumber,
     };
 
     const response = await axios.post(endpoints.auth.login, data);
 
     const { accessToken, user } = response.data;
-
+    console.log(user);
     setSession(accessToken);
 
     dispatch({

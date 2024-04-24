@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import * as Yup from 'yup';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
@@ -29,11 +29,25 @@ import FormProvider, {
   RHFTextField,
   RHFUploadAvatar,
   RHFAutocomplete,
+  RHFSelect,
 } from 'src/components/hook-form';
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/material.css';
+import { MenuItem } from '@mui/material';
+import { color } from 'framer-motion';
+import axiosInstance from 'src/utils/axios';
 
 // ----------------------------------------------------------------------
 
+const classes = {
+  labelStyle: {
+    '&.react-tel-input .special-label': {
+      color: 'red !important',
+    },
+  },
+};
 export default function UserNewEditForm({ currentUser }) {
+  console.log(currentUser);
   const router = useRouter();
 
   const { enqueueSnackbar } = useSnackbar();
@@ -42,34 +56,18 @@ export default function UserNewEditForm({ currentUser }) {
     name: Yup.string().required('Name is required'),
     email: Yup.string().required('Email is required').email('Email must be a valid email address'),
     phoneNumber: Yup.string().required('Phone number is required'),
-    address: Yup.string().required('Address is required'),
-    country: Yup.string().required('Country is required'),
-    company: Yup.string().required('Company is required'),
-    state: Yup.string().required('State is required'),
-    city: Yup.string().required('City is required'),
     role: Yup.string().required('Role is required'),
-    zipCode: Yup.string().required('Zip code is required'),
-    avatarUrl: Yup.mixed().nullable().required('Avatar is required'),
-    // not required
-    status: Yup.string(),
-    isVerified: Yup.boolean(),
+    isActive: Yup.boolean(),
   });
 
   const defaultValues = useMemo(
     () => ({
-      name: currentUser?.name || '',
-      city: currentUser?.city || '',
-      role: currentUser?.role || '',
+      name: currentUser?.fullName || '',
+      role: currentUser?.permissions[0] || '',
       email: currentUser?.email || '',
-      state: currentUser?.state || '',
-      status: currentUser?.status || '',
-      address: currentUser?.address || '',
-      country: currentUser?.country || '',
-      zipCode: currentUser?.zipCode || '',
-      company: currentUser?.company || '',
-      avatarUrl: currentUser?.avatarUrl || null,
+      isActive: currentUser?.isActive || true,
+      avatarUrl: currentUser?.avatar?.fileUrl || null,
       phoneNumber: currentUser?.phoneNumber || '',
-      isVerified: currentUser?.isVerified || true,
     }),
     [currentUser]
   );
@@ -85,37 +83,71 @@ export default function UserNewEditForm({ currentUser }) {
     control,
     setValue,
     handleSubmit,
-    formState: { isSubmitting },
+    formState: { isSubmitting, errors },
   } = methods;
 
   const values = watch();
-
-  const onSubmit = handleSubmit(async (data) => {
+  const onSubmit = handleSubmit(async (formData) => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      console.log(formData);
+      const inputData = {
+        fullName: formData.name,
+        permissions: [formData.role],
+        email: formData.email,
+        phoneNumber: `+${formData.phoneNumber}`,
+        isActive: formData.isActive,
+      };
+      if (formData.avatarUrl) {
+        inputData.avatar = {
+          fileUrl: formData.avatarUrl,
+        };
+      }
+      if (!currentUser) {
+        await axiosInstance.post('/register', inputData);
+      } else {
+        delete inputData.phoneNumber;
+        await axiosInstance.patch(`/api/users/${currentUser.id}`, inputData);
+      }
       reset();
       enqueueSnackbar(currentUser ? 'Update success!' : 'Create success!');
       router.push(paths.dashboard.user.list);
-      console.info('DATA', data);
     } catch (error) {
       console.error(error);
+      enqueueSnackbar(typeof error === 'string' ? error : error.error.message, {
+        variant: 'error',
+      });
     }
   });
 
   const handleDrop = useCallback(
-    (acceptedFiles) => {
+    async (acceptedFiles) => {
       const file = acceptedFiles[0];
 
-      const newFile = Object.assign(file, {
-        preview: URL.createObjectURL(file),
-      });
+      // const newFile = Object.assign(file, {
+      //   preview: URL.createObjectURL(file),
+      // });
 
       if (file) {
-        setValue('avatarUrl', newFile, { shouldValidate: true });
+        const formData = new FormData();
+        formData.append('file', file);
+        const response = await axiosInstance.post('/files', formData);
+        const { data } = response;
+        console.log(data);
+        setValue('avatarUrl', data?.files[0].fileUrl, {
+          shouldValidate: true,
+        });
       }
     },
     [setValue]
   );
+
+  useEffect(() => {
+    console.log(currentUser);
+    if (currentUser) {
+      console.log(defaultValues);
+      reset(defaultValues);
+    }
+  }, [currentUser, defaultValues, reset]);
 
   return (
     <FormProvider methods={methods} onSubmit={onSubmit}>
@@ -124,14 +156,10 @@ export default function UserNewEditForm({ currentUser }) {
           <Card sx={{ pt: 10, pb: 5, px: 3 }}>
             {currentUser && (
               <Label
-                color={
-                  (values.status === 'active' && 'success') ||
-                  (values.status === 'banned' && 'error') ||
-                  'warning'
-                }
+                color={(values.isActive && 'success') || (!values.isActive && 'error') || 'warning'}
                 sx={{ position: 'absolute', top: 24, right: 24 }}
               >
-                {values.status}
+                {values.isActive ? 'Active' : 'In-Active'}
               </Label>
             )}
 
@@ -157,62 +185,6 @@ export default function UserNewEditForm({ currentUser }) {
                 }
               />
             </Box>
-
-            {currentUser && (
-              <FormControlLabel
-                labelPlacement="start"
-                control={
-                  <Controller
-                    name="status"
-                    control={control}
-                    render={({ field }) => (
-                      <Switch
-                        {...field}
-                        checked={field.value !== 'active'}
-                        onChange={(event) =>
-                          field.onChange(event.target.checked ? 'banned' : 'active')
-                        }
-                      />
-                    )}
-                  />
-                }
-                label={
-                  <>
-                    <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-                      Banned
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                      Apply disable account
-                    </Typography>
-                  </>
-                }
-                sx={{ mx: 0, mb: 3, width: 1, justifyContent: 'space-between' }}
-              />
-            )}
-
-            <RHFSwitch
-              name="isVerified"
-              labelPlacement="start"
-              label={
-                <>
-                  <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-                    Email Verified
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                    Disabling this will automatically send the user a verification email
-                  </Typography>
-                </>
-              }
-              sx={{ mx: 0, width: 1, justifyContent: 'space-between' }}
-            />
-
-            {currentUser && (
-              <Stack justifyContent="center" alignItems="center" sx={{ mt: 3 }}>
-                <Button variant="soft" color="error">
-                  Delete User
-                </Button>
-              </Stack>
-            )}
           </Card>
         </Grid>
 
@@ -229,47 +201,70 @@ export default function UserNewEditForm({ currentUser }) {
             >
               <RHFTextField name="name" label="Full Name" />
               <RHFTextField name="email" label="Email Address" />
-              <RHFTextField name="phoneNumber" label="Phone Number" />
-
-              <RHFAutocomplete
-                name="country"
-                label="Country"
-                options={countries.map((country) => country.label)}
-                getOptionLabel={(option) => option}
-                isOptionEqualToValue={(option, value) => option === value}
-                renderOption={(props, option) => {
-                  const { code, label, phone } = countries.filter(
-                    (country) => country.label === option
-                  )[0];
-
-                  if (!label) {
-                    return null;
-                  }
-
-                  return (
-                    <li {...props} key={label}>
-                      <Iconify
-                        key={label}
-                        icon={`circle-flags:${code.toLowerCase()}`}
-                        width={28}
-                        sx={{ mr: 1 }}
+              <div>
+                <Controller
+                  name="phoneNumber"
+                  control={methods.control}
+                  render={({ field }) => (
+                    <>
+                      <PhoneInput
+                        country="in"
+                        value={field.value}
+                        onChange={(phoneNumber) => field.onChange(phoneNumber)}
+                        inputProps={{
+                          autoComplete: 'on',
+                        }}
+                        inputStyle={{
+                          width: '100%',
+                          height: '50px',
+                          border: errors.phoneNumber ? '1px solid red' : '1px solid #ced4da',
+                        }}
+                        containerStyle={
+                          errors.phoneNumber ? { color: 'red' } : { color: '#637381' }
+                        }
+                        disabled={!!currentUser}
                       />
-                      {label} ({code}) +{phone}
-                    </li>
-                  );
-                }}
-              />
-
-              <RHFTextField name="state" label="State/Region" />
-              <RHFTextField name="city" label="City" />
-              <RHFTextField name="address" label="Address" />
-              <RHFTextField name="zipCode" label="Zip/Code" />
-              <RHFTextField name="company" label="Company" />
-              <RHFTextField name="role" label="Role" />
+                      {errors.phoneNumber && (
+                        <Box
+                          sx={{
+                            color: '#FF5630',
+                            fontSize: '0.75rem',
+                            marginTop: '8px',
+                            marginRight: '14px',
+                            marginLeft: '14px',
+                          }}
+                        >
+                          {errors.phoneNumber.message}
+                        </Box>
+                      )}
+                    </>
+                  )}
+                />
+              </div>
+              <RHFSelect fullWidth name="role" label="Role">
+                {[
+                  { value: 'hut_admin', name: 'Hut Admin' },
+                  { value: 'cluster_admin', name: 'Cluster Admin' },
+                ].map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.name}
+                  </MenuItem>
+                ))}
+              </RHFSelect>
             </Box>
 
-            <Stack alignItems="flex-end" sx={{ mt: 3 }}>
-              <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
+            <Stack alignItems="center" sx={{ mt: 3 }}>
+              <LoadingButton
+                type="submit"
+                variant="contained"
+                loading={isSubmitting}
+                style={{
+                  backgroundColor: '#00554E',
+                  width: '250px',
+                  height: '40px',
+                  marginTop: '20px',
+                }}
+              >
                 {!currentUser ? 'Create User' : 'Save Changes'}
               </LoadingButton>
             </Stack>

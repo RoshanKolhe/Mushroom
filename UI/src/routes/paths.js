@@ -60,8 +60,8 @@ export const paths = {
       forgotPassword: `${ROOTS.AUTH}/amplify/forgot-password`,
     },
     jwt: {
-      login: `${ROOTS.AUTH}/jwt/login`,
-      register: `${ROOTS.AUTH}/jwt/register`,
+      login: `${ROOTS.AUTH}/admin/login`,
+      register: `${ROOTS.AUTH}/admin/register`,
     },
     firebase: {
       login: `${ROOTS.AUTH}/firebase/login`,
@@ -72,6 +72,7 @@ export const paths = {
     auth0: {
       login: `${ROOTS.AUTH}/auth0/login`,
     },
+    
   },
   authDemo: {
     classic: {

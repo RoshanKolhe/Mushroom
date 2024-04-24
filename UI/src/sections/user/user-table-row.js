@@ -21,8 +21,15 @@ import UserQuickEditForm from './user-quick-edit-form';
 
 // ----------------------------------------------------------------------
 
-export default function UserTableRow({ row, selected, onEditRow, onSelectRow, onDeleteRow }) {
-  const { name, avatarUrl, company, role, status, email, phoneNumber } = row;
+export default function UserTableRow({
+  row,
+  selected,
+  onEditRow,
+  onSelectRow,
+  onDeleteRow,
+  onRefreshUsers,
+}) {
+  const { fullName: name, avatar, permissions, isActive, email, phoneNumber } = row;
 
   const confirm = useBoolean();
 
@@ -38,7 +45,7 @@ export default function UserTableRow({ row, selected, onEditRow, onSelectRow, on
         </TableCell>
 
         <TableCell sx={{ display: 'flex', alignItems: 'center' }}>
-          <Avatar alt={name} src={avatarUrl} sx={{ mr: 2 }} />
+          <Avatar alt={name} src={avatar?.fileUrl} sx={{ mr: 2 }} />
 
           <ListItemText
             primary={name}
@@ -50,21 +57,14 @@ export default function UserTableRow({ row, selected, onEditRow, onSelectRow, on
 
         <TableCell sx={{ whiteSpace: 'nowrap' }}>{phoneNumber}</TableCell>
 
-        <TableCell sx={{ whiteSpace: 'nowrap' }}>{company}</TableCell>
-
-        <TableCell sx={{ whiteSpace: 'nowrap' }}>{role}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{permissions.toString()}</TableCell>
 
         <TableCell>
           <Label
             variant="soft"
-            color={
-              (status === 'active' && 'success') ||
-              (status === 'pending' && 'warning') ||
-              (status === 'banned' && 'error') ||
-              'default'
-            }
+            color={(isActive && 'success') || (isActive && 'error') || 'default'}
           >
-            {status}
+            {isActive ? 'Active' : 'In-Active'}
           </Label>
         </TableCell>
 
@@ -81,7 +81,12 @@ export default function UserTableRow({ row, selected, onEditRow, onSelectRow, on
         </TableCell>
       </TableRow>
 
-      <UserQuickEditForm currentUser={row} open={quickEdit.value} onClose={quickEdit.onFalse} />
+      <UserQuickEditForm
+        currentUser={row}
+        open={quickEdit.value}
+        onClose={quickEdit.onFalse}
+        onRefreshUsers={onRefreshUsers}
+      />
 
       <CustomPopover
         open={popover.open}
@@ -89,7 +94,7 @@ export default function UserTableRow({ row, selected, onEditRow, onSelectRow, on
         arrow="right-top"
         sx={{ width: 140 }}
       >
-        <MenuItem
+        {/* <MenuItem
           onClick={() => {
             confirm.onTrue();
             popover.onClose();
@@ -98,7 +103,7 @@ export default function UserTableRow({ row, selected, onEditRow, onSelectRow, on
         >
           <Iconify icon="solar:trash-bin-trash-bold" />
           Delete
-        </MenuItem>
+        </MenuItem> */}
 
         <MenuItem
           onClick={() => {
@@ -128,6 +133,7 @@ export default function UserTableRow({ row, selected, onEditRow, onSelectRow, on
 
 UserTableRow.propTypes = {
   onDeleteRow: PropTypes.func,
+  onRefreshUsers: PropTypes.func,
   onEditRow: PropTypes.func,
   onSelectRow: PropTypes.func,
   row: PropTypes.object,

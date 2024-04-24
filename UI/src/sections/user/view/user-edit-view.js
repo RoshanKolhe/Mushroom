@@ -9,6 +9,7 @@ import { _userList } from 'src/_mock';
 import { useSettingsContext } from 'src/components/settings';
 import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
 //
+import { useGetUser } from 'src/api/user';
 import UserNewEditForm from '../user-new-edit-form';
 
 // ----------------------------------------------------------------------
@@ -20,7 +21,7 @@ export default function UserEditView() {
 
   const { id } = params;
 
-  const currentUser = _userList.find((user) => user.id === id);
+  const { user: currentUser } = useGetUser(id);
 
   return (
     <Container maxWidth={settings.themeStretch ? false : 'lg'}>
@@ -33,9 +34,9 @@ export default function UserEditView() {
           },
           {
             name: 'User',
-            href: paths.dashboard.user.root,
+            href: paths.dashboard.user.list,
           },
-          { name: currentUser?.name },
+          { name: currentUser?.fullName },
         ]}
         sx={{
           mb: { xs: 3, md: 5 },

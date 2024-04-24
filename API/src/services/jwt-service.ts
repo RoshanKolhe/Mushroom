@@ -14,7 +14,7 @@ export class JWTService {
     let token = '';
     try {
       token = await signAsync(userProfile, 'mushroom', {
-        expiresIn: '100y',
+        expiresIn: '7h',
       });
     } catch (err) {
       throw new HttpErrors.Unauthorized(`error generating token${err}`);

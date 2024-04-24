@@ -142,7 +142,7 @@ export class UserController {
     });
   }
 
-  @post('/send-otp-customer-login')
+  @post('/send-otp-login')
   async sendOTPForMoblileUser(
     @requestBody({
       description: 'Request body description',
@@ -198,7 +198,7 @@ export class UserController {
     }
   }
 
-  @post('/verify-otp-customer-login')
+  @post('/verify-otp-login')
   async verifyOTPForMoblileUser(
     @requestBody({
       description: 'Request body description',
@@ -255,7 +255,7 @@ export class UserController {
           return {
             success: true,
             accessToken: token,
-            user: userData,
+            user: allUserData,
             verificationSid: 'testverificationsid',
           };
         }
@@ -281,7 +281,7 @@ export class UserController {
           return {
             success: true,
             accessToken: token,
-            user: userData,
+            user: allUserData,
             verificationSid: result.sid,
           };
         }
@@ -381,20 +381,7 @@ export class UserController {
     @requestBody({
       content: {
         'application/json': {
-          schema: {
-            type: 'object',
-            properties: {
-              // Include properties from the User model
-              user: {
-                type: 'object',
-                properties: {
-                  name: {type: 'string'},
-                  contactNo: {type: 'string'},
-                  isActive: {type: 'boolean'},
-                },
-              },
-            },
-          },
+          schema: getModelSchemaRef(User, {partial: true}),
         },
       },
     })
