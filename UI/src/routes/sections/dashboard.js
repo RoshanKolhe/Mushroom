@@ -29,6 +29,10 @@ const ClusterEditPage = lazy(() => import('src/pages/dashboard/cluster/edit'));
 const HutListPage = lazy(() => import('src/pages/dashboard/hut/list'));
 const HutCreatePage = lazy(() => import('src/pages/dashboard/hut/new'));
 const HutEditPage = lazy(() => import('src/pages/dashboard/hut/edit'));
+// FAQ
+const FaqListPage = lazy(() => import('src/pages/dashboard/faq/list'));
+const FaqCreatePage = lazy(() => import('src/pages/dashboard/faq/new'));
+const FaqEditPage = lazy(() => import('src/pages/dashboard/faq/edit'));
 // ORDER
 const OrderListPage = lazy(() => import('src/pages/dashboard/order/list'));
 const OrderDetailsPage = lazy(() => import('src/pages/dashboard/order/details'));
@@ -119,6 +123,15 @@ export const dashboardRoutes = [
           { path: 'list', element: <HutListPage /> },
           { path: 'new', element: <HutCreatePage /> },
           { path: ':id/edit', element: <HutEditPage /> },
+        ],
+      },
+      {
+        path: 'faq',
+        children: [
+          { element: <FaqListPage />, index: true },
+          { path: 'list', element: <FaqListPage /> },
+          { path: 'new', element: <FaqCreatePage /> },
+          { path: ':id/edit', element: <FaqEditPage /> },
         ],
       },
       {

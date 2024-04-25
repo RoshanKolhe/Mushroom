@@ -26,6 +26,7 @@ const ICONS = {
   user: icon('ic_user'),
   cluster: icon('ic_cluster'),
   hut: icon('ic_hut'),
+  faq: icon('ic_faq'),
   file: icon('ic_file'),
   lock: icon('ic_lock'),
   tour: icon('ic_tour'),
@@ -93,6 +94,16 @@ export function useNavData() {
             children: [
               { title: t('list'), path: paths.dashboard.hut.list },
               { title: t('create'), path: paths.dashboard.hut.new },
+            ],
+          },
+          // FAQ
+          {
+            title: 'Manage FAQ’s',
+            path: paths.dashboard.faq.root,
+            icon: ICONS.faq,
+            children: [
+              { title: t('list'), path: paths.dashboard.faq.list },
+              { title: t('create'), path: paths.dashboard.faq.new },
             ],
           },
         ],

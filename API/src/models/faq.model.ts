@@ -25,7 +25,7 @@ export class Faq extends Entity {
     type: 'boolean',
     default: true,
   })
-  status?: boolean;
+  isActive?: boolean;
 
   @property({
     type: 'date',

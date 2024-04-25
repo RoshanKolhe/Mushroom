@@ -131,6 +131,12 @@ export const paths = {
       new: `${ROOTS.DASHBOARD}/hut/new`,
       edit: (id) => `${ROOTS.DASHBOARD}/hut/${id}/edit`,
     },
+    faq: {
+      root: `${ROOTS.DASHBOARD}/faq`,
+      list: `${ROOTS.DASHBOARD}/faq/list`,
+      new: `${ROOTS.DASHBOARD}/faq/new`,
+      edit: (id) => `${ROOTS.DASHBOARD}/faq/${id}/edit`,
+    },
     product: {
       root: `${ROOTS.DASHBOARD}/product`,
       new: `${ROOTS.DASHBOARD}/product/new`,
