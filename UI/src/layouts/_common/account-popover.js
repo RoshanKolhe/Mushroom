@@ -29,7 +29,7 @@ const OPTIONS = [
   },
   {
     label: 'Profile',
-    linkTo: paths.dashboard.user.profile,
+    linkTo: paths.dashboard.profile,
   },
 ];
 

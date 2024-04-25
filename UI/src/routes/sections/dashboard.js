@@ -33,6 +33,10 @@ const HutEditPage = lazy(() => import('src/pages/dashboard/hut/edit'));
 const FaqListPage = lazy(() => import('src/pages/dashboard/faq/list'));
 const FaqCreatePage = lazy(() => import('src/pages/dashboard/faq/new'));
 const FaqEditPage = lazy(() => import('src/pages/dashboard/faq/edit'));
+// SALES DATA
+const SalesDataListPage = lazy(() => import('src/pages/dashboard/salesData/list'));
+const SalesDataCreatePage = lazy(() => import('src/pages/dashboard/salesData/new'));
+const SalesDataEditPage = lazy(() => import('src/pages/dashboard/salesData/edit'));
 // ORDER
 const OrderListPage = lazy(() => import('src/pages/dashboard/order/list'));
 const OrderDetailsPage = lazy(() => import('src/pages/dashboard/order/details'));
@@ -95,6 +99,7 @@ export const dashboardRoutes = [
       { path: 'banking', element: <OverviewBankingPage /> },
       { path: 'booking', element: <OverviewBookingPage /> },
       { path: 'file', element: <OverviewFilePage /> },
+      { path: 'profile', element: <UserAccountPage /> },
       {
         path: 'user',
         children: [
@@ -132,6 +137,15 @@ export const dashboardRoutes = [
           { path: 'list', element: <FaqListPage /> },
           { path: 'new', element: <FaqCreatePage /> },
           { path: ':id/edit', element: <FaqEditPage /> },
+        ],
+      },
+      {
+        path: 'salesData',
+        children: [
+          { element: <SalesDataListPage />, index: true },
+          { path: 'list', element: <SalesDataListPage /> },
+          { path: 'new', element: <SalesDataCreatePage /> },
+          { path: ':id/edit', element: <SalesDataEditPage /> },
         ],
       },
       {

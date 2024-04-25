@@ -5,3 +5,4 @@ export * from './cluster.controller';
 export * from './hut.controller';
 export * from './faq.controller';
 export * from './environment-data.controller';
+export * from './sales-data.controller';

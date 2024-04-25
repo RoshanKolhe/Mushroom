@@ -26,7 +26,6 @@ import { useGetClusters } from 'src/api/cluster';
 // ----------------------------------------------------------------------
 
 export default function FaqQuickEditForm({ currentFaq, open, onClose, onRefreshFaqs }) {
-  console.log(currentFaq);
   const { enqueueSnackbar } = useSnackbar();
 
   const NewFaqSchema = Yup.object().shape({

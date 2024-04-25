@@ -62,18 +62,18 @@ export default function AccountView() {
   return (
     <Container maxWidth={settings.themeStretch ? false : 'lg'}>
       <CustomBreadcrumbs
-        heading="Account"
+        heading="Profile"
         links={[
           { name: 'Dashboard', href: paths.dashboard.root },
           { name: 'User', href: paths.dashboard.user.root },
-          { name: 'Account' },
+          { name: 'Profile' },
         ]}
         sx={{
           mb: { xs: 3, md: 5 },
         }}
       />
-
-      <Tabs
+      <AccountGeneral />
+      {/* <Tabs
         value={currentTab}
         onChange={handleChangeTab}
         sx={{
@@ -100,7 +100,7 @@ export default function AccountView() {
 
       {currentTab === 'social' && <AccountSocialLinks socialLinks={_userAbout.socialLinks} />}
 
-      {currentTab === 'security' && <AccountChangePassword />}
+      {currentTab === 'security' && <AccountChangePassword />} */}
     </Container>
   );
 }

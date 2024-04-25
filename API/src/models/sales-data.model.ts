@@ -13,6 +13,12 @@ export class SalesData extends Entity {
     type: 'string',
     required: true,
   })
+  orderId: string;
+
+  @property({
+    type: 'string',
+    required: true,
+  })
   user: string;
 
   @property({
@@ -44,6 +50,16 @@ export class SalesData extends Entity {
     default: 'pending',
   })
   status: string;
+
+  @property({
+    type: 'date',
+  })
+  createdAt?: Date;
+
+  @property({
+    type: 'date',
+  })
+  updatedAt?: Date;
 
   constructor(data?: Partial<SalesData>) {
     super(data);

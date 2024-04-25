@@ -27,6 +27,7 @@ const ICONS = {
   cluster: icon('ic_cluster'),
   hut: icon('ic_hut'),
   faq: icon('ic_faq'),
+  salesData: icon('ic_salesData'),
   file: icon('ic_file'),
   lock: icon('ic_lock'),
   tour: icon('ic_tour'),
@@ -104,6 +105,16 @@ export function useNavData() {
             children: [
               { title: t('list'), path: paths.dashboard.faq.list },
               { title: t('create'), path: paths.dashboard.faq.new },
+            ],
+          },
+           // SALES DATA
+           {
+            title: 'Manage Sales Data',
+            path: paths.dashboard.salesData.root,
+            icon: ICONS.salesData,
+            children: [
+              { title: t('list'), path: paths.dashboard.salesData.list },
+              { title: t('create'), path: paths.dashboard.salesData.new },
             ],
           },
         ],

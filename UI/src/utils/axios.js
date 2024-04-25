@@ -69,4 +69,8 @@ export const endpoints = {
     list: '/faqs',
     details: (id) => `/faqs/${id}`,
   },
+  salesData: {
+    list: '/sales-data',
+    details: (id) => `/sales-data/${id}`,
+  },
 };
