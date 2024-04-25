@@ -13,6 +13,7 @@ import {
 import { useSettingsContext } from 'src/components/settings';
 //
 import { TicketListView } from 'src/sections/ticket/view';
+import { HutListView } from 'src/sections/hut/view';
 import AnalyticsNews from '../analytics-news';
 import AnalyticsTasks from '../analytics-tasks';
 import AnalyticsCurrentVisits from '../analytics-current-visits';
@@ -74,6 +75,11 @@ export default function OverviewAnalyticsView() {
             icon={<img alt="icon" src="/assets/icons/glass/ic_glass_message.png" />}
           />
         </Grid>
+
+        <Grid xs={12} sm={12} md={12}>
+          <HutListView isDashboard />
+        </Grid>
+
         <Grid xs={12} sm={12} md={12}>
           <TicketListView isDashboard />
         </Grid>

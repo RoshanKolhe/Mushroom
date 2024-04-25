@@ -1,4 +1,5 @@
 import isEqual from 'lodash/isEqual';
+import PropTypes from 'prop-types';
 import { useState, useCallback, useEffect } from 'react';
 // @mui
 import { alpha } from '@mui/material/styles';
@@ -60,7 +61,7 @@ const defaultFilters = {
 
 // ----------------------------------------------------------------------
 
-export default function HutListView() {
+export default function HutListView({ isDashboard }) {
   const table = useTable();
 
   const settings = useSettingsContext();
@@ -152,49 +153,51 @@ export default function HutListView() {
   return (
     <>
       <Container maxWidth={settings.themeStretch ? false : 'lg'}>
-        <CustomBreadcrumbs
-          heading="Manage Huts"
-          links={[
-            { name: 'Dashboard', href: paths.dashboard.root },
-            { name: 'Manage Huts', href: paths.dashboard.hut.list },
-            { name: 'List' },
-          ]}
-          action={
-            <>
-              <Button
-                component={RouterLink}
-                href={paths.dashboard.hut.new}
-                variant="contained"
-                startIcon={<Iconify icon="carbon:download" />}
-                color="primary"
-                style={{
-                  backgroundColor: 'transparent',
-                  color: '#212B36',
-                  border: 'solid 1px #00554E',
-                  marginRight: '20px',
-                }}
-              >
-                Download report
-              </Button>
-              <Button
-                component={RouterLink}
-                href={paths.dashboard.hut.new}
-                variant="contained"
-                startIcon={<Iconify icon="mingcute:add-line" />}
-                color="primary"
-                style={{ width: '155px', backgroundColor: '#00554E' }}
-              >
-                New Hut
-              </Button>
-            </>
-          }
-          sx={{
-            mb: { xs: 3, md: 5 },
-          }}
-        />
+        {!isDashboard ? (
+          <CustomBreadcrumbs
+            heading="Manage Huts"
+            links={[
+              { name: 'Dashboard', href: paths.dashboard.root },
+              { name: 'Manage Huts', href: paths.dashboard.hut.list },
+              { name: 'List' },
+            ]}
+            action={
+              <>
+                <Button
+                  component={RouterLink}
+                  href={paths.dashboard.hut.new}
+                  variant="contained"
+                  startIcon={<Iconify icon="carbon:download" />}
+                  color="primary"
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: '#212B36',
+                    border: 'solid 1px #00554E',
+                    marginRight: '20px',
+                  }}
+                >
+                  Download report
+                </Button>
+                <Button
+                  component={RouterLink}
+                  href={paths.dashboard.hut.new}
+                  variant="contained"
+                  startIcon={<Iconify icon="mingcute:add-line" />}
+                  color="primary"
+                  style={{ width: '155px', backgroundColor: '#00554E' }}
+                >
+                  New Hut
+                </Button>
+              </>
+            }
+            sx={{
+              mb: { xs: 3, md: 5 },
+            }}
+          />
+        ) : null}
 
         <Card>
-          <HutTableToolbar filters={filters} onFilters={handleFilters} />
+          <HutTableToolbar filters={filters} onFilters={handleFilters} isDashboard={isDashboard} />
 
           {canReset && (
             <HutTableFiltersResult
@@ -313,6 +316,9 @@ export default function HutListView() {
   );
 }
 
+HutListView.propTypes = {
+  isDashboard: PropTypes.any,
+};
 // ----------------------------------------------------------------------
 
 function applyFilter({ inputData, comparator, filters }) {

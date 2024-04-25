@@ -145,7 +145,7 @@ export default function TicketListView({ isDashboard }) {
   const handleResetFilters = useCallback(() => {
     setFilters(defaultFilters);
   }, []);
-  console.log(tickets);
+
   useEffect(() => {
     if (tickets) {
       setTableData(tickets);

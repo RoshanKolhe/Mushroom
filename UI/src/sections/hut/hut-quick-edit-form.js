@@ -26,7 +26,6 @@ import { useGetClusters } from 'src/api/cluster';
 // ----------------------------------------------------------------------
 
 export default function HutQuickEditForm({ currentHut, open, onClose, onRefreshHuts }) {
-  console.log(currentHut);
   const { enqueueSnackbar } = useSnackbar();
 
   const { filteredUsers, filteredUsersLoading, filteredUsersEmpty, refreshFilterUsers } =

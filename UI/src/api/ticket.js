@@ -47,7 +47,6 @@ export function useGetTicket(ticketId) {
 }
 
 export function useGetTicketsWithFilter(filter) {
-  console.log(filter);
   let URL;
   if (filter) {
     URL = endpoints.ticket.filterList(filter);
