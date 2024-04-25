@@ -6,3 +6,6 @@ export * from './hut.controller';
 export * from './faq.controller';
 export * from './environment-data.controller';
 export * from './sales-data.controller';
+export * from './ticket.controller';
+export * from './ticket-hut.controller';
+export * from './ticket-user.controller';

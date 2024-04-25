@@ -1,4 +1,5 @@
 import isEqual from 'lodash/isEqual';
+import PropTypes from 'prop-types';
 import { useState, useCallback, useEffect } from 'react';
 // @mui
 import { alpha } from '@mui/material/styles';
@@ -37,20 +38,19 @@ import {
   TablePaginationCustom,
 } from 'src/components/table';
 //
-import { useGetHuts } from 'src/api/hut';
-import HutTableRow from '../hut-table-row';
-import HutTableToolbar from '../hut-table-toolbar';
-import HutTableFiltersResult from '../hut-table-filters-result';
+import { useGetTickets, useGetTicketsWithFilter } from 'src/api/ticket';
+import TicketTableRow from '../ticket-table-row';
+import TicketTableToolbar from '../ticket-table-toolbar';
+import TicketTableFiltersResult from '../ticket-table-filters-result';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'name', label: 'Hut Name' },
-  { id: 'user', label: 'Hut User', width: 180 },
-  { id: 'cluster', label: 'Cluster Name', width: 180 },
-  { id: 'totalCultivation', label: 'Total Cultivation', width: 100 },
-  { id: 'isActive', label: 'Status', width: 180 },
-
+  { id: 'ticketId', label: 'Ticket ID', width: 180 },
+  { id: 'user', label: 'User', width: 180 },
+  { id: 'query', label: 'Query', width: 180 },
+  { id: 'description', label: 'Ticket description', width: 180 },
+  { id: 'status', label: 'Status', width: 180 },
   { id: '', width: 88 },
 ];
 
@@ -60,7 +60,8 @@ const defaultFilters = {
 
 // ----------------------------------------------------------------------
 
-export default function HutListView() {
+export default function TicketListView({ isDashboard }) {
+  console.log(isDashboard);
   const table = useTable();
 
   const settings = useSettingsContext();
@@ -73,7 +74,9 @@ export default function HutListView() {
 
   const [filters, setFilters] = useState(defaultFilters);
 
-  const { huts, hutsLoading, hutsEmpty, refreshHuts } = useGetHuts();
+  const { tickets, ticketsLoading, ticketsEmpty, refreshTickets } = useGetTicketsWithFilter(
+    isDashboard ? 'filter={"where":{"status":"open"}}' : null
+  );
 
   const dataFiltered = applyFilter({
     inputData: tableData,
@@ -126,7 +129,7 @@ export default function HutListView() {
 
   const handleEditRow = useCallback(
     (id) => {
-      router.push(paths.dashboard.hut.edit(id));
+      router.push(paths.dashboard.ticket.edit(id));
     },
     [router]
   );
@@ -142,62 +145,68 @@ export default function HutListView() {
   const handleResetFilters = useCallback(() => {
     setFilters(defaultFilters);
   }, []);
-
+  console.log(tickets);
   useEffect(() => {
-    if (huts) {
-      setTableData(huts);
+    if (tickets) {
+      setTableData(tickets);
     }
-  }, [huts]);
+  }, [tickets]);
 
   return (
     <>
       <Container maxWidth={settings.themeStretch ? false : 'lg'}>
-        <CustomBreadcrumbs
-          heading="Manage Huts"
-          links={[
-            { name: 'Dashboard', href: paths.dashboard.root },
-            { name: 'Manage Huts', href: paths.dashboard.hut.list },
-            { name: 'List' },
-          ]}
-          action={
-            <>
-              <Button
+        {!isDashboard ? (
+          <CustomBreadcrumbs
+            heading="Manage Tickets"
+            links={[
+              { name: 'Dashboard', href: paths.dashboard.root },
+              { name: 'Manage Tickets', href: paths.dashboard.ticket.list },
+              { name: 'List' },
+            ]}
+            action={
+              <>
+                <Button
+                  component={RouterLink}
+                  href={paths.dashboard.ticket.new}
+                  variant="contained"
+                  startIcon={<Iconify icon="carbon:download" />}
+                  color="primary"
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: '#212B36',
+                    border: 'solid 1px #00554E',
+                    marginRight: '20px',
+                  }}
+                >
+                  Download report
+                </Button>
+                {/* <Button
                 component={RouterLink}
-                href={paths.dashboard.hut.new}
-                variant="contained"
-                startIcon={<Iconify icon="carbon:download" />}
-                color="primary"
-                style={{
-                  backgroundColor: 'transparent',
-                  color: '#212B36',
-                  border: 'solid 1px #00554E',
-                  marginRight: '20px',
-                }}
-              >
-                Download report
-              </Button>
-              <Button
-                component={RouterLink}
-                href={paths.dashboard.hut.new}
+                href={paths.dashboard.ticket.new}
                 variant="contained"
                 startIcon={<Iconify icon="mingcute:add-line" />}
                 color="primary"
                 style={{ width: '155px', backgroundColor: '#00554E' }}
               >
-                New Hut
-              </Button>
-            </>
-          }
-          sx={{
-            mb: { xs: 3, md: 5 },
-          }}
-        />
+                New Ticket
+              </Button> */}
+              </>
+            }
+            sx={{
+              mb: { xs: 3, md: 5 },
+            }}
+          />
+        ) : null}
 
         <Card>
-          <HutTableToolbar filters={filters} onFilters={handleFilters} />
+          <TicketTableToolbar
+            filters={filters}
+            onFilters={handleFilters}
+            isDashboard={isDashboard}
+          />
 
           {canReset && (
-            <HutTableFiltersResult
+            <TicketTableFiltersResult
               filters={filters}
               onFilters={handleFilters}
               //
@@ -252,14 +261,14 @@ export default function HutListView() {
                       table.page * table.rowsPerPage + table.rowsPerPage
                     )
                     .map((row) => (
-                      <HutTableRow
+                      <TicketTableRow
                         key={row.id}
                         row={row}
                         selected={table.selected.includes(row.id)}
                         onSelectRow={() => table.onSelectRow(row.id)}
                         onDeleteRow={() => handleDeleteRow(row.id)}
                         onEditRow={() => handleEditRow(row.id)}
-                        onRefreshHuts={() => refreshHuts()}
+                        onRefreshTickets={() => refreshTickets()}
                       />
                     ))}
 
@@ -313,6 +322,10 @@ export default function HutListView() {
   );
 }
 
+TicketListView.propTypes = {
+  isDashboard: PropTypes.any,
+};
+
 // ----------------------------------------------------------------------
 
 function applyFilter({ inputData, comparator, filters }) {
@@ -328,7 +341,7 @@ function applyFilter({ inputData, comparator, filters }) {
 
   if (name) {
     inputData = inputData.filter(
-      (hut) => hut.name.toLowerCase().indexOf(name.toLowerCase()) !== -1
+      (ticket) => ticket.ticketId.toLowerCase().indexOf(name.toLowerCase()) !== -1
     );
   }
 

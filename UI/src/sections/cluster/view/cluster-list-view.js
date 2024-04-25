@@ -144,7 +144,7 @@ export default function ClusterListView() {
   }, []);
 
   useEffect(() => {
-    if (clusters.length) {
+    if (clusters) {
       setTableData(clusters);
     }
   }, [clusters]);

@@ -147,7 +147,7 @@ export default function UserListView() {
   }, []);
 
   useEffect(() => {
-    if (users.length) {
+    if (users) {
       const updatedUsers = users.filter((obj) => !obj.permissions.includes('super_admin'));
       setTableData(updatedUsers);
     }

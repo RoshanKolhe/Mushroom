@@ -33,6 +33,10 @@ const HutEditPage = lazy(() => import('src/pages/dashboard/hut/edit'));
 const FaqListPage = lazy(() => import('src/pages/dashboard/faq/list'));
 const FaqCreatePage = lazy(() => import('src/pages/dashboard/faq/new'));
 const FaqEditPage = lazy(() => import('src/pages/dashboard/faq/edit'));
+// TICKET
+const TicketListPage = lazy(() => import('src/pages/dashboard/ticket/list'));
+const TicketCreatePage = lazy(() => import('src/pages/dashboard/ticket/new'));
+const TicketEditPage = lazy(() => import('src/pages/dashboard/ticket/edit'));
 // SALES DATA
 const SalesDataListPage = lazy(() => import('src/pages/dashboard/salesData/list'));
 const SalesDataCreatePage = lazy(() => import('src/pages/dashboard/salesData/new'));
@@ -137,6 +141,15 @@ export const dashboardRoutes = [
           { path: 'list', element: <FaqListPage /> },
           { path: 'new', element: <FaqCreatePage /> },
           { path: ':id/edit', element: <FaqEditPage /> },
+        ],
+      },
+      {
+        path: 'ticket',
+        children: [
+          { element: <TicketListPage />, index: true },
+          { path: 'list', element: <TicketListPage /> },
+          { path: 'new', element: <TicketCreatePage /> },
+          { path: ':id/edit', element: <TicketEditPage /> },
         ],
       },
       {

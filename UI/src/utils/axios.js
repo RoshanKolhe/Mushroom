@@ -73,4 +73,9 @@ export const endpoints = {
     list: '/sales-data',
     details: (id) => `/sales-data/${id}`,
   },
+  ticket: {
+    list: '/tickets',
+    details: (id) => `/tickets/${id}`,
+    filterList: (filter) => `/tickets?${filter}`,
+  },
 };

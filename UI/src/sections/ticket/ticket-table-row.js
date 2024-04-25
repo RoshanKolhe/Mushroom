@@ -18,19 +18,19 @@ import CustomPopover, { usePopover } from 'src/components/custom-popover';
 import { ConfirmDialog } from 'src/components/custom-dialog';
 //
 import { Typography } from '@mui/material';
-import FaqQuickEditForm from './faq-quick-edit-form';
+import TicketQuickEditForm from './ticket-quick-edit-form';
 
 // ----------------------------------------------------------------------
 
-export default function FaqTableRow({
+export default function TicketTableRow({
   row,
   selected,
   onEditRow,
   onSelectRow,
   onDeleteRow,
-  onRefreshFaqs,
+  onRefreshTickets,
 }) {
-  const { question, answer, isActive } = row;
+  const { ticketId, query, description, status, user } = row;
 
   const confirm = useBoolean();
 
@@ -46,26 +46,15 @@ export default function FaqTableRow({
         </TableCell>
 
         <TableCell sx={{ display: 'flex', alignItems: 'center' }}>
-          <Tooltip title={question} placement="top" arrow>
-            <Typography
-              variant="subtitle2"
-              component="span"
-              sx={{
-                display: 'block',
-                alignItems: 'center',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                width: 200,
-              }}
-            >
-              {question}
-            </Typography>
-          </Tooltip>
+          <ListItemText
+            primary={`#${ticketId}`}
+            primaryTypographyProps={{ typography: 'body2' }}
+            secondaryTypographyProps={{ component: 'span', color: 'text.disabled' }}
+          />
         </TableCell>
-
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{user?.fullName}</TableCell>
         <TableCell sx={{ whiteSpace: 'nowrap' }}>
-          <Tooltip title={answer} placement="top" arrow>
+          <Tooltip title={query} placement="top" arrow>
             <Typography
               variant="subtitle2"
               component="span"
@@ -78,17 +67,42 @@ export default function FaqTableRow({
                 width: 200,
               }}
             >
-              {answer}
+              {query}
             </Typography>
           </Tooltip>
         </TableCell>
+        <Tooltip title={description} placement="top" arrow>
+          <TableCell>
+            <Tooltip title={description} placement="top" arrow>
+              <Typography
+                variant="subtitle2"
+                component="span"
+                sx={{
+                  display: 'block',
+                  alignItems: 'center',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  width: 200,
+                }}
+              >
+                {description}
+              </Typography>
+            </Tooltip>
+          </TableCell>
+        </Tooltip>
 
         <TableCell>
           <Label
             variant="soft"
-            color={(isActive && 'success') || (isActive && 'error') || 'default'}
+            color={
+              (status === 'open' && 'warning') ||
+              (status === 'closed' && 'success') ||
+              (status === 'rejected' && 'error') ||
+              'default'
+            }
           >
-            {isActive ? 'Active' : 'In-Active'}
+            {status}
           </Label>
         </TableCell>
 
@@ -99,17 +113,17 @@ export default function FaqTableRow({
             </IconButton>
           </Tooltip>
 
-          <IconButton color={popover.open ? 'inherit' : 'default'} onClick={popover.onOpen}>
+          {/* <IconButton color={popover.open ? 'inherit' : 'default'} onClick={popover.onOpen}>
             <Iconify icon="eva:more-vertical-fill" />
-          </IconButton>
+          </IconButton> */}
         </TableCell>
       </TableRow>
 
-      <FaqQuickEditForm
-        currentFaq={row}
+      <TicketQuickEditForm
+        currentTicket={row}
         open={quickEdit.value}
         onClose={quickEdit.onFalse}
-        onRefreshFaqs={onRefreshFaqs}
+        onRefreshTickets={onRefreshTickets}
       />
 
       <CustomPopover
@@ -155,9 +169,9 @@ export default function FaqTableRow({
   );
 }
 
-FaqTableRow.propTypes = {
+TicketTableRow.propTypes = {
   onDeleteRow: PropTypes.func,
-  onRefreshFaqs: PropTypes.func,
+  onRefreshTickets: PropTypes.func,
   onEditRow: PropTypes.func,
   onSelectRow: PropTypes.func,
   row: PropTypes.object,

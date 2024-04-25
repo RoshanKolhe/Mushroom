@@ -45,7 +45,7 @@ import FaqTableFiltersResult from '../faq-table-filters-result';
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'question', label: 'Faq Question' },
+  { id: 'question', label: 'Faq Question', width: 180 },
   { id: 'answer', label: 'Faq Answer', width: 180 },
   { id: 'isActive', label: 'Status', width: 180 },
   { id: '', width: 88 },
@@ -141,7 +141,7 @@ export default function FaqListView() {
   }, []);
 
   useEffect(() => {
-    if (faqs.length) {
+    if (faqs) {
       setTableData(faqs);
     }
   }, [faqs]);

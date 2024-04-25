@@ -151,7 +151,7 @@ export default function SalesDataListView() {
   }, []);
 
   useEffect(() => {
-    if (salesDatas.length) {
+    if (salesDatas) {
       setTableData(salesDatas);
     }
   }, [salesDatas]);
