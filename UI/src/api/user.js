@@ -49,7 +49,12 @@ export function useGetUser(userId) {
 // ----------------------------------------------------------------------
 
 export function useGetUsersWithFilter(filter) {
-  const URL = endpoints.user.filterList(filter);
+  let URL;
+  if (filter) {
+    URL = endpoints.user.filterList(filter);
+  } else {
+    URL = endpoints.user.list;
+  }
 
   const { data, isLoading, error, isValidating, mutate } = useSWR(URL, fetcher);
 

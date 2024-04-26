@@ -18,10 +18,16 @@ import {
   response,
   HttpErrors,
 } from '@loopback/rest';
+import {UserProfile} from '@loopback/security';
 import {Hut} from '../models';
-import {HutRepository, UserRepository} from '../repositories';
-import {authenticate} from '@loopback/authentication';
+import {
+  ClusterRepository,
+  HutRepository,
+  UserRepository,
+} from '../repositories';
+import {authenticate, AuthenticationBindings} from '@loopback/authentication';
 import {PermissionKeys} from '../authorization/permission-keys';
+import {inject} from '@loopback/core';
 
 export class HutController {
   constructor(
@@ -29,6 +35,8 @@ export class HutController {
     public hutRepository: HutRepository,
     @repository(UserRepository)
     public userRepository: UserRepository,
+    @repository(ClusterRepository)
+    public clusterRepository: ClusterRepository,
   ) {}
 
   @authenticate({
@@ -91,8 +99,32 @@ export class HutController {
       },
     },
   })
-  async find(@param.filter(Hut) filter?: Filter<Hut>): Promise<Hut[]> {
-    return this.hutRepository.find({...filter, include: ['user', 'cluster']});
+  async find(
+    @inject(AuthenticationBindings.CURRENT_USER) currnetUser: UserProfile,
+    @param.filter(Hut) filter?: Filter<Hut>,
+  ): Promise<Hut[]> {
+    const currentUserPermission = currnetUser.permissions;
+    if (currentUserPermission.includes('super_admin')) {
+      return this.hutRepository.find({...filter, include: ['user', 'cluster']});
+    } else {
+      const userAssignedClusters = await this.clusterRepository.find({
+        where: {
+          userId: currnetUser.id,
+        },
+      });
+      const userClusterIds: any = userAssignedClusters.map(
+        cluster => cluster.id,
+      );
+      const userAssignedHuts = await this.hutRepository.find({
+        where: {
+          clusterId: {
+            inq: userClusterIds,
+          },
+        },
+        include: ['user', 'cluster'],
+      });
+      return userAssignedHuts;
+    }
   }
 
   @authenticate({

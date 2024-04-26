@@ -38,7 +38,8 @@ import {
   TablePaginationCustom,
 } from 'src/components/table';
 //
-import { useGetUsers } from 'src/api/user';
+import { useGetUsers, useGetUsersWithFilter } from 'src/api/user';
+import { useAuthContext } from 'src/auth/hooks';
 import UserTableRow from '../user-table-row';
 import UserTableToolbar from '../user-table-toolbar';
 import UserTableFiltersResult from '../user-table-filters-result';
@@ -72,11 +73,24 @@ export default function UserListView() {
 
   const confirm = useBoolean();
 
+  const { user: userData } = useAuthContext();
+
+  console.log(userData);
+
   const [tableData, setTableData] = useState([]);
 
   const [filters, setFilters] = useState(defaultFilters);
 
-  const { users, usersLoading, usersEmpty, refreshUsers } = useGetUsers();
+  const {
+    filteredUsers: users,
+    filteredUsersLoadingusersLoading,
+    filteredUsersEmpty: usersEmpty,
+    refreshFilterUsers: refreshUsers,
+  } = useGetUsersWithFilter(
+    userData && userData.permissions.includes('cluster_admin')
+      ? 'filter={"where":{"permissions":["hut_admin"]}}'
+      : null
+  );
 
   const dataFiltered = applyFilter({
     inputData: tableData,
