@@ -50,13 +50,7 @@ export default function SalesDataTableRow({
           <Checkbox checked={selected} onClick={onSelectRow} />
         </TableCell>
 
-        <TableCell sx={{ display: 'flex', alignItems: 'center' }}>
-          <ListItemText
-            primary={orderId}
-            primaryTypographyProps={{ typography: 'body2' }}
-            secondaryTypographyProps={{ component: 'span', color: 'text.disabled' }}
-          />
-        </TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{orderId}</TableCell>
 
         <TableCell sx={{ whiteSpace: 'nowrap' }}>{user}</TableCell>
         <TableCell sx={{ whiteSpace: 'nowrap' }}>

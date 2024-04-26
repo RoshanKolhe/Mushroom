@@ -45,7 +45,7 @@ export default function FaqTableRow({
           <Checkbox checked={selected} onClick={onSelectRow} />
         </TableCell>
 
-        <TableCell sx={{ display: 'flex', alignItems: 'center' }}>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>
           <Tooltip title={question} placement="top" arrow>
             <Typography
               variant="subtitle2"

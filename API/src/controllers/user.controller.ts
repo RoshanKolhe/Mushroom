@@ -5,6 +5,7 @@ import {
   DefaultTransactionalRepository,
   Filter,
   IsolationLevel,
+  WhereBuilder,
   repository,
 } from '@loopback/repository';
 import {
@@ -22,8 +23,14 @@ import {UserProfile} from '@loopback/security';
 import * as _ from 'lodash';
 import {PermissionKeys} from '../authorization/permission-keys';
 import {EmailManagerBindings} from '../keys';
-import {User} from '../models';
-import {Credentials, UserRepository} from '../repositories';
+import {EnvironmentData, User} from '../models';
+import {
+  ClusterRepository,
+  Credentials,
+  EnvironmentDataRepository,
+  HutRepository,
+  UserRepository,
+} from '../repositories';
 import {EmailManager} from '../services/email.service';
 import {BcryptHasher} from '../services/hash.password.bcrypt';
 import {JWTService} from '../services/jwt-service';
@@ -47,6 +54,12 @@ export class UserController {
     public emailManager: EmailManager,
     @repository(UserRepository)
     public userRepository: UserRepository,
+    @repository(ClusterRepository)
+    public clusterRepository: ClusterRepository,
+    @repository(HutRepository)
+    public hutRepository: HutRepository,
+    @repository(EnvironmentDataRepository)
+    public environmentDataRepository: EnvironmentDataRepository,
 
     @inject('service.hasher')
     public hasher: BcryptHasher,
@@ -194,7 +207,7 @@ export class UserController {
         };
       }
     } catch (error) {
-      return {success: false, message: error.message};
+      throw error;
     }
   }
 
@@ -290,7 +303,7 @@ export class UserController {
         );
       }
     } catch (error) {
-      return {success: false, message: error.message};
+      throw error;
     }
   }
 
@@ -482,6 +495,7 @@ export class UserController {
       throw new HttpErrors.BadRequest("Email Doesn't Exists");
     }
   }
+
   @post('/setPassword')
   async setPassword(
     @requestBody({})
@@ -518,5 +532,113 @@ export class UserController {
 
   addMinutesToDate(date: any, minutes: any) {
     return new Date(date.getTime() + minutes * 60000);
+  }
+
+  @authenticate({
+    strategy: 'jwt',
+    options: {required: [PermissionKeys.SUPER_ADMIN]},
+  })
+  @get('/getDashboardCounts')
+  async getDashboardCounts(
+    @inject(AuthenticationBindings.CURRENT_USER) currnetUser: UserProfile,
+  ): Promise<any> {
+    let totalClusters = 0;
+    let totalHuts = 0;
+    let totalCultivation = 0;
+    let todaysCultivation = 0;
+    // Construct a filter to select today's records
+    const now = new Date();
+    const startOfDay = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+    );
+    const endOfDay = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000); // Next day
+    const todayFilter = {
+      where: {
+        date: {
+          between: [startOfDay.toISOString(), endOfDay.toISOString()] as [
+            string,
+            string,
+          ],
+        },
+      },
+    };
+    const user = await this.userRepository.findById(currnetUser.id);
+    if (user.permissions.includes('super_admin')) {
+      totalClusters = (await this.clusterRepository.count()).count;
+      totalHuts = (await this.hutRepository.count()).count;
+
+      // Retrieve today's cultivation records
+      const todaysCultivationRecords =
+        await this.environmentDataRepository.find(todayFilter);
+
+      // Calculate the total quantity from today's records
+      todaysCultivation = todaysCultivationRecords.reduce(
+        (total, record) => total + parseFloat(record.quantity),
+        0,
+      );
+      console.log(todaysCultivation);
+
+      const allCultivationRecords = await this.environmentDataRepository.find();
+
+      totalCultivation = allCultivationRecords.reduce(
+        (total, record) => total + parseFloat(record.quantity),
+        0,
+      );
+    } else if (user.permissions.includes('cluster_admin')) {
+      const userAssignedClusters = await this.clusterRepository.find({
+        where: {
+          userId: currnetUser.id,
+        },
+      });
+      totalClusters = userAssignedClusters.length;
+      const userClusterIds: any = userAssignedClusters.map(
+        cluster => cluster.id,
+      );
+      const userAssignedHuts = await this.hutRepository.find({
+        where: {
+          clusterId: {
+            inq: userClusterIds,
+          },
+        },
+      });
+      const hutIds: any = userAssignedHuts.map(hut => hut.id);
+      totalHuts = userAssignedHuts.length;
+
+      // Retrieve today's cultivation records
+      const todaysCultivationRecords =
+        await this.environmentDataRepository.find({
+          where: {
+            ...todayFilter.where,
+            hutId: {
+              inq: hutIds,
+            },
+          },
+        });
+      todaysCultivation = todaysCultivationRecords.reduce(
+        (total, record) => total + parseFloat(record.quantity),
+        0,
+      );
+      const allCultivationRecords = await this.environmentDataRepository.find({
+        where: {
+          hutId: {
+            inq: hutIds,
+          },
+        },
+      });
+
+      totalCultivation = allCultivationRecords.reduce(
+        (total, record) => total + parseFloat(record.quantity),
+        0,
+      );
+    }
+    return Promise.resolve({
+      success: true,
+      totalClusters,
+      totalHuts,
+      todaysCultivation,
+      totalCultivation,
+    });
   }
 }

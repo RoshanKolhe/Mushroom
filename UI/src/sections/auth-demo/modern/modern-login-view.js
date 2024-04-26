@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-useless-escape */
 /* eslint-disable import/no-extraneous-dependencies */
 import * as Yup from 'yup';
@@ -57,6 +58,7 @@ export default function ModernLoginView() {
   const {
     handleSubmit,
     formState: { isSubmitting, errors },
+    setValue,
     reset,
   } = methods;
 
@@ -64,7 +66,7 @@ export default function ModernLoginView() {
     try {
       if (!isOtpSend) {
         const inputData = {
-          phoneNumber: '+918928470503',
+          phoneNumber: `+${data.phoneNumber}`,
         };
         const res = await axiosInstance.post(`/send-otp-login`, inputData);
         console.log(res);
@@ -72,15 +74,32 @@ export default function ModernLoginView() {
         enqueueSnackbar(res?.data?.message, { variant: 'success' });
         setIsOtpSend(true);
       } else {
-        await login?.('+918928470503', data.otp, verificationSid);
+        await login?.(`+${data.phoneNumber}`, data.otp, verificationSid);
         router.push(returnTo || PATH_AFTER_LOGIN);
         setIsOtpSend(false);
       }
     } catch (error) {
-      console.error(error);
-      reset();
-      enqueueSnackbar(typeof error === 'string' ? error : error.message, { variant: 'error' });
-      setErrorMsg(typeof error === 'string' ? error : error.message);
+      console.log(typeof error);
+      console.log(error);
+      console.log(error.message);
+      if (typeof error !== 'string' && error?.error?.statusCode === 500) {
+        enqueueSnackbar('Invalid Credentials', {
+          variant: 'error',
+        });
+      } else {
+        enqueueSnackbar(
+          typeof error === 'string'
+            ? error
+            : error?.error?.message
+            ? error?.error?.message
+            : error?.message,
+          {
+            variant: 'error',
+          }
+        );
+        setValue('otp', '');
+        setIsOtpSend(false);
+      }
     }
   });
 

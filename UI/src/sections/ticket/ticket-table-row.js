@@ -45,13 +45,7 @@ export default function TicketTableRow({
           <Checkbox checked={selected} onClick={onSelectRow} />
         </TableCell>
 
-        <TableCell sx={{ display: 'flex', alignItems: 'center' }}>
-          <ListItemText
-            primary={`#${ticketId}`}
-            primaryTypographyProps={{ typography: 'body2' }}
-            secondaryTypographyProps={{ component: 'span', color: 'text.disabled' }}
-          />
-        </TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{`#${ticketId}`}</TableCell>
         <TableCell sx={{ whiteSpace: 'nowrap' }}>{user?.fullName}</TableCell>
         <TableCell sx={{ whiteSpace: 'nowrap' }}>
           <Tooltip title={query} placement="top" arrow>
@@ -71,26 +65,24 @@ export default function TicketTableRow({
             </Typography>
           </Tooltip>
         </TableCell>
-        <Tooltip title={description} placement="top" arrow>
-          <TableCell>
-            <Tooltip title={description} placement="top" arrow>
-              <Typography
-                variant="subtitle2"
-                component="span"
-                sx={{
-                  display: 'block',
-                  alignItems: 'center',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  width: 200,
-                }}
-              >
-                {description}
-              </Typography>
-            </Tooltip>
-          </TableCell>
-        </Tooltip>
+        <TableCell>
+          <Tooltip title={description} placement="top" arrow>
+            <Typography
+              variant="subtitle2"
+              component="span"
+              sx={{
+                display: 'block',
+                alignItems: 'center',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                width: 200,
+              }}
+            >
+              {description}
+            </Typography>
+          </Tooltip>
+        </TableCell>
 
         <TableCell>
           <Label

@@ -55,7 +55,7 @@ export const endpoints = {
     filterList: (filter) => `/api/users/list?${filter}`,
     details: (id) => `/api/users/${id}`,
     search: '/api/user/search',
-    company: '/api/getActiveCompany',
+    getDashboradCounts: '/getDashboardCounts',
   },
   cluster: {
     list: '/clusters',

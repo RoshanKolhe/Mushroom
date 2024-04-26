@@ -67,3 +67,22 @@ export function useGetUsersWithFilter(filter) {
     refreshFilterUsers, // Include the refresh function separately
   };
 }
+
+export function useGetDashboardCounts() {
+  const URL = endpoints.user.getDashboradCounts;
+
+  const { data, isLoading, error, isValidating, mutate } = useSWR(URL, fetcher);
+
+  const refreshDashboardCounts = () => {
+    // Use the `mutate` function to trigger a revalidation
+    mutate();
+  };
+
+  return {
+    dashboardCounts: data || [],
+    isLoading,
+    error,
+    isValidating,
+    refreshDashboardCounts,
+  };
+}

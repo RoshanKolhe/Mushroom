@@ -44,13 +44,7 @@ export default function ClusterTableRow({
           <Checkbox checked={selected} onClick={onSelectRow} />
         </TableCell>
 
-        <TableCell sx={{ display: 'flex', alignItems: 'center' }}>
-          <ListItemText
-            primary={name}
-            primaryTypographyProps={{ typography: 'body2' }}
-            secondaryTypographyProps={{ component: 'span', color: 'text.disabled' }}
-          />
-        </TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{name}</TableCell>
 
         <TableCell sx={{ whiteSpace: 'nowrap' }}>{user?.fullName}</TableCell>
 
