@@ -30,10 +30,11 @@ export class Ticket extends Entity {
   description: string;
 
   @property({
-    type: 'object',
+    type: 'array',
+    itemType: 'object',
     required: true,
   })
-  media: object;
+  media: object[];
 
   @property({
     type: 'string',

@@ -60,9 +60,9 @@ export class EnvironmentData extends Entity {
 
   @property({
     type: 'array',
-    itemType: 'string',
+    itemType: 'object',
   })
-  files?: string[];
+  files?: object[];
 
   @property({
     type: 'date',
