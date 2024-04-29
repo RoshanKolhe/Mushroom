@@ -39,6 +39,7 @@ import {
 } from 'src/components/table';
 //
 import { useGetHuts } from 'src/api/hut';
+import { useAuthContext } from 'src/auth/hooks';
 import HutTableRow from '../hut-table-row';
 import HutTableToolbar from '../hut-table-toolbar';
 import HutTableFiltersResult from '../hut-table-filters-result';
@@ -65,6 +66,10 @@ export default function HutListView({ isDashboard }) {
   const table = useTable();
 
   const settings = useSettingsContext();
+
+  const { user: userData } = useAuthContext();
+
+  const isAdmin = userData ? userData.permissions.includes('super_admin') : false;
 
   const router = useRouter();
 
@@ -152,7 +157,10 @@ export default function HutListView({ isDashboard }) {
 
   return (
     <>
-      <Container maxWidth={settings.themeStretch ? false : 'lg'}>
+      <Container
+        maxWidth={settings.themeStretch ? false : 'lg'}
+        style={isDashboard ? { padding: 0, maxWidth: 'initial' } : {}}
+      >
         {!isDashboard ? (
           <CustomBreadcrumbs
             heading="Manage Huts"
@@ -178,16 +186,18 @@ export default function HutListView({ isDashboard }) {
                 >
                   Download report
                 </Button>
-                <Button
-                  component={RouterLink}
-                  href={paths.dashboard.hut.new}
-                  variant="contained"
-                  startIcon={<Iconify icon="mingcute:add-line" />}
-                  color="primary"
-                  style={{ width: '155px', backgroundColor: '#00554E' }}
-                >
-                  New Hut
-                </Button>
+                {isAdmin ? (
+                  <Button
+                    component={RouterLink}
+                    href={paths.dashboard.hut.new}
+                    variant="contained"
+                    startIcon={<Iconify icon="mingcute:add-line" />}
+                    color="primary"
+                    style={{ width: '155px', backgroundColor: '#00554E' }}
+                  >
+                    New Hut
+                  </Button>
+                ) : null}
               </>
             }
             sx={{
@@ -263,6 +273,7 @@ export default function HutListView({ isDashboard }) {
                         onDeleteRow={() => handleDeleteRow(row.id)}
                         onEditRow={() => handleEditRow(row.id)}
                         onRefreshHuts={() => refreshHuts()}
+                        isAdmin={isAdmin}
                       />
                     ))}
 

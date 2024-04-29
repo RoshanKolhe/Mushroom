@@ -45,6 +45,7 @@ import SITE_SETTINGS from '../utils/config';
 import {CredentialsRequestBody} from './specs/user-controller-spec';
 import {MushroomDataSource} from '../datasources';
 import {all} from 'axios';
+import {getStartAndEndDateOfWeek} from '../utils/constants';
 
 export class UserController {
   constructor(
@@ -640,5 +641,139 @@ export class UserController {
       todaysCultivation,
       totalCultivation,
     });
+  }
+
+  @authenticate({
+    strategy: 'jwt',
+    options: {
+      required: [PermissionKeys.SUPER_ADMIN, PermissionKeys.CLUSTER_ADMIN],
+    },
+  })
+  @post('/getDayWiseCultivationData')
+  async getDayWiseCultivationData(
+    @inject(AuthenticationBindings.CURRENT_USER) currnetUser: UserProfile,
+    @requestBody({})
+    clusterData: any,
+  ): Promise<any> {
+    const cluster = await this.clusterRepository.findById(clusterData.cluster);
+    const hut = await this.hutRepository.findById(clusterData.hut);
+    const dates = getStartAndEndDateOfWeek(clusterData.date);
+    const selectedDate = new Date(clusterData.date);
+    console.log(dates);
+    let avgMoisture = 0;
+    let avgHumidity = 0;
+    let totalCultivation = 0;
+    const startOfDay = new Date(
+      selectedDate.getFullYear(),
+      selectedDate.getMonth(),
+      selectedDate.getDate(),
+    );
+    const endOfDay = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000); // Next day
+    const hutEnvironmentData = await this.environmentDataRepository.find({
+      where: {
+        hutId: clusterData.hut,
+        date: {
+          between: [startOfDay.toISOString(), endOfDay.toISOString()] as [
+            string,
+            string,
+          ],
+        },
+      },
+    });
+    hutEnvironmentData.forEach(res => {
+      avgMoisture += Number(res.moisture);
+      avgHumidity += Number(res.humidity);
+      totalCultivation += Number(res.quantity);
+    });
+    if (hutEnvironmentData.length > 0) {
+      avgMoisture /= hutEnvironmentData.length;
+      avgHumidity /= hutEnvironmentData.length;
+    }
+
+    const weeksHutEnvironmentData = await this.environmentDataRepository.find({
+      where: {
+        hutId: clusterData.hut,
+        date: {
+          between: [
+            dates.startDate.toISOString(),
+            dates.endDate.toISOString(),
+          ] as [string, string],
+        },
+      },
+    });
+
+    console.log(JSON.stringify(weeksHutEnvironmentData));
+
+    const allWeeklyData = this.calculateData(weeksHutEnvironmentData, dates);
+
+    return {
+      avgMoisture,
+      avgHumidity,
+      totalCultivation,
+      ...allWeeklyData,
+    };
+  }
+
+  calculateData(
+    data: any[],
+    dateRange: any,
+  ): {
+    weeklyAverageMoisture: number[];
+    weeklyAverageHumidity: number[];
+    totalWeeklyCultivation: number[];
+  } {
+    const {startDate, endDate} = dateRange;
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    // Initialize arrays to store daily averages and total cultivation
+    const dailyAverageMoisture: number[] = [];
+    const dailyAverageHumidity: number[] = [];
+    const dailyTotalCultivation: number[] = [];
+
+    // Iterate through each day within the date range
+    while (start <= end) {
+      // Filter environment data for the current day
+      const dailyData = data.filter(entry => {
+        const entryDate = new Date(entry.date);
+        return (
+          entryDate.getFullYear() === start.getFullYear() &&
+          entryDate.getMonth() === start.getMonth() &&
+          entryDate.getDate() === start.getDate()
+        );
+      });
+
+      // Calculate the average moisture and humidity for the current day
+      const totalMoisture = dailyData.reduce(
+        (sum, entry) => sum + Number(entry.moisture),
+        0,
+      );
+      const totalHumidity = dailyData.reduce(
+        (sum, entry) => sum + Number(entry.humidity),
+        0,
+      );
+      const totalCultivation = dailyData.reduce(
+        (sum, entry) => sum + Number(entry.quantity),
+        0,
+      );
+      const averageMoisture =
+        dailyData.length > 0 ? totalMoisture / dailyData.length : 0;
+      const averageHumidity =
+        dailyData.length > 0 ? totalHumidity / dailyData.length : 0;
+
+      // Add the daily averages and total cultivation to the result arrays
+      dailyAverageMoisture.push(averageMoisture);
+      dailyAverageHumidity.push(averageHumidity);
+      dailyTotalCultivation.push(totalCultivation);
+
+      // Move to the next day
+      start.setDate(start.getDate() + 1);
+    }
+
+    return {
+      weeklyAverageMoisture: dailyAverageMoisture,
+      weeklyAverageHumidity: dailyAverageHumidity,
+      totalWeeklyCultivation: dailyTotalCultivation,
+    };
   }
 }

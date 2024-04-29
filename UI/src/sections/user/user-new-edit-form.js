@@ -36,6 +36,7 @@ import 'react-phone-input-2/lib/material.css';
 import { MenuItem } from '@mui/material';
 import { color } from 'framer-motion';
 import axiosInstance from 'src/utils/axios';
+import { useAuthContext } from 'src/auth/hooks';
 
 // ----------------------------------------------------------------------
 
@@ -47,8 +48,11 @@ const classes = {
   },
 };
 export default function UserNewEditForm({ currentUser }) {
-  console.log(currentUser);
   const router = useRouter();
+
+  const { user: userData } = useAuthContext();
+
+  const isAdmin = userData ? userData.permissions.includes('super_admin') : false;
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -245,11 +249,20 @@ export default function UserNewEditForm({ currentUser }) {
                 {[
                   { value: 'hut_admin', name: 'Hut Admin' },
                   { value: 'cluster_admin', name: 'Cluster Admin' },
-                ].map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.name}
-                  </MenuItem>
-                ))}
+                ].map((option) => {
+                  if (option.value === 'cluster_admin' && isAdmin) {
+                    return (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.name}
+                      </MenuItem>
+                    );
+                  }
+                  return (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.name}
+                    </MenuItem>
+                  );
+                })}
               </RHFSelect>
             </Box>
 

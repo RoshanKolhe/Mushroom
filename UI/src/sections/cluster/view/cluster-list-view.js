@@ -38,6 +38,7 @@ import {
 } from 'src/components/table';
 //
 import { useGetClusters } from 'src/api/cluster';
+import { useAuthContext } from 'src/auth/hooks';
 import ClusterTableRow from '../cluster-table-row';
 import ClusterTableToolbar from '../cluster-table-toolbar';
 import ClusterTableFiltersResult from '../cluster-table-filters-result';
@@ -64,6 +65,10 @@ export default function ClusterListView() {
   const table = useTable();
 
   const settings = useSettingsContext();
+
+  const { user: userData } = useAuthContext();
+
+  const isAdmin = userData ? userData.permissions.includes('super_admin') : false;
 
   const router = useRouter();
 
@@ -176,16 +181,18 @@ export default function ClusterListView() {
               >
                 Download report
               </Button>
-              <Button
-                component={RouterLink}
-                href={paths.dashboard.cluster.new}
-                variant="contained"
-                startIcon={<Iconify icon="mingcute:add-line" />}
-                color="primary"
-                style={{ width: '155px', backgroundColor: '#00554E' }}
-              >
-                New Cluster
-              </Button>
+              {isAdmin ? (
+                <Button
+                  component={RouterLink}
+                  href={paths.dashboard.cluster.new}
+                  variant="contained"
+                  startIcon={<Iconify icon="mingcute:add-line" />}
+                  color="primary"
+                  style={{ width: '155px', backgroundColor: '#00554E' }}
+                >
+                  New Cluster
+                </Button>
+              ) : null}
             </>
           }
           sx={{
@@ -260,6 +267,7 @@ export default function ClusterListView() {
                         onDeleteRow={() => handleDeleteRow(row.id)}
                         onEditRow={() => handleEditRow(row.id)}
                         onRefreshClusters={() => refreshClusters()}
+                        isAdmin={isAdmin}
                       />
                     ))}
 

@@ -9,6 +9,7 @@ import { TicketListView } from 'src/sections/ticket/view';
 import { HutListView } from 'src/sections/hut/view';
 import { useGetDashboardCounts } from 'src/api/user';
 import AnalyticsWidgetSummary from '../analytics-widget-summary';
+import CultivaionCard from '../cultivation-card';
 // ----------------------------------------------------------------------
 
 export default function OverviewAnalyticsView() {
@@ -31,7 +32,7 @@ export default function OverviewAnalyticsView() {
         <Grid xs={12} sm={6} md={3}>
           <AnalyticsWidgetSummary
             title="Total Cultivation"
-            total={`${dashboardCounts?.totalCultivation}Kg`}
+            total={`${dashboardCounts?.totalCultivation}Kg` || '0'}
             icon={<img alt="icon" src="/assets/icons/glass/ic_glass_bag.png" />}
             color="info"
           />
@@ -40,7 +41,7 @@ export default function OverviewAnalyticsView() {
         <Grid xs={12} sm={6} md={3}>
           <AnalyticsWidgetSummary
             title="Today’s Cultivation"
-            total={`${dashboardCounts?.todaysCultivation}Kg`}
+            total={`${dashboardCounts?.todaysCultivation}Kg` || '0'}
             icon={<img alt="icon" src="/assets/icons/glass/ic_glass_mushroom.png" />}
           />
         </Grid>
@@ -48,7 +49,7 @@ export default function OverviewAnalyticsView() {
         <Grid xs={12} sm={6} md={3}>
           <AnalyticsWidgetSummary
             title="Total Clusters"
-            total={`${dashboardCounts?.totalClusters}`}
+            total={`${dashboardCounts?.totalClusters}` || '0'}
             color="warning"
             icon={<img alt="icon" src="/assets/icons/glass/ic_glass_cluster.png" />}
           />
@@ -57,10 +58,14 @@ export default function OverviewAnalyticsView() {
         <Grid xs={12} sm={6} md={3}>
           <AnalyticsWidgetSummary
             title="Total Huts"
-            total={`${dashboardCounts?.totalHuts}`}
+            total={`${dashboardCounts?.totalHuts}` || '0'}
             color="error"
             icon={<img alt="icon" src="/assets/icons/glass/ic_glass_hut.png" />}
           />
+        </Grid>
+
+        <Grid xs={12} sm={12} md={12}>
+          <CultivaionCard />
         </Grid>
 
         <Grid xs={12} sm={12} md={12}>

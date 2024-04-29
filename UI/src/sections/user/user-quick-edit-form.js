@@ -20,11 +20,16 @@ import PhoneInput from 'react-phone-input-2';
 import { useSnackbar } from 'src/components/snackbar';
 import FormProvider, { RHFSelect, RHFTextField } from 'src/components/hook-form';
 import axiosInstance from 'src/utils/axios';
+import { useAuthContext } from 'src/auth/hooks';
 
 // ----------------------------------------------------------------------
 
 export default function UserQuickEditForm({ currentUser, open, onClose, onRefreshUsers }) {
   const { enqueueSnackbar } = useSnackbar();
+
+  const { user: userData } = useAuthContext();
+
+  const isAdmin = userData ? userData.permissions.includes('super_admin') : false;
 
   const NewUserSchema = Yup.object().shape({
     name: Yup.string().required('Name is required'),
@@ -144,11 +149,20 @@ export default function UserQuickEditForm({ currentUser, open, onClose, onRefres
               {[
                 { value: 'hut_admin', name: 'Hut Admin' },
                 { value: 'cluster_admin', name: 'Cluster Admin' },
-              ].map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.name}
-                </MenuItem>
-              ))}
+              ].map((option) => {
+                if (option.value === 'cluster_admin' && isAdmin) {
+                  return (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.name}
+                    </MenuItem>
+                  );
+                }
+                return (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.name}
+                  </MenuItem>
+                );
+              })}
             </RHFSelect>
           </Box>
         </DialogContent>

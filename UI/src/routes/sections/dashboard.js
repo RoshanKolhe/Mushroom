@@ -6,6 +6,7 @@ import { AuthGuard } from 'src/auth/guard';
 import DashboardLayout from 'src/layouts/dashboard';
 // components
 import { LoadingScreen } from 'src/components/loading-screen';
+import { RolesAuthRoute } from '../hook/RolesAuthRoute';
 
 // ----------------------------------------------------------------------
 
@@ -111,8 +112,22 @@ export const dashboardRoutes = [
           { path: 'profile', element: <UserProfilePage /> },
           { path: 'cards', element: <UserCardsPage /> },
           { path: 'list', element: <UserListPage /> },
-          { path: 'new', element: <UserCreatePage /> },
-          { path: ':id/edit', element: <UserEditPage /> },
+          {
+            path: 'new',
+            element: (
+              <RolesAuthRoute roles={['super_admin', 'cluster_admin']}>
+                <UserCreatePage />
+              </RolesAuthRoute>
+            ),
+          },
+          {
+            path: ':id/edit',
+            element: (
+              <RolesAuthRoute roles={['super_admin', 'cluster_admin']}>
+                <UserEditPage />
+              </RolesAuthRoute>
+            ),
+          },
           { path: 'account', element: <UserAccountPage /> },
         ],
       },
@@ -120,9 +135,31 @@ export const dashboardRoutes = [
         path: 'cluster',
         children: [
           { element: <ClusterListPage />, index: true },
-          { path: 'list', element: <ClusterListPage /> },
-          { path: 'new', element: <ClusterCreatePage /> },
-          { path: ':id/edit', element: <ClusterEditPage /> },
+
+          {
+            path: 'list',
+            element: (
+              <RolesAuthRoute roles={['super_admin', 'cluster_admin']}>
+                <ClusterListPage />
+              </RolesAuthRoute>
+            ),
+          },
+          {
+            path: 'new',
+            element: (
+              <RolesAuthRoute roles={['super_admin']}>
+                <ClusterCreatePage />
+              </RolesAuthRoute>
+            ),
+          },
+          {
+            path: ':id/edit',
+            element: (
+              <RolesAuthRoute roles={['super_admin']}>
+                <ClusterEditPage />
+              </RolesAuthRoute>
+            ),
+          },
         ],
       },
       {
@@ -130,24 +167,66 @@ export const dashboardRoutes = [
         children: [
           { element: <HutListPage />, index: true },
           { path: 'list', element: <HutListPage /> },
-          { path: 'new', element: <HutCreatePage /> },
-          { path: ':id/edit', element: <HutEditPage /> },
+          {
+            path: 'new',
+            element: (
+              <RolesAuthRoute roles={['super_admin']}>
+                <HutCreatePage />
+              </RolesAuthRoute>
+            ),
+          },
+          {
+            path: ':id/edit',
+            element: (
+              <RolesAuthRoute roles={['super_admin']}>
+                <HutEditPage />
+              </RolesAuthRoute>
+            ),
+          },
         ],
       },
       {
         path: 'faq',
         children: [
           { element: <FaqListPage />, index: true },
-          { path: 'list', element: <FaqListPage /> },
-          { path: 'new', element: <FaqCreatePage /> },
-          { path: ':id/edit', element: <FaqEditPage /> },
+          {
+            path: 'list',
+            element: (
+              <RolesAuthRoute roles={['super_admin']}>
+                <FaqListPage />
+              </RolesAuthRoute>
+            ),
+          },
+          {
+            path: 'new',
+            element: (
+              <RolesAuthRoute roles={['super_admin']}>
+                <FaqCreatePage />
+              </RolesAuthRoute>
+            ),
+          },
+          {
+            path: ':id/edit',
+            element: (
+              <RolesAuthRoute roles={['super_admin']}>
+                <FaqEditPage />
+              </RolesAuthRoute>
+            ),
+          },
         ],
       },
       {
         path: 'ticket',
         children: [
           { element: <TicketListPage />, index: true },
-          { path: 'list', element: <TicketListPage /> },
+          {
+            path: 'list',
+            element: (
+              <RolesAuthRoute roles={['super_admin', 'cluster_admin']}>
+                <TicketListPage />
+              </RolesAuthRoute>
+            ),
+          },
           { path: 'new', element: <TicketCreatePage /> },
           { path: ':id/edit', element: <TicketEditPage /> },
         ],
@@ -156,9 +235,30 @@ export const dashboardRoutes = [
         path: 'salesData',
         children: [
           { element: <SalesDataListPage />, index: true },
-          { path: 'list', element: <SalesDataListPage /> },
-          { path: 'new', element: <SalesDataCreatePage /> },
-          { path: ':id/edit', element: <SalesDataEditPage /> },
+          {
+            path: 'list',
+            element: (
+              <RolesAuthRoute roles={['super_admin']}>
+                <SalesDataListPage />
+              </RolesAuthRoute>
+            ),
+          },
+          {
+            path: 'new',
+            element: (
+              <RolesAuthRoute roles={['super_admin']}>
+                <SalesDataCreatePage />
+              </RolesAuthRoute>
+            ),
+          },
+          {
+            path: ':id/edit',
+            element: (
+              <RolesAuthRoute roles={['super_admin']}>
+                <SalesDataEditPage />
+              </RolesAuthRoute>
+            ),
+          },
         ],
       },
       {

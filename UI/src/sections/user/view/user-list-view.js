@@ -75,7 +75,7 @@ export default function UserListView() {
 
   const { user: userData } = useAuthContext();
 
-  console.log(userData);
+  const isAdmin = userData ? userData.permissions.includes('super_admin') : false;
 
   const [tableData, setTableData] = useState([]);
 
@@ -194,16 +194,18 @@ export default function UserListView() {
               >
                 Download report
               </Button>
-              <Button
-                component={RouterLink}
-                href={paths.dashboard.user.new}
-                variant="contained"
-                startIcon={<Iconify icon="mingcute:add-line" />}
-                color="primary"
-                style={{ width: '155px', backgroundColor: '#00554E' }}
-              >
-                New User
-              </Button>
+              {isAdmin ? (
+                <Button
+                  component={RouterLink}
+                  href={paths.dashboard.user.new}
+                  variant="contained"
+                  startIcon={<Iconify icon="mingcute:add-line" />}
+                  color="primary"
+                  style={{ width: '155px', backgroundColor: '#00554E' }}
+                >
+                  New User
+                </Button>
+              ) : null}
             </>
           }
           sx={{
@@ -318,6 +320,7 @@ export default function UserListView() {
                         onDeleteRow={() => handleDeleteRow(row.id)}
                         onEditRow={() => handleEditRow(row.id)}
                         onRefreshUsers={() => refreshUsers()}
+                        isAdmin={isAdmin}
                       />
                     ))}
 

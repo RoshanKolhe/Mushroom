@@ -63,7 +63,7 @@ export default function AppWidgetSummary({ title, percent, total, chart, sx, ...
         <Typography variant="subtitle2">{title}</Typography>
 
         <Stack direction="row" alignItems="center" sx={{ mt: 2, mb: 1 }}>
-          <Iconify
+          {/* <Iconify
             width={24}
             icon={
               percent < 0
@@ -83,10 +83,10 @@ export default function AppWidgetSummary({ title, percent, total, chart, sx, ...
             {percent > 0 && '+'}
 
             {fPercent(percent)}
-          </Typography>
+          </Typography> */}
         </Stack>
 
-        <Typography variant="h3">{fNumber(total)}</Typography>
+        <Typography variant="h3">{total}</Typography>
       </Box>
 
       <Chart type="bar" series={[{ data: series }]} options={chartOptions} width={60} height={36} />
@@ -99,5 +99,5 @@ AppWidgetSummary.propTypes = {
   percent: PropTypes.number,
   sx: PropTypes.object,
   title: PropTypes.string,
-  total: PropTypes.number,
+  total: PropTypes.any,
 };

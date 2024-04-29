@@ -61,7 +61,6 @@ const defaultFilters = {
 // ----------------------------------------------------------------------
 
 export default function TicketListView({ isDashboard }) {
-  console.log(isDashboard);
   const table = useTable();
 
   const settings = useSettingsContext();
@@ -74,7 +73,7 @@ export default function TicketListView({ isDashboard }) {
 
   const [filters, setFilters] = useState(defaultFilters);
 
-  const { tickets, ticketsLoading, ticketsEmpty, refreshTickets } = useGetTicketsWithFilter(
+  const { tickets, ticketsError, ticketsEmpty, refreshTickets } = useGetTicketsWithFilter(
     isDashboard ? 'filter={"where":{"status":"open"}}' : null
   );
 
@@ -154,7 +153,10 @@ export default function TicketListView({ isDashboard }) {
 
   return (
     <>
-      <Container maxWidth={settings.themeStretch ? false : 'lg'}>
+      <Container
+        maxWidth={settings.themeStretch ? false : 'lg'}
+        style={isDashboard ? { padding: 0, maxWidth: 'initial' } : {}}
+      >
         {!isDashboard ? (
           <CustomBreadcrumbs
             heading="Manage Tickets"

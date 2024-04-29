@@ -156,7 +156,7 @@ export function useNavData() {
             icon: ICONS.user,
             children: [
               { title: t('list'), path: paths.dashboard.user.list },
-              { title: t('create'), path: paths.dashboard.user.new },
+              // { title: t('create'), path: paths.dashboard.user.new },
             ],
           },
           // CLUSTER
@@ -166,7 +166,7 @@ export function useNavData() {
             icon: ICONS.cluster,
             children: [
               { title: t('list'), path: paths.dashboard.cluster.list },
-              { title: t('create'), path: paths.dashboard.cluster.new },
+              // { title: t('create'), path: paths.dashboard.cluster.new },
             ],
           },
           // HUT
@@ -176,7 +176,7 @@ export function useNavData() {
             icon: ICONS.hut,
             children: [
               { title: t('list'), path: paths.dashboard.hut.list },
-              { title: t('create'), path: paths.dashboard.hut.new },
+              // { title: t('create'), path: paths.dashboard.hut.new },
             ],
           },
           // TICKET

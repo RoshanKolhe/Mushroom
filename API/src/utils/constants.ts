@@ -11,3 +11,25 @@ export function generateUniqueId(): string {
 
   return id;
 }
+
+export function getStartAndEndDateOfWeek(selectedDate: Date): {
+  startDate: Date;
+  endDate: Date;
+} {
+  const currentDate = new Date(selectedDate);
+  const currentDayOfWeek = currentDate.getDay(); // 0 for Sunday, 1 for Monday, ..., 6 for Saturday
+
+  // Calculate the start date of the week
+  const startDate = new Date(currentDate);
+  startDate.setDate(currentDate.getDate() - currentDayOfWeek);
+
+  // Calculate the end date of the week
+  const endDate = new Date(currentDate);
+  endDate.setDate(currentDate.getDate() + (6 - currentDayOfWeek));
+
+  // Set time to the beginning of the day for both start and end dates
+  startDate.setHours(0, 0, 0, 0);
+  endDate.setHours(23, 59, 59, 999);
+
+  return {startDate, endDate};
+}
