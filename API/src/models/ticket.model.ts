@@ -26,6 +26,7 @@ export class Ticket extends Entity {
   @property({
     type: 'string',
     required: true,
+    length: 10000,
   })
   description: string;
 
