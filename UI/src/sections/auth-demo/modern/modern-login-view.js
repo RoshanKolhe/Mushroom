@@ -116,6 +116,10 @@ export default function ModernLoginView() {
           <>
             <Typography style={{ fontWeight: '700' }}>Enter the verification code</Typography>
             <RHFCode pt={2} name="otp" type="number" />
+
+            <Typography style={{ fontWeight: '400', color: '#949494', textAlign: 'center' }}>
+              Didn’t receive code ? <span style={{ fontWeight: '700' }}>Resend</span>
+            </Typography>
           </>
         ) : (
           <>

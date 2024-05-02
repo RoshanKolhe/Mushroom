@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import isEqual from 'lodash/isEqual';
 import { useState, useCallback, useEffect } from 'react';
 // @mui
@@ -6,6 +7,7 @@ import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import Card from '@mui/material/Card';
 import Table from '@mui/material/Table';
+import * as XLSX from 'xlsx';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import Container from '@mui/material/Container';
@@ -148,11 +150,21 @@ export default function ClusterListView() {
     setFilters(defaultFilters);
   }, []);
 
+  const downlodCsvFromTableData = () =>{
+    const fileName = 'Cluster Management.xlsx';
+    const ws = XLSX.utils.json_to_sheet(tableData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Coupon Master');
+    XLSX.writeFile(wb, fileName);
+  }
+
   useEffect(() => {
     if (clusters) {
       setTableData(clusters);
     }
   }, [clusters]);
+
+
 
   return (
     <>
@@ -167,8 +179,6 @@ export default function ClusterListView() {
           action={
             <>
               <Button
-                component={RouterLink}
-                href={paths.dashboard.cluster.new}
                 variant="contained"
                 startIcon={<Iconify icon="carbon:download" />}
                 color="primary"
@@ -177,6 +187,9 @@ export default function ClusterListView() {
                   color: '#212B36',
                   border: 'solid 1px #00554E',
                   marginRight: '20px',
+                }}
+                onClick={()=>{
+                  downlodCsvFromTableData();
                 }}
               >
                 Download report

@@ -1,8 +1,10 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import isEqual from 'lodash/isEqual';
 import { useState, useCallback, useEffect } from 'react';
 // @mui
 import { alpha } from '@mui/material/styles';
 import Tab from '@mui/material/Tab';
+import * as XLSX from 'xlsx';
 import Tabs from '@mui/material/Tabs';
 import Card from '@mui/material/Card';
 import Table from '@mui/material/Table';
@@ -150,6 +152,14 @@ export default function SalesDataListView() {
     setFilters(defaultFilters);
   }, []);
 
+  const downlodCsvFromTableData = () =>{
+    const fileName = 'Cluster Management.xlsx';
+    const ws = XLSX.utils.json_to_sheet(tableData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Coupon Master');
+    XLSX.writeFile(wb, fileName);
+  }
+
   useEffect(() => {
     if (salesDatas) {
       setTableData(salesDatas);
@@ -169,8 +179,6 @@ export default function SalesDataListView() {
           action={
             <>
               <Button
-                component={RouterLink}
-                href={paths.dashboard.salesData.new}
                 variant="contained"
                 startIcon={<Iconify icon="carbon:download" />}
                 color="primary"
@@ -179,6 +187,9 @@ export default function SalesDataListView() {
                   color: '#212B36',
                   border: 'solid 1px #00554E',
                   marginRight: '20px',
+                }}
+                onClick={()=>{
+                  downlodCsvFromTableData();
                 }}
               >
                 Download report

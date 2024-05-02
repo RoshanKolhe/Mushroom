@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import isEqual from 'lodash/isEqual';
 import PropTypes from 'prop-types';
 import { useState, useCallback, useEffect } from 'react';
@@ -6,6 +7,7 @@ import { alpha } from '@mui/material/styles';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import Card from '@mui/material/Card';
+import * as XLSX from 'xlsx';
 import Table from '@mui/material/Table';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
@@ -145,6 +147,14 @@ export default function TicketListView({ isDashboard }) {
     setFilters(defaultFilters);
   }, []);
 
+  const downlodCsvFromTableData = () =>{
+    const fileName = 'Cluster Management.xlsx';
+    const ws = XLSX.utils.json_to_sheet(tableData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Coupon Master');
+    XLSX.writeFile(wb, fileName);
+  }
+
   useEffect(() => {
     if (tickets) {
       setTableData(tickets);
@@ -168,8 +178,6 @@ export default function TicketListView({ isDashboard }) {
             action={
               <>
                 <Button
-                  component={RouterLink}
-                  href={paths.dashboard.ticket.new}
                   variant="contained"
                   startIcon={<Iconify icon="carbon:download" />}
                   color="primary"
@@ -178,6 +186,9 @@ export default function TicketListView({ isDashboard }) {
                     color: '#212B36',
                     border: 'solid 1px #00554E',
                     marginRight: '20px',
+                  }}
+                  onClick={()=>{
+                    downlodCsvFromTableData();
                   }}
                 >
                   Download report

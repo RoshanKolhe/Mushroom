@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import isEqual from 'lodash/isEqual';
 import { useState, useCallback, useEffect } from 'react';
 // @mui
@@ -7,6 +8,7 @@ import Tabs from '@mui/material/Tabs';
 import Card from '@mui/material/Card';
 import Table from '@mui/material/Table';
 import Button from '@mui/material/Button';
+import * as XLSX from 'xlsx';
 import Tooltip from '@mui/material/Tooltip';
 import Container from '@mui/material/Container';
 import TableBody from '@mui/material/TableBody';
@@ -148,6 +150,14 @@ export default function UserListView() {
     [router]
   );
 
+  const downlodCsvFromTableData = () =>{
+    const fileName = 'ACL Management.xlsx';
+    const ws = XLSX.utils.json_to_sheet(tableData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Coupon Master');
+    XLSX.writeFile(wb, fileName);
+  }
+
   const handleFilterStatus = useCallback(
     (event, newValue) => {
       console.log(newValue);
@@ -180,8 +190,6 @@ export default function UserListView() {
           action={
             <>
               <Button
-                component={RouterLink}
-                href={paths.dashboard.user.new}
                 variant="contained"
                 startIcon={<Iconify icon="carbon:download" />}
                 color="primary"
@@ -190,6 +198,9 @@ export default function UserListView() {
                   color: '#212B36',
                   border: 'solid 1px #00554E',
                   marginRight: '20px',
+                }}
+                onClick={()=>{
+                  downlodCsvFromTableData();
                 }}
               >
                 Download report
