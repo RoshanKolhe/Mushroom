@@ -776,4 +776,21 @@ export class UserController {
       totalWeeklyCultivation: dailyTotalCultivation,
     };
   }
+
+  @authenticate({
+    strategy: 'jwt',
+  })
+  @get('/latestEnvironmentData', {
+    responses: {
+      '200': {
+        description: 'Latest entry',
+      },
+    },
+  })
+  async findLatest(): Promise<any> {
+    const latestEntry = await this.environmentDataRepository.findOne({
+      order: ['createdAt DESC'],
+    });
+    return latestEntry;
+  }
 }
