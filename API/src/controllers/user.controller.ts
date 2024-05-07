@@ -793,4 +793,52 @@ export class UserController {
     });
     return latestEntry;
   }
+
+  // @authenticate({
+  //   strategy: 'jwt',
+  // })
+  @post('/totalMushroomQuantity', {
+    responses: {
+      '200': {
+        description: 'Array of total mushroom quantities for each month',
+      },
+    },
+  })
+  async getTotalMushroomQuantity(
+    @requestBody() payload: any,
+  ): Promise<number[]> {
+    const mushroomQuantities: number[] = [];
+
+    // Loop through each month
+    for (let i = 1; i <= 12; i++) {
+      const startDateString = `${payload.year}-${String(i).padStart(2, '0')}-01 00:00:00`;
+      const endDateString = `${payload.year}-${String(i).padStart(2, '0')}-31 23:59:59`;
+
+      console.log('startDateString:', startDateString);
+      console.log('endDateString:', endDateString);
+
+      const startDate = new Date(startDateString);
+      const endDate = new Date(endDateString);
+
+      console.log('startDate:', startDate);
+      console.log('endDate:', endDate);
+
+      // Find all entries within the current month
+      const entriesInMonth = await this.environmentDataRepository.find({
+        where: {
+          and: [{createdAt: {gte: startDate}}, {createdAt: {lte: endDate}}],
+        },
+      });
+
+      // Calculate total mushroom quantity for the month
+      const totalQuantity = entriesInMonth.reduce(
+        (total, entry) => total + Number(entry.quantity),
+        0,
+      );
+
+      mushroomQuantities.push(totalQuantity);
+    }
+
+    return mushroomQuantities;
+  }
 }
