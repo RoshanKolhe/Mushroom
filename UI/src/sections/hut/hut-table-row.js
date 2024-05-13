@@ -47,7 +47,9 @@ export default function HutTableRow({
 
         <TableCell sx={{ whiteSpace: 'nowrap' }}>{name}</TableCell>
 
-        <TableCell sx={{ whiteSpace: 'nowrap' }}>{user?.fullName}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{`${user?.firstName} ${
+          user?.lastName ? user?.lastName : ''
+        }`}</TableCell>
 
         <TableCell sx={{ whiteSpace: 'nowrap' }}>{cluster?.name}</TableCell>
         <TableCell sx={{ whiteSpace: 'nowrap' }}>{totalCultivation}</TableCell>

@@ -30,7 +30,7 @@ export default function UserTableRow({
   onRefreshUsers,
   isAdmin,
 }) {
-  const { fullName: name, avatar, permissions, isActive, email, phoneNumber } = row;
+  const { firstName,lastName, avatar, permissions, isActive, email, phoneNumber } = row;
 
   const confirm = useBoolean();
 
@@ -46,10 +46,10 @@ export default function UserTableRow({
         </TableCell>
 
         <TableCell sx={{ display: 'flex', alignItems: 'center' }}>
-          <Avatar alt={name} src={avatar?.fileUrl} sx={{ mr: 2 }} />
+          <Avatar alt={firstName} src={avatar?.fileUrl} sx={{ mr: 2 }} />
 
           <ListItemText
-            primary={name}
+            primary={`${firstName} ${lastName || ''}`}
             secondary={email}
             primaryTypographyProps={{ typography: 'body2' }}
             secondaryTypographyProps={{ component: 'span', color: 'text.disabled' }}

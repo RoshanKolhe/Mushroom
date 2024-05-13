@@ -7,6 +7,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
@@ -38,21 +39,34 @@ export default function AccountGeneral() {
   const [user, setUser] = useState();
 
   const UpdateUserSchema = Yup.object().shape({
-    name: Yup.string().required('Name is required'),
+    firstName: Yup.string().required('First Name is required'),
+    lastName: Yup.string().required('Last Name is required'),
     email: Yup.string().required('Email is required').email('Email must be a valid email address'),
     phoneNumber: Yup.string().required('Phone number is required'),
     role: Yup.string().required('Role is required'),
+    gender: Yup.string().required('Role is required'),
     isActive: Yup.boolean(),
+    dob: Yup.string().required('Date is required'),
+    fullAddress: Yup.string().required('Role is required'),
+    city: Yup.string().required('Role is required'),
+    state: Yup.string().required('Role is required'),
+
   });
 
   const defaultValues = useMemo(
     () => ({
-      name: user?.fullName || '',
+      firstName: user?.firstName || '',
+      lastName: user?.lastName || '',
       role: user?.permissions[0] || '',
+      dob: user?.dob || '',
+      gender: user?.gender || '',
       email: user?.email || '',
       isActive: user?.isActive || true,
       avatarUrl: user?.avatar?.fileUrl || null,
       phoneNumber: user?.phoneNumber || '',
+      fullAddress: user?.fullAddress || '',
+      city: user?.city || '',
+      state: user?.state || '',
     }),
     [user]
   );
@@ -75,10 +89,16 @@ export default function AccountGeneral() {
     try {
       console.log(formData);
       const inputData = {
-        fullName: formData.name,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
         permissions: [formData.role],
         email: formData.email,
         isActive: formData.isActive,
+        gender: formData.gender,
+        dob: formData.dob,
+        fullAddress: formData.fullAddress,
+        city: formData.city,
+        state: formData.state,
       };
       if (formData.avatarUrl) {
         inputData.avatar = {
@@ -176,7 +196,8 @@ export default function AccountGeneral() {
                 sm: 'repeat(2, 1fr)',
               }}
             >
-              <RHFTextField name="name" label="Full Name" />
+              <RHFTextField name="firstName" label="First Name" />
+              <RHFTextField name="lastName" label="Last Name" />
               <RHFTextField name="email" label="Email Address" />
               <div>
                 <Controller
@@ -229,6 +250,41 @@ export default function AccountGeneral() {
                   </MenuItem>
                 ))}
               </RHFSelect>
+              <RHFSelect fullWidth name="gender" label="Gender">
+                {[
+                  { value: 'male', name: 'Male' },
+                  { value: 'female', name: 'Female' },
+                  { value: 'other', name: 'Other' },
+                ].map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.name}
+                  </MenuItem>
+                ))}
+              </RHFSelect>
+              <Controller
+                name="dob"
+                control={control}
+                render={({ field, fieldState: { error } }) => (
+                  <DatePicker
+                    label="DOB"
+                    value={new Date(field.value)}
+                    onChange={(newValue) => {
+                      field.onChange(newValue);
+                    }}
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        error: !!error,
+                        helperText: error?.message,
+                      },
+                    }}
+                  />
+                )}
+              />
+              <RHFTextField name="fullAddress" label="Full Address" />
+              <RHFTextField name="state" label="State" />
+              <RHFTextField name="city" label="City" />
+              
             </Box>
 
             <Stack spacing={3} alignItems="flex-end" sx={{ mt: 3 }}>
