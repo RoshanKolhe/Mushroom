@@ -56,6 +56,33 @@ export class EnvironmentData extends Entity {
     type: 'string',
     required: true,
   })
+  mushroomType: string;
+
+  @property({
+    type: 'boolean',
+    default: false,
+  })
+  isColorChanged?: string;
+
+  @property({
+    type: 'string',
+  })
+  changedColor?: string;
+
+  @property({
+    type: 'string',
+  })
+  changedColorRow?: string;
+
+  @property({
+    type: 'string',
+  })
+  changedColorColumn?: string;
+
+  @property({
+    type: 'string',
+    required: true,
+  })
   quantity: string;
 
   @property({
