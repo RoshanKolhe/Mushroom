@@ -13,7 +13,37 @@ export class User extends Entity {
   @property({
     type: 'string',
   })
-  fullName: string;
+  firstName: string;
+
+  @property({
+    type: 'string',
+  })
+  lastName: string;
+
+  @property({
+    type: 'string',
+  })
+  gender: string;
+
+  @property({
+    type: 'string',
+  })
+  dob: string;
+
+  @property({
+    type: 'string',
+  })
+  fullAddress: string;
+
+  @property({
+    type: 'string',
+  })
+  city: string;
+
+  @property({
+    type: 'string',
+  })
+  state: string;
 
   @property({
     type: 'string',

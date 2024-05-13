@@ -321,7 +321,7 @@ export class UserController {
     const userData = _.omit(user, 'password');
     return Promise.resolve({
       ...userData,
-      displayName: userData?.fullName,
+      displayName: userData?.firstName,
     });
   }
 
