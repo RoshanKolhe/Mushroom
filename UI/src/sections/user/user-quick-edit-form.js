@@ -12,6 +12,8 @@ import Dialog from '@mui/material/Dialog';
 import MenuItem from '@mui/material/MenuItem';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+
 import DialogContent from '@mui/material/DialogContent';
 // _mock
 import { USER_STATUS_OPTIONS } from 'src/_mock';
@@ -32,20 +34,33 @@ export default function UserQuickEditForm({ currentUser, open, onClose, onRefres
   const isAdmin = userData ? userData.permissions.includes('super_admin') : false;
 
   const NewUserSchema = Yup.object().shape({
-    name: Yup.string().required('Name is required'),
+    firstName: Yup.string().required('First Name is required'),
+    lastName: Yup.string().required('Last Name is required'),
     email: Yup.string().required('Email is required').email('Email must be a valid email address'),
     phoneNumber: Yup.string().required('Phone number is required'),
     role: Yup.string().required('Role is required'),
+    gender: Yup.string().required('Role is required'),
     isActive: Yup.boolean(),
+    dob: Yup.string().required('Date is required'),
+    fullAddress: Yup.string().required('Role is required'),
+    city: Yup.string().required('Role is required'),
+    state: Yup.string().required('Role is required'),
   });
 
   const defaultValues = useMemo(
     () => ({
-      name: currentUser?.fullName || '',
-      email: currentUser?.email || '',
-      phoneNumber: currentUser?.phoneNumber || '',
-      isActive: currentUser?.isActive ? '1' : '0' || '',
+      firstName: currentUser?.firstName || '',
+      lastName: currentUser?.lastName || '',
       role: currentUser?.permissions[0] || '',
+      dob: currentUser?.dob || '',
+      gender: currentUser?.gender || '',
+      email: currentUser?.email || '',
+      isActive: currentUser?.isActive ? '1' : '0' || '',
+      avatarUrl: currentUser?.avatar?.fileUrl || null,
+      phoneNumber: currentUser?.phoneNumber || '',
+      fullAddress: currentUser?.fullAddress || '',
+      city: currentUser?.city || '',
+      state: currentUser?.state || '',
     }),
     [currentUser]
   );
@@ -57,6 +72,7 @@ export default function UserQuickEditForm({ currentUser, open, onClose, onRefres
 
   const {
     reset,
+    control,
     handleSubmit,
     formState: { isSubmitting },
   } = methods;
@@ -65,10 +81,17 @@ export default function UserQuickEditForm({ currentUser, open, onClose, onRefres
     try {
       console.log(data);
       const inputData = {
-        fullName: data.name,
+        phoneNumber: data.phoneNumber,
+        firstName: data.firstName,
+        lastName: data.lastName,
         permissions: [data.role],
         email: data.email,
         isActive: data.isActive,
+        gender: data.gender,
+        dob: data.dob,
+        fullAddress: data.fullAddress,
+        city: data.city,
+        state: data.state,
       };
       await axiosInstance.patch(`/api/users/${currentUser.id}`, inputData);
       // reset();
@@ -120,7 +143,8 @@ export default function UserQuickEditForm({ currentUser, open, onClose, onRefres
 
             <Box sx={{ display: { xs: 'none', sm: 'block' } }} />
 
-            <RHFTextField name="name" label="Full Name" />
+            <RHFTextField name="firstName" label="First Name" />
+            <RHFTextField name="lastName" label="Last Name" />
             <RHFTextField name="email" label="Email Address" />
             <div>
               <Controller
@@ -139,7 +163,6 @@ export default function UserQuickEditForm({ currentUser, open, onClose, onRefres
                       height: '50px',
                       border: '1px solid #ced4da',
                     }}
-                    disabled
                   />
                 )}
               />
@@ -164,6 +187,40 @@ export default function UserQuickEditForm({ currentUser, open, onClose, onRefres
                 );
               })}
             </RHFSelect>
+            <RHFSelect fullWidth name="gender" label="Gender">
+              {[
+                { value: 'male', name: 'Male' },
+                { value: 'female', name: 'Female' },
+                { value: 'other', name: 'Other' },
+              ].map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.name}
+                </MenuItem>
+              ))}
+            </RHFSelect>
+            <Controller
+              name="dob"
+              control={control}
+              render={({ field, fieldState: { error } }) => (
+                <DatePicker
+                  label="DOB"
+                  value={new Date(field.value)}
+                  onChange={(newValue) => {
+                    field.onChange(newValue);
+                  }}
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      error: !!error,
+                      helperText: error?.message,
+                    },
+                  }}
+                />
+              )}
+            />
+            <RHFTextField name="fullAddress" label="Full Address" />
+            <RHFTextField name="state" label="State" />
+            <RHFTextField name="city" label="City" />
           </Box>
         </DialogContent>
 

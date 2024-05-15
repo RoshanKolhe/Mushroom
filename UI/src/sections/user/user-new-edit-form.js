@@ -5,6 +5,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
 import LoadingButton from '@mui/lab/LoadingButton';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
@@ -57,21 +58,33 @@ export default function UserNewEditForm({ currentUser }) {
   const { enqueueSnackbar } = useSnackbar();
 
   const NewUserSchema = Yup.object().shape({
-    name: Yup.string().required('Name is required'),
+    firstName: Yup.string().required('First Name is required'),
+    lastName: Yup.string().required('Last Name is required'),
     email: Yup.string().required('Email is required').email('Email must be a valid email address'),
     phoneNumber: Yup.string().required('Phone number is required'),
     role: Yup.string().required('Role is required'),
+    gender: Yup.string().required('Role is required'),
     isActive: Yup.boolean(),
+    dob: Yup.string().required('Date is required'),
+    fullAddress: Yup.string().required('Role is required'),
+    city: Yup.string().required('Role is required'),
+    state: Yup.string().required('Role is required'),
   });
 
   const defaultValues = useMemo(
     () => ({
-      name: currentUser?.fullName || '',
+      firstName: currentUser?.firstName || '',
+      lastName: currentUser?.lastName || '',
       role: currentUser?.permissions[0] || '',
+      dob: currentUser?.dob || '',
+      gender: currentUser?.gender || '',
       email: currentUser?.email || '',
       isActive: currentUser?.isActive || true,
       avatarUrl: currentUser?.avatar?.fileUrl || null,
       phoneNumber: currentUser?.phoneNumber || '',
+      fullAddress: currentUser?.fullAddress || '',
+      city: currentUser?.city || '',
+      state: currentUser?.state || '',
     }),
     [currentUser]
   );
@@ -95,11 +108,16 @@ export default function UserNewEditForm({ currentUser }) {
     try {
       console.log(formData);
       const inputData = {
-        fullName: formData.name,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
         permissions: [formData.role],
         email: formData.email,
-        phoneNumber: `+${formData.phoneNumber}`,
         isActive: formData.isActive,
+        gender: formData.gender,
+        dob: formData.dob,
+        fullAddress: formData.fullAddress,
+        city: formData.city,
+        state: formData.state,
       };
       if (formData.avatarUrl) {
         inputData.avatar = {
@@ -107,9 +125,10 @@ export default function UserNewEditForm({ currentUser }) {
         };
       }
       if (!currentUser) {
+        inputData.phoneNumber = `+${formData.phoneNumber}`;
         await axiosInstance.post('/register', inputData);
       } else {
-        delete inputData.phoneNumber;
+        inputData.phoneNumber = formData.phoneNumber;
         await axiosInstance.patch(`/api/users/${currentUser.id}`, inputData);
       }
       reset();
@@ -146,9 +165,7 @@ export default function UserNewEditForm({ currentUser }) {
   );
 
   useEffect(() => {
-    console.log(currentUser);
     if (currentUser) {
-      console.log(defaultValues);
       reset(defaultValues);
     }
   }, [currentUser, defaultValues, reset]);
@@ -203,7 +220,8 @@ export default function UserNewEditForm({ currentUser }) {
                 sm: 'repeat(2, 1fr)',
               }}
             >
-              <RHFTextField name="name" label="Full Name" />
+              <RHFTextField name="firstName" label="First Name" />
+              <RHFTextField name="lastName" label="Last Name" />
               <RHFTextField name="email" label="Email Address" />
               <div>
                 <Controller
@@ -226,7 +244,6 @@ export default function UserNewEditForm({ currentUser }) {
                         containerStyle={
                           errors.phoneNumber ? { color: 'red' } : { color: '#637381' }
                         }
-                        disabled={!!currentUser}
                       />
                       {errors.phoneNumber && (
                         <Box
@@ -264,6 +281,40 @@ export default function UserNewEditForm({ currentUser }) {
                   );
                 })}
               </RHFSelect>
+              <RHFSelect fullWidth name="gender" label="Gender">
+                {[
+                  { value: 'male', name: 'Male' },
+                  { value: 'female', name: 'Female' },
+                  { value: 'other', name: 'Other' },
+                ].map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.name}
+                  </MenuItem>
+                ))}
+              </RHFSelect>
+              <Controller
+                name="dob"
+                control={control}
+                render={({ field, fieldState: { error } }) => (
+                  <DatePicker
+                    label="DOB"
+                    value={new Date(field.value)}
+                    onChange={(newValue) => {
+                      field.onChange(newValue);
+                    }}
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        error: !!error,
+                        helperText: error?.message,
+                      },
+                    }}
+                  />
+                )}
+              />
+              <RHFTextField name="fullAddress" label="Full Address" />
+              <RHFTextField name="state" label="State" />
+              <RHFTextField name="city" label="City" />
             </Box>
 
             <Stack alignItems="center" sx={{ mt: 3 }}>

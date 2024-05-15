@@ -22,7 +22,7 @@ export default function UserEditView() {
   const { id } = params;
 
   const { user: currentUser } = useGetUser(id);
-
+  console.log(currentUser);
   return (
     <Container maxWidth={settings.themeStretch ? false : 'lg'}>
       <CustomBreadcrumbs
@@ -36,7 +36,9 @@ export default function UserEditView() {
             name: 'User',
             href: paths.dashboard.user.list,
           },
-          { name: currentUser?.fullName },
+          {
+            name: `${currentUser?.firstName} ${currentUser?.lastName ? currentUser?.lastName : ''}`,
+          },
         ]}
         sx={{
           mb: { xs: 3, md: 5 },
