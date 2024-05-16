@@ -6,6 +6,7 @@ import Typography from '@mui/material/Typography';
 import { useSettingsContext } from 'src/components/settings';
 //
 import { TicketListView } from 'src/sections/ticket/view';
+import MissedEntryListView from 'src/sections/missedEntry/view/missedEntry-list-view';
 import { HutListView } from 'src/sections/hut/view';
 import { useGetDashboardCounts } from 'src/api/user';
 import AnalyticsWidgetSummary from '../analytics-widget-summary';
@@ -74,6 +75,9 @@ export default function OverviewAnalyticsView() {
 
         <Grid xs={12} sm={12} md={12}>
           <TicketListView isDashboard />
+        </Grid>
+        <Grid xs={12} sm={12} md={12}>
+          <MissedEntryListView isDashboard />
         </Grid>
       </Grid>
     </Container>

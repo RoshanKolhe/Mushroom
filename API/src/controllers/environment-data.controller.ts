@@ -193,4 +193,82 @@ export class EnvironmentDataController {
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.environmentDataRepository.deleteById(id);
   }
+
+  @authenticate({
+    strategy: 'jwt',
+    options: {
+      required: [
+        PermissionKeys.SUPER_ADMIN,
+        PermissionKeys.CLUSTER_ADMIN,
+        PermissionKeys.HUT_ADMIN,
+      ],
+    },
+  })
+  @get('/missing-entries', {
+    responses: {
+      '200': {
+        description:
+          'Array of missing EnvironmentData entries with Hut details',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  date: {type: 'string'},
+                  hut: {
+                    type: 'object',
+                    properties: {
+                      id: {type: 'number'},
+                      name: {type: 'string'},
+                      // Include other Hut properties as needed
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+  async findMissingEntries(
+    @param.query.string('startDate') startDate: string,
+    @param.query.string('endDate') endDate: string,
+  ): Promise<any> {
+    const {startDate: defaultStartDate, endDate: defaultEndDate} =
+      this.getDefaultDates();
+
+    // Set default values if not provided
+    if (!startDate) {
+      startDate = defaultStartDate;
+    }
+    if (!endDate) {
+      endDate = defaultEndDate;
+    }
+    const missingEntries =
+      await this.environmentDataRepository.findMissingEntries(
+        startDate,
+        endDate,
+      );
+
+    return missingEntries;
+  }
+
+  getDefaultDates() {
+    const now = new Date();
+    const yesterday = new Date(now);
+    yesterday.setDate(now.getDate() - 1);
+    const lastMonthFirstDay = new Date(
+      now.getFullYear(),
+      now.getMonth() - 1,
+      1,
+    );
+
+    return {
+      startDate: lastMonthFirstDay.toISOString().split('T')[0],
+      endDate: yesterday.toISOString().split('T')[0],
+    };
+  }
 }

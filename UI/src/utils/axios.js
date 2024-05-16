@@ -65,6 +65,9 @@ export const endpoints = {
     list: '/huts',
     details: (id) => `/huts/${id}`,
   },
+  missedEntry: {
+    list: '/missing-entries',
+  },
   faq: {
     list: '/faqs',
     details: (id) => `/faqs/${id}`,
