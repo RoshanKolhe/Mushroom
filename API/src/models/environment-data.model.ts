@@ -59,10 +59,10 @@ export class EnvironmentData extends Entity {
   mushroomType: string;
 
   @property({
-    type: 'string',
-    default: 'No',
+    type: 'boolean',
+    default: false,
   })
-  isColorChanged?: string;
+  isColorChanged?: boolean;
 
   @property({
     type: 'string',
