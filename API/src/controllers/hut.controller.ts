@@ -106,7 +106,7 @@ export class HutController {
     const currentUserPermission = currnetUser.permissions;
     if (currentUserPermission.includes('super_admin')) {
       return this.hutRepository.find({...filter, include: ['user', 'cluster']});
-    } else {
+    } else if (currentUserPermission.includes('cluster_admin')) {
       const userAssignedClusters = await this.clusterRepository.find({
         where: {
           userId: currnetUser.id,
@@ -123,6 +123,15 @@ export class HutController {
         },
         include: ['user', 'cluster'],
       });
+      return userAssignedHuts;
+    } else {
+      const userAssignedHuts = await this.hutRepository.find({
+        where: {
+          userId: currnetUser.id,
+        },
+        include: ['user', 'cluster'],
+      });
+
       return userAssignedHuts;
     }
   }
