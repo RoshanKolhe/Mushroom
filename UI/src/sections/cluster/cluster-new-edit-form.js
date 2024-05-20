@@ -144,7 +144,7 @@ export default function ClusterNewEditForm({ currentCluster }) {
               <RHFSelect fullWidth name="user" label="Cluster User">
                 {userOptions.map((option) => (
                   <MenuItem key={option.id} value={option.id}>
-                    {option.fullName}
+                    {`${option?.firstName} ${option?.lastName ? option?.lastName : ''}`}
                   </MenuItem>
                 ))}
               </RHFSelect>

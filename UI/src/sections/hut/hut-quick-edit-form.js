@@ -147,7 +147,7 @@ export default function HutQuickEditForm({ currentHut, open, onClose, onRefreshH
             <RHFSelect fullWidth name="user" label="Hut User">
               {userOptions.map((option) => (
                 <MenuItem key={option.id} value={option.id}>
-                  {option.fullName}
+                  {`${option?.firstName} ${option?.lastName ? option?.lastName : ''}`}
                 </MenuItem>
               ))}
             </RHFSelect>
