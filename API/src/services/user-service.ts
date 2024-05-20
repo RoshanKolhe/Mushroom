@@ -25,6 +25,12 @@ export class MyUserService implements UserService<User, Credentials> {
       throw new HttpErrors.BadRequest('Email not found');
     }
 
+    if (!getUser.password) {
+      throw new HttpErrors.BadRequest(
+        'No Password is assigned to this mail please reset the password',
+      );
+    }
+
     if (!getUser.isActive) {
       throw new HttpErrors.BadRequest('User not active');
     }
@@ -44,7 +50,7 @@ export class MyUserService implements UserService<User, Credentials> {
       id: `${user.id}`,
       name: `${user.firstName}`,
       email: user.email,
-      phoneNumber:user.phoneNumber,
+      phoneNumber: user.phoneNumber,
       [securityId]: `${user.id}`,
       permissions: user.permissions,
     };

@@ -93,6 +93,32 @@ export function AuthProvider({ children }) {
     initialize();
   }, [initialize]);
 
+  // LOGIN With email
+  const loginWithMail = useCallback(async (email, password) => {
+    const data = {
+      email,
+      password,
+    };
+
+    const response = await axios.post(endpoints.auth.loginWithMail, data);
+
+    const { accessToken, user } = response.data;
+    console.log(user);
+    if (
+      user &&
+      (user.permissions.includes('super_admin') || user.permissions.includes('cluster_admin'))
+    )
+      setSession(accessToken);
+    else throw new Error("User Doesn't have permission");
+
+    dispatch({
+      type: 'LOGIN',
+      payload: {
+        user,
+      },
+    });
+  }, []);
+
   // LOGIN
   const login = useCallback(async (phoneNumber, otp, verificationsid) => {
     const data = {
@@ -167,9 +193,10 @@ export function AuthProvider({ children }) {
       //
       login,
       register,
+      loginWithMail,
       logout,
     }),
-    [login, logout, register, state.user, status]
+    [login,loginWithMail, logout, register, state.user, status]
   );
 
   return <AuthContext.Provider value={memoizedValue}>{children}</AuthContext.Provider>;

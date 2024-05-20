@@ -46,6 +46,7 @@ import {CredentialsRequestBody} from './specs/user-controller-spec';
 import {MushroomDataSource} from '../datasources';
 import {all} from 'axios';
 import {getStartAndEndDateOfWeek} from '../utils/constants';
+import Response from 'twilio/lib/http/response';
 
 export class UserController {
   constructor(
@@ -484,7 +485,7 @@ export class UserController {
         });
         return {
           success: true,
-          message: 'otp verification successfull',
+          message: 'Password reset successfull',
         };
       } else {
         return {

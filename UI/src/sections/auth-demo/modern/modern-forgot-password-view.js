@@ -14,10 +14,16 @@ import { PasswordIcon } from 'src/assets/icons';
 // components
 import Iconify from 'src/components/iconify';
 import FormProvider, { RHFTextField } from 'src/components/hook-form';
+import axiosInstance from 'src/utils/axios';
+import { useSnackbar } from 'notistack';
+import { useRouter } from 'src/routes/hook';
 
 // ----------------------------------------------------------------------
 
 export default function ModernForgotPasswordView() {
+  const { enqueueSnackbar } = useSnackbar();
+  const router = useRouter();
+
   const ForgotPasswordSchema = Yup.object().shape({
     email: Yup.string().required('Email is required').email('Email must be a valid email address'),
   });
@@ -38,8 +44,20 @@ export default function ModernForgotPasswordView() {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
       console.info('DATA', data);
+      const inputData = {
+        email: data.email,
+      };
+      axiosInstance
+        .post('/sendOtp', inputData)
+        .then((res) => {
+          if (res.data.success) {
+            router.push(`${paths.auth.jwt.newPassword}?email=${encodeURIComponent(data.email)}`);
+          }
+        })
+        .catch((err) => {
+          enqueueSnackbar(err.response.data.error.message);
+        });
     } catch (error) {
       console.error(error);
     }
@@ -63,7 +81,7 @@ export default function ModernForgotPasswordView() {
 
       <Link
         component={RouterLink}
-        href={paths.authDemo.modern.login}
+        href={paths.auth.jwt.login}
         color="inherit"
         variant="subtitle2"
         sx={{
@@ -85,8 +103,8 @@ export default function ModernForgotPasswordView() {
         <Typography variant="h3">Forgot your password?</Typography>
 
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          Please enter the email address associated with your account and We will email you a link
-          to reset your password.
+          Please enter the email address associated with your account and We will email you a OTP to
+          reset your password.
         </Typography>
       </Stack>
     </>

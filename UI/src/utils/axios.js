@@ -32,6 +32,7 @@ export const endpoints = {
   auth: {
     me: '/me',
     login: '/verify-otp-login',
+    loginWithMail: '/login',
     register: '/api/auth/register',
   },
   mail: {

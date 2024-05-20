@@ -50,7 +50,7 @@ export default function HeaderSimple() {
       >
         <Logo />
 
-        <Stack direction="row" alignItems="center" spacing={1}>
+        {/* <Stack direction="row" alignItems="center" spacing={1}>
           <SettingsButton />
 
           <Link
@@ -61,7 +61,7 @@ export default function HeaderSimple() {
           >
             Need help?
           </Link>
-        </Stack>
+        </Stack> */}
       </Toolbar>
 
       {offsetTop && <HeaderShadow />}

@@ -18,11 +18,20 @@ import { SentIcon } from 'src/assets/icons';
 // components
 import Iconify from 'src/components/iconify';
 import FormProvider, { RHFTextField, RHFCode } from 'src/components/hook-form';
+import { useLocation } from 'react-router';
+import axiosInstance from 'src/utils/axios';
+import { useSnackbar } from 'notistack';
+import { useRouter } from 'src/routes/hook';
 
 // ----------------------------------------------------------------------
 
 export default function ModernNewPasswordView() {
   const password = useBoolean();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const email = queryParams.get('email');
+  const router = useRouter();
+  const { enqueueSnackbar } = useSnackbar();
 
   const NewPasswordSchema = Yup.object().shape({
     code: Yup.string().min(6, 'Code must be at least 6 characters').required('Code is required'),
@@ -37,7 +46,7 @@ export default function ModernNewPasswordView() {
 
   const defaultValues = {
     code: '',
-    email: '',
+    email,
     password: '',
     confirmPassword: '',
   };
@@ -53,10 +62,38 @@ export default function ModernNewPasswordView() {
     formState: { isSubmitting },
   } = methods;
 
+  const resendOtp = () => {
+    const inputData = {
+      email,
+    };
+    axiosInstance
+      .post('/sendOtp', inputData)
+      .then((res) => {
+        if (res.data.success) {
+          enqueueSnackbar('Otp Resend Successfull');
+        }
+      })
+      .catch((err) => {
+        enqueueSnackbar(err.response.data.error.message);
+      });
+  };
+
   const onSubmit = handleSubmit(async (data) => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
       console.info('DATA', data);
+      const inputData = {
+        email: data.email,
+        otp: data.code,
+        password: data.password,
+      };
+      await axiosInstance.post('/verifyOtp', inputData).then((res) => {
+        if (res.data.success) {
+          enqueueSnackbar(res?.data?.message, { variant: 'success' });
+          router.push(paths.auth.jwt.login);
+        } else {
+          methods.setError('otp', "OTP Doesn't match");
+        }
+      });
     } catch (error) {
       console.error(error);
     }
@@ -69,6 +106,7 @@ export default function ModernNewPasswordView() {
         label="Email"
         placeholder="example@gmail.com"
         InputLabelProps={{ shrink: true }}
+        disabled
       />
 
       <RHFCode name="code" />
@@ -119,6 +157,9 @@ export default function ModernNewPasswordView() {
           variant="subtitle2"
           sx={{
             cursor: 'pointer',
+          }}
+          onClick={() => {
+            resendOtp();
           }}
         >
           Resend code
