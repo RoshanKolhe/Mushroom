@@ -778,18 +778,24 @@ export class UserController {
     };
   }
 
-  @authenticate({
-    strategy: 'jwt',
-  })
-  @get('/latestEnvironmentData', {
+  // @authenticate({
+  //   strategy: 'jwt',
+  // })
+  @post('/latestEnvironmentData', {
     responses: {
       '200': {
         description: 'Latest entry',
       },
     },
   })
-  async findLatest(): Promise<any> {
+  async findLatest(
+    @requestBody({})
+    hutData: any,
+  ): Promise<any> {
     const latestEntry = await this.environmentDataRepository.findOne({
+      where: {
+        hutId: hutData.hutId,
+      },
       order: ['createdAt DESC'],
     });
     return latestEntry;
