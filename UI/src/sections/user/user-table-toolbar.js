@@ -100,9 +100,9 @@ export default function UserTableToolbar({
             }}
           />
 
-          {/* <IconButton onClick={popover.onOpen}>
+          <IconButton onClick={popover.onOpen}>
             <Iconify icon="eva:more-vertical-fill" />
-          </IconButton> */}
+          </IconButton>
         </Stack>
       </Stack>
 
@@ -112,14 +112,14 @@ export default function UserTableToolbar({
         arrow="right-top"
         sx={{ width: 140 }}
       >
-        <MenuItem
+        {/* <MenuItem
           onClick={() => {
             popover.onClose();
           }}
         >
           <Iconify icon="solar:printer-minimalistic-bold" />
           Print
-        </MenuItem>
+        </MenuItem> */}
 
         <MenuItem
           onClick={() => {
@@ -136,7 +136,7 @@ export default function UserTableToolbar({
           }}
         >
           <Iconify icon="solar:export-bold" />
-          Export
+          Dummy Excel
         </MenuItem>
       </CustomPopover>
     </>

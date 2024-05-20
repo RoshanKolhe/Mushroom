@@ -73,7 +73,7 @@ export class HutController {
     }
 
     const user = await this.userRepository.findById(hut.userId);
-    if (!user.permissions.includes('hut_admin')) {
+    if (!user.permissions.includes('hut_user')) {
       throw new HttpErrors.BadRequest(
         'only user with hut admin permission can be assign to this hut',
       );

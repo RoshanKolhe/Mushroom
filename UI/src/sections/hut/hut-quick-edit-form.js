@@ -29,7 +29,7 @@ export default function HutQuickEditForm({ currentHut, open, onClose, onRefreshH
   const { enqueueSnackbar } = useSnackbar();
 
   const { filteredUsers, filteredUsersLoading, filteredUsersEmpty, refreshFilterUsers } =
-    useGetUsersWithFilter('filter={"where":{"permissions":["hut_admin"]}}');
+    useGetUsersWithFilter('filter={"where":{"permissions":["hut_user"]}}');
 
   const { clusters, clustersLoading, clustersEmpty, refreshClusters } = useGetClusters();
 

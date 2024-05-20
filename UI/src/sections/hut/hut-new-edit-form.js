@@ -52,7 +52,7 @@ export default function HutNewEditForm({ currentHut }) {
   const router = useRouter();
 
   const { filteredUsers, filteredUsersLoading, filteredUsersEmpty, refreshFilterUsers } =
-    useGetUsersWithFilter('filter={"where":{"permissions":["hut_admin"]}}');
+    useGetUsersWithFilter('filter={"where":{"permissions":["hut_user"]}}');
 
   const { clusters, clustersLoading, clustersEmpty, refreshClusters } = useGetClusters();
 

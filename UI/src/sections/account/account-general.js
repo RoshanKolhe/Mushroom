@@ -242,7 +242,7 @@ export default function AccountGeneral() {
               <RHFSelect fullWidth name="role" label="Role" disabled>
                 {[
                   { value: 'super_admin', name: 'Super Admin' },
-                  { value: 'hut_admin', name: 'Hut Admin' },
+                  { value: 'hut_user', name: 'Hut Admin' },
                   { value: 'cluster_admin', name: 'Cluster Admin' },
                 ].map((option) => (
                   <MenuItem key={option.value} value={option.value}>

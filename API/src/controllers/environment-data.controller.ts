@@ -40,7 +40,7 @@ export class EnvironmentDataController {
       required: [
         PermissionKeys.SUPER_ADMIN,
         PermissionKeys.CLUSTER_ADMIN,
-        PermissionKeys.HUT_ADMIN,
+        PermissionKeys.HUT_USER,
       ],
     },
   })
@@ -82,7 +82,7 @@ export class EnvironmentDataController {
       required: [
         PermissionKeys.SUPER_ADMIN,
         PermissionKeys.CLUSTER_ADMIN,
-        PermissionKeys.HUT_ADMIN,
+        PermissionKeys.HUT_USER,
       ],
     },
   })
@@ -127,7 +127,7 @@ export class EnvironmentDataController {
       required: [
         PermissionKeys.SUPER_ADMIN,
         PermissionKeys.CLUSTER_ADMIN,
-        PermissionKeys.HUT_ADMIN,
+        PermissionKeys.HUT_USER,
       ],
     },
   })
@@ -154,7 +154,7 @@ export class EnvironmentDataController {
       required: [
         PermissionKeys.SUPER_ADMIN,
         PermissionKeys.CLUSTER_ADMIN,
-        PermissionKeys.HUT_ADMIN,
+        PermissionKeys.HUT_USER,
       ],
     },
   })
@@ -182,7 +182,7 @@ export class EnvironmentDataController {
       required: [
         PermissionKeys.SUPER_ADMIN,
         PermissionKeys.CLUSTER_ADMIN,
-        PermissionKeys.HUT_ADMIN,
+        PermissionKeys.HUT_USER,
       ],
     },
   })
@@ -200,7 +200,7 @@ export class EnvironmentDataController {
       required: [
         PermissionKeys.SUPER_ADMIN,
         PermissionKeys.CLUSTER_ADMIN,
-        PermissionKeys.HUT_ADMIN,
+        PermissionKeys.HUT_USER,
       ],
     },
   })

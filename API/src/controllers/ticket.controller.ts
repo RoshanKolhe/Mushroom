@@ -49,7 +49,7 @@ export class TicketController {
     options: {
       required: [
         PermissionKeys.SUPER_ADMIN,
-        PermissionKeys.HUT_ADMIN,
+        PermissionKeys.HUT_USER,
         PermissionKeys.CLUSTER_ADMIN,
       ],
     },
@@ -95,7 +95,7 @@ export class TicketController {
     options: {
       required: [
         PermissionKeys.SUPER_ADMIN,
-        PermissionKeys.HUT_ADMIN,
+        PermissionKeys.HUT_USER,
         PermissionKeys.CLUSTER_ADMIN,
       ],
     },
@@ -123,7 +123,7 @@ export class TicketController {
         include: ['user'],
         order: ['createdAt DESC'],
       });
-    } else if (user.permissions.includes('hut_admin')) {
+    } else if (user.permissions.includes('hut_user')) {
       const userHut = await this.hutRepository.findOne(currnetUser.id);
       if (!userHut) {
         throw new HttpErrors.BadRequest('No Hut is assigned to this user');
@@ -171,7 +171,7 @@ export class TicketController {
     options: {
       required: [
         PermissionKeys.SUPER_ADMIN,
-        PermissionKeys.HUT_ADMIN,
+        PermissionKeys.HUT_USER,
         PermissionKeys.CLUSTER_ADMIN,
       ],
     },

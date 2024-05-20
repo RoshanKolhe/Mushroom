@@ -90,7 +90,7 @@ export default function UserListView() {
     refreshFilterUsers: refreshUsers,
   } = useGetUsersWithFilter(
     userData && userData.permissions.includes('cluster_admin')
-      ? 'filter={"where":{"permissions":["hut_admin"]}}'
+      ? 'filter={"where":{"permissions":["hut_user"]}}'
       : null
   );
 
@@ -391,7 +391,7 @@ function applyFilter({ inputData, comparator, filters }) {
   const { name, status, role } = filters;
   const stabilizedThis = inputData.map((el, index) => [el, index]);
   const roleMapping = {
-    hut_admin: 'Hut Admin',
+    hut_user: 'Hut Admin',
     cluster_admin: 'Cluster Admin',
   };
   stabilizedThis.sort((a, b) => {

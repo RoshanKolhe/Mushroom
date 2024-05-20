@@ -264,7 +264,7 @@ export default function UserNewEditForm({ currentUser }) {
               </div>
               <RHFSelect fullWidth name="role" label="Role">
                 {[
-                  { value: 'hut_admin', name: 'Hut Admin' },
+                  { value: 'hut_user', name: 'Hut Admin' },
                   { value: 'cluster_admin', name: 'Cluster Admin' },
                 ].map((option) => {
                   if (option.value === 'cluster_admin' && isAdmin) {
