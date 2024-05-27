@@ -30,6 +30,7 @@ import {
 import {inject} from '@loopback/core';
 import {authenticate, AuthenticationBindings} from '@loopback/authentication';
 import {PermissionKeys} from '../authorization/permission-keys';
+import {request} from 'http';
 
 export class EnvironmentDataController {
   constructor(
@@ -95,7 +96,7 @@ export class EnvironmentDataController {
       ],
     },
   })
-  @get('/environment-data')
+  @post('/environment-data')
   @response(200, {
     description: 'Array of EnvironmentData model instances',
     content: {
@@ -108,6 +109,8 @@ export class EnvironmentDataController {
     },
   })
   async find(
+    @requestBody()
+    environmentData: any,
     @inject(AuthenticationBindings.CURRENT_USER) currnetUser: UserProfile,
     @param.filter(EnvironmentData) filter?: Filter<EnvironmentData>,
   ): Promise<EnvironmentData[]> {
@@ -115,16 +118,16 @@ export class EnvironmentDataController {
     if (currentUserPermission.includes('super_admin')) {
       return this.environmentDataRepository.find(filter);
     } else {
-      const user = await this.userRepository.findById(currnetUser.id, {
-        include: ['hut'],
-      });
-      if (!user.hut) {
-        throw new HttpErrors.BadRequest('No hut is assigned to this user');
-      }
+      // const user = await this.userRepository.findById(currnetUser.id, {
+      //   include: ['hut'],
+      // });
+      // if (!user.hut) {
+      //   throw new HttpErrors.BadRequest('No hut is assigned to this user');
+      // }
       return this.environmentDataRepository.find({
         ...filter,
         where: {
-          hutId: user.hut.id,
+          hutId: environmentData.hutId,
         },
       });
     }
