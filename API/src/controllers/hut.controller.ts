@@ -42,7 +42,11 @@ export class HutController {
   @authenticate({
     strategy: 'jwt',
     options: {
-      required: [PermissionKeys.SUPER_ADMIN, PermissionKeys.CLUSTER_ADMIN],
+      required: [
+        PermissionKeys.SUPER_ADMIN,
+        PermissionKeys.CLUSTER_ADMIN,
+        PermissionKeys.HUT_USER,
+      ],
     },
   })
   @post('/huts')
@@ -75,7 +79,7 @@ export class HutController {
     const user = await this.userRepository.findById(hut.userId);
     if (!user.permissions.includes('hut_user')) {
       throw new HttpErrors.BadRequest(
-        'only user with hut admin permission can be assign to this hut',
+        'only user with hut user permission can be assign to this hut',
       );
     }
     return this.hutRepository.create(hut);
