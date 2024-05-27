@@ -92,6 +92,7 @@ export class HutController {
         PermissionKeys.SUPER_ADMIN,
         PermissionKeys.CLUSTER_ADMIN,
         PermissionKeys.GROUP_ADMIN,
+        PermissionKeys.HUT_USER,
       ],
     },
   })
@@ -165,7 +166,11 @@ export class HutController {
   @authenticate({
     strategy: 'jwt',
     options: {
-      required: [PermissionKeys.SUPER_ADMIN, PermissionKeys.CLUSTER_ADMIN],
+      required: [
+        PermissionKeys.SUPER_ADMIN,
+        PermissionKeys.CLUSTER_ADMIN,
+        PermissionKeys.HUT_USER,
+      ],
     },
   })
   @get('/huts/{id}')
@@ -190,7 +195,11 @@ export class HutController {
   @authenticate({
     strategy: 'jwt',
     options: {
-      required: [PermissionKeys.SUPER_ADMIN, PermissionKeys.CLUSTER_ADMIN],
+      required: [
+        PermissionKeys.SUPER_ADMIN,
+        PermissionKeys.CLUSTER_ADMIN,
+        PermissionKeys.HUT_USER,
+      ],
     },
   })
   @patch('/huts/{id}')
@@ -224,7 +233,11 @@ export class HutController {
   @authenticate({
     strategy: 'jwt',
     options: {
-      required: [PermissionKeys.SUPER_ADMIN, PermissionKeys.CLUSTER_ADMIN],
+      required: [
+        PermissionKeys.SUPER_ADMIN,
+        PermissionKeys.CLUSTER_ADMIN,
+        PermissionKeys.HUT_USER,
+      ],
     },
   })
   @del('/huts/{id}')
