@@ -54,7 +54,7 @@ export class TicketController {
       ],
     },
   })
-  @post('/tickets')
+  @post('/create-tickets')
   @response(200, {
     description: 'Ticket model instance',
     content: {'application/json': {schema: getModelSchemaRef(Ticket)}},
@@ -93,7 +93,7 @@ export class TicketController {
       ],
     },
   })
-  @get('/tickets')
+  @post('/tickets')
   @response(200, {
     description: 'Array of Ticket model instances',
     content: {
@@ -106,6 +106,7 @@ export class TicketController {
     },
   })
   async find(
+    @requestBody() ticketData:any,
     @inject(AuthenticationBindings.CURRENT_USER) currnetUser: UserProfile,
     @param.filter(Ticket) filter?: Filter<Ticket>,
   ): Promise<Ticket[]> {
@@ -118,15 +119,11 @@ export class TicketController {
         order: ['createdAt DESC'],
       });
     } else if (user.permissions.includes('hut_user')) {
-      const userHut = await this.hutRepository.findOne(currnetUser.id);
-      if (!userHut) {
-        throw new HttpErrors.BadRequest('No Hut is assigned to this user');
-      }
       return this.ticketRepository.find({
         ...filter,
         where: {
           ...((filter && filter.where) || {}),
-          hutId: userHut.id,
+          hutId: ticketData.hutId,
         },
         include: ['user'],
         order: ['createdAt DESC'],
