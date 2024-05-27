@@ -54,7 +54,7 @@ export class EnvironmentDataController {
       ],
     },
   })
-  @post('/environment-data')
+  @post('/create-environment-data')
   @response(200, {
     description: 'EnvironmentData model instance',
     content: {'application/json': {schema: getModelSchemaRef(EnvironmentData)}},
