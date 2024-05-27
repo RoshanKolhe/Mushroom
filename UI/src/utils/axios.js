@@ -78,8 +78,8 @@ export const endpoints = {
     details: (id) => `/sales-data/${id}`,
   },
   ticket: {
-    list: '/tickets',
+    list: '/tickets-with-filter',
     details: (id) => `/tickets/${id}`,
-    filterList: (filter) => `/tickets?${filter}`,
+    filterList: (filter) => `/tickets-with-filter?${filter}`,
   },
 };

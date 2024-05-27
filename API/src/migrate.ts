@@ -16,6 +16,7 @@ export async function migrate(args: string[]) {
       'EnvironmentData',
       'SalesData',
       'Ticket',
+      'Messages',
     ],
   });
 

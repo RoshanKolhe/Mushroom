@@ -314,6 +314,8 @@ export default function UserListView() {
                       tableData.map((row) => row.id)
                     )
                   }
+                  showCheckbox={false}
+
                 />
 
                 <TableBody>
@@ -391,7 +393,7 @@ function applyFilter({ inputData, comparator, filters }) {
   const { name, status, role } = filters;
   const stabilizedThis = inputData.map((el, index) => [el, index]);
   const roleMapping = {
-    hut_user: 'Hut Admin',
+    hut_user: 'Hut User',
     cluster_admin: 'Cluster Admin',
   };
   stabilizedThis.sort((a, b) => {

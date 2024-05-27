@@ -17,15 +17,26 @@ import CustomPopover, { usePopover } from 'src/components/custom-popover';
 import { Button, Typography } from '@mui/material';
 import { RouterLink } from 'src/routes/components';
 import { paths } from 'src/routes/paths';
+import { useGetClusters } from 'src/api/cluster';
 
 // ----------------------------------------------------------------------
 
 export default function HutTableToolbar({ isDashboard, filters, onFilters }) {
   const popover = usePopover();
 
+  const { clusters, clustersLoading, clustersEmpty, refreshClusters } = useGetClusters();
+
   const handleFilterName = useCallback(
     (event) => {
       onFilters('name', event.target.value);
+    },
+    [onFilters]
+  );
+
+  const handleFilterHuts = useCallback(
+    (event) => {
+      console.log(event);
+      onFilters('clusterId', event.target.value);
     },
     [onFilters]
   );
@@ -46,6 +57,41 @@ export default function HutTableToolbar({ isDashboard, filters, onFilters }) {
               pr: { xs: 2.5, md: 1 },
             }}
           >
+            <FormControl
+              sx={{
+                flexShrink: 0,
+                width: { xs: 1, md: 200 },
+              }}
+            >
+              <InputLabel>Clusters</InputLabel>
+
+              <Select
+                multiple
+                value={filters.clusterId}
+                onChange={handleFilterHuts}
+                input={<OutlinedInput label="Clusters" />}
+                renderValue={(selected) => selected.map((value) => value.name).join(', ')}
+                MenuProps={{
+                  PaperProps: {
+                    sx: { maxHeight: 240 },
+                  },
+                }}
+              >
+                {clusters &&
+                  clusters.length &&
+                  clusters.length > 0 &&
+                  clusters.map((option) => (
+                    <MenuItem key={option.id} value={option}>
+                      <Checkbox
+                        disableRipple
+                        size="small"
+                        checked={filters.clusterId.some((obj) => obj.id === option.id)}
+                      />
+                      {option.name}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
             <Stack direction="row" alignItems="center" spacing={2} flexGrow={1} sx={{ width: 1 }}>
               <TextField
                 fullWidth

@@ -61,6 +61,7 @@ const TABLE_HEAD = [
 
 const defaultFilters = {
   name: '',
+  clusterId: [],
 };
 
 // ----------------------------------------------------------------------
@@ -152,14 +153,13 @@ export default function HutListView({ isDashboard }) {
     setFilters(defaultFilters);
   }, []);
 
-  
-  const downlodCsvFromTableData = () =>{
+  const downlodCsvFromTableData = () => {
     const fileName = 'Cluster Management.xlsx';
     const ws = XLSX.utils.json_to_sheet(tableData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Coupon Master');
     XLSX.writeFile(wb, fileName);
-  }
+  };
 
   useEffect(() => {
     if (huts) {
@@ -193,7 +193,7 @@ export default function HutListView({ isDashboard }) {
                     border: 'solid 1px #00554E',
                     marginRight: '20px',
                   }}
-                  onClick={()=>{
+                  onClick={() => {
                     downlodCsvFromTableData();
                   }}
                 >
@@ -207,7 +207,6 @@ export default function HutListView({ isDashboard }) {
                     startIcon={<Iconify icon="mingcute:add-line" />}
                     color="primary"
                     style={{ width: '155px', backgroundColor: '#00554E' }}
-                    
                   >
                     New Hut
                   </Button>
@@ -270,6 +269,7 @@ export default function HutListView({ isDashboard }) {
                       tableData.map((row) => row.id)
                     )
                   }
+                  showCheckbox={false}
                 />
 
                 <TableBody>
@@ -347,7 +347,7 @@ HutListView.propTypes = {
 // ----------------------------------------------------------------------
 
 function applyFilter({ inputData, comparator, filters }) {
-  const { name } = filters;
+  const { name, clusterId } = filters;
   const stabilizedThis = inputData.map((el, index) => [el, index]);
   stabilizedThis.sort((a, b) => {
     const order = comparator(a[0], b[0]);
@@ -363,5 +363,12 @@ function applyFilter({ inputData, comparator, filters }) {
     );
   }
 
+  if (clusterId.length) {
+    inputData = inputData.filter((hut) => {
+      console.log(hut);
+      return clusterId.some((cluster) => cluster.id === hut.clusterId);
+    });
+  }
+  console.log(inputData);
   return inputData;
 }

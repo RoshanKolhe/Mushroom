@@ -265,6 +265,7 @@ export default function TicketListView({ isDashboard }) {
                       tableData.map((row) => row.id)
                     )
                   }
+                  showCheckbox={false}
                 />
 
                 <TableBody>

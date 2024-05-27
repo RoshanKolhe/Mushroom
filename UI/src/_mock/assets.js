@@ -238,7 +238,7 @@ export const _phoneNumbers = [
 
 // ----------------------------------------------------------------------
 
-export const _roles = ['Hut Admin', 'Cluster Admin'];
+export const _roles = ['Hut User', 'Cluster Admin'];
 
 // ----------------------------------------------------------------------
 

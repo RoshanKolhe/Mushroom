@@ -5,3 +5,4 @@ export * from './faq.repository';
 export * from './environment-data.repository';
 export * from './sales-data.repository';
 export * from './ticket.repository';
+export * from './messages.repository';

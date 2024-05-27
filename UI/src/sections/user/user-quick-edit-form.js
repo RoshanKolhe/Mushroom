@@ -23,6 +23,7 @@ import { useSnackbar } from 'src/components/snackbar';
 import FormProvider, { RHFSelect, RHFTextField } from 'src/components/hook-form';
 import axiosInstance from 'src/utils/axios';
 import { useAuthContext } from 'src/auth/hooks';
+import { states } from 'src/utils/constants';
 
 // ----------------------------------------------------------------------
 
@@ -170,7 +171,7 @@ export default function UserQuickEditForm({ currentUser, open, onClose, onRefres
 
             <RHFSelect fullWidth name="role" label="Role">
               {[
-                { value: 'hut_user', name: 'Hut Admin' },
+                { value: 'hut_user', name: 'Hut User' },
                 { value: 'cluster_admin', name: 'Cluster Admin' },
                 { value: 'group_admin', name: 'Group Admin' },
               ].map((option) => {
@@ -220,8 +221,14 @@ export default function UserQuickEditForm({ currentUser, open, onClose, onRefres
               )}
             />
             <RHFTextField name="fullAddress" label="Full Address" />
-            <RHFTextField name="state" label="State" />
             <RHFTextField name="city" label="City" />
+            <RHFSelect fullWidth name="state" label="State">
+                {states.map((option) => (
+                  <MenuItem key={option.id} value={option.id}>
+                    {option.name}
+                  </MenuItem>
+                ))}
+              </RHFSelect>
           </Box>
         </DialogContent>
 

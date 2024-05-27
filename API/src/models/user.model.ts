@@ -63,6 +63,39 @@ export class User extends Entity {
   phoneNumber: string;
 
   @property({
+    type: 'string',
+    required: true,
+  })
+  userType: string;
+
+  @property({
+    type: 'string',
+    required: true,
+  })
+  investmentType: string;
+
+  @property({
+    type: 'string',
+  })
+  emiStartDate: string;
+
+  @property({
+    type: 'string',
+  })
+  emiAmount: string;
+
+
+  @property({
+    type: 'string',
+  })
+  emiDate: string;
+
+  @property({
+    type: 'string',
+  })
+  shgName: string;
+
+  @property({
     type: 'object',
   })
   avatar?: object;

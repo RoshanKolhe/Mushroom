@@ -183,6 +183,96 @@ export class TicketController {
     }
   }
 
+
+  @authenticate({
+    strategy: 'jwt',
+    options: {
+      required: [
+        PermissionKeys.SUPER_ADMIN,
+        PermissionKeys.HUT_USER,
+        PermissionKeys.CLUSTER_ADMIN,
+        PermissionKeys.GROUP_ADMIN,
+      ],
+    },
+  })
+  @get('/tickets-with-filter')
+  @response(200, {
+    description: 'Array of Ticket model instances',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(Ticket, {includeRelations: true}),
+        },
+      },
+    },
+  })
+  async findAllTickets(
+    @inject(AuthenticationBindings.CURRENT_USER) currnetUser: UserProfile,
+    @param.filter(Ticket) filter?: Filter<Ticket>,
+  ): Promise<Ticket[]> {
+    const user = await this.userRepository.findById(currnetUser.id);
+    if (user.permissions.includes('super_admin')) {
+      return this.ticketRepository.find({
+        ...filter,
+        include: ['user'],
+        order: ['createdAt DESC'],
+      });
+    } else if (user.permissions.includes('group_admin')) {
+      const userClusters = await this.clusterRepository.find({
+        where: {
+          groupUserId: currnetUser.id,
+        },
+      });
+      const userClusterIds: any = userClusters.map(cluster => cluster.id);
+      const hutsAssignToClusters = await this.hutRepository.find({
+        where: {
+          clusterId: {
+            inq: userClusterIds,
+          },
+        },
+      });
+      const hutIds: any = hutsAssignToClusters.map(hut => hut.id);
+      return this.ticketRepository.find({
+        ...filter,
+        include: ['user'],
+        where: {
+          ...((filter && filter.where) || {}),
+          hutId: {
+            inq: hutIds,
+          },
+        },
+        order: ['createdAt DESC'],
+      });
+    } else {
+      const userClusters = await this.clusterRepository.find({
+        where: {
+          userId: currnetUser.id,
+        },
+      });
+      const userClusterIds: any = userClusters.map(cluster => cluster.id);
+      const hutsAssignToClusters = await this.hutRepository.find({
+        where: {
+          clusterId: {
+            inq: userClusterIds,
+          },
+        },
+      });
+      const hutIds: any = hutsAssignToClusters.map(hut => hut.id);
+      return this.ticketRepository.find({
+        ...filter,
+        include: ['user'],
+        where: {
+          ...((filter && filter.where) || {}),
+          hutId: {
+            inq: hutIds,
+          },
+        },
+        order: ['createdAt DESC'],
+      });
+    }
+  }
+
   @authenticate({
     strategy: 'jwt',
     options: {

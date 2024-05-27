@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import * as Yup from 'yup';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
@@ -38,6 +38,7 @@ import { MenuItem } from '@mui/material';
 import { color } from 'framer-motion';
 import axiosInstance from 'src/utils/axios';
 import { useAuthContext } from 'src/auth/hooks';
+import { states } from 'src/utils/constants';
 
 // ----------------------------------------------------------------------
 
@@ -57,19 +58,29 @@ export default function UserNewEditForm({ currentUser }) {
 
   const { enqueueSnackbar } = useSnackbar();
 
-  const NewUserSchema = Yup.object().shape({
-    firstName: Yup.string().required('First Name is required'),
-    lastName: Yup.string().required('Last Name is required'),
-    email: Yup.string().required('Email is required').email('Email must be a valid email address'),
-    phoneNumber: Yup.string().required('Phone number is required'),
-    role: Yup.string().required('Role is required'),
-    gender: Yup.string().required('Gender is required'),
-    isActive: Yup.boolean(),
-    dob: Yup.string().required('Date is required'),
-    fullAddress: Yup.string().required('Full Address is required'),
-    city: Yup.string().required('City is required'),
-    state: Yup.string().required('State is required'),
-  });
+  const [validationSchema, setValidationSchema] = useState(
+    Yup.object().shape({
+      firstName: Yup.string().required('First Name is required'),
+      lastName: Yup.string().required('Last Name is required'),
+      email: Yup.string()
+        .required('Email is required')
+        .email('Email must be a valid email address'),
+      phoneNumber: Yup.string().required('Phone number is required'),
+      role: Yup.string().required('Role is required'),
+      gender: Yup.string().required('Gender is required'),
+      isActive: Yup.boolean(),
+      dob: Yup.string().required('Date is required'),
+      fullAddress: Yup.string().required('Full Address is required'),
+      city: Yup.string().required('City is required'),
+      state: Yup.string().required('State is required'),
+      userType: Yup.string().required('User Type is required'),
+      investmentType: Yup.string().required('Investment Type is required'),
+      shgName: Yup.string(),
+      emiStartDate: Yup.string(),
+      emiAmount: Yup.string(),
+      emiDate: Yup.string(),
+    })
+  );
 
   const defaultValues = useMemo(
     () => ({
@@ -85,12 +96,18 @@ export default function UserNewEditForm({ currentUser }) {
       fullAddress: currentUser?.fullAddress || '',
       city: currentUser?.city || '',
       state: currentUser?.state || '',
+      shgName: currentUser?.shgName || '',
+      userType: currentUser?.userType || '',
+      investmentType: currentUser?.investmentType || '',
+      emiStartDate: currentUser?.emiStartDate || '',
+      emiAmount: currentUser?.emiAmount || '',
+      emiDate: currentUser?.emiDate || '',
     }),
     [currentUser]
   );
 
   const methods = useForm({
-    resolver: yupResolver(NewUserSchema),
+    resolver: yupResolver(validationSchema),
     defaultValues,
   });
 
@@ -118,6 +135,12 @@ export default function UserNewEditForm({ currentUser }) {
         fullAddress: formData.fullAddress,
         city: formData.city,
         state: formData.state,
+        userType: formData.userType,
+        shgName: formData.shgName,
+        investmentType: formData.investmentType,
+        emiStartDate: formData.emiStartDate,
+        emiAmount: formData.emiAmount,
+        emiDate: formData.emiDate,
       };
       if (formData.avatarUrl) {
         inputData.avatar = {
@@ -169,6 +192,44 @@ export default function UserNewEditForm({ currentUser }) {
       reset(defaultValues);
     }
   }, [currentUser, defaultValues, reset]);
+
+  useEffect(() => {
+    if (values.userType === 'shg') {
+      setValidationSchema((prevSchema) =>
+        prevSchema.concat(
+          Yup.object().shape({ shgName: Yup.string().required('SHG Name is required') })
+        )
+      );
+    } else {
+      setValidationSchema((prevSchema) =>
+        prevSchema.concat(Yup.object().shape({ shgName: Yup.string() }))
+      );
+    }
+  }, [values.userType]);
+
+  useEffect(() => {
+    if (values.investmentType === 'bankLoan') {
+      setValidationSchema((prevSchema) =>
+        prevSchema.concat(
+          Yup.object().shape({
+            emiStartDate: Yup.string().required('Emi Start date is required'),
+            emiAmount: Yup.string().required('Emi Amount date is required'),
+            emiDate: Yup.string().required('Emi Date is required'),
+          })
+        )
+      );
+    } else {
+      setValidationSchema((prevSchema) =>
+        prevSchema.concat(
+          Yup.object().shape({
+            emiStartDate: Yup.string(),
+            emiAmount: Yup.string(),
+            emiDate: Yup.string(),
+          })
+        )
+      );
+    }
+  }, [values.investmentType]);
 
   return (
     <FormProvider methods={methods} onSubmit={onSubmit}>
@@ -264,7 +325,7 @@ export default function UserNewEditForm({ currentUser }) {
               </div>
               <RHFSelect fullWidth name="role" label="Role">
                 {[
-                  { value: 'hut_user', name: 'Hut Admin' },
+                  { value: 'hut_user', name: 'Hut User' },
                   { value: 'cluster_admin', name: 'Cluster Admin' },
                   { value: 'group_admin', name: 'Group Admin' },
                 ].map((option) => {
@@ -313,9 +374,73 @@ export default function UserNewEditForm({ currentUser }) {
                   />
                 )}
               />
+              <RHFSelect fullWidth name="userType" label="User Type">
+                {[
+                  { value: 'individual', name: 'Individual' },
+                  { value: 'shg', name: 'SHG ( Self Hep Group)' },
+                ].map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.name}
+                  </MenuItem>
+                ))}
+              </RHFSelect>
+              {values.userType === 'shg' ? <RHFTextField name="shgName" label="SHG Name" /> : null}
+              <RHFSelect fullWidth name="investmentType" label="Investment Type">
+                {[
+                  { value: 'bankLoan', name: 'Bank Loan' },
+                  { value: 'selfFinanace', name: 'Self Finance' },
+                ].map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.name}
+                  </MenuItem>
+                ))}
+              </RHFSelect>
+              {values.investmentType === 'bankLoan' ? (
+                <>
+                  <Controller
+                    name="emiStartDate"
+                    control={control}
+                    render={({ field, fieldState: { error } }) => (
+                      <DatePicker
+                        label="EMI Start Date"
+                        value={new Date(field.value)}
+                        onChange={(newValue) => {
+                          field.onChange(newValue);
+                        }}
+                        slotProps={{
+                          textField: {
+                            fullWidth: true,
+                            error: !!error,
+                            helperText: error?.message,
+                          },
+                        }}
+                      />
+                    )}
+                  />
+                  <RHFTextField name="emiAmount" label="Emi Amount" />
+                  <RHFSelect fullWidth name="emiDate" label="Emi Date">
+                    {[
+                      { value: '1', name: '1' },
+                      { value: '2', name: '2' },
+                      { value: '3', name: '3' },
+                    ].map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.name}
+                      </MenuItem>
+                    ))}
+                  </RHFSelect>
+                </>
+              ) : null}
+
               <RHFTextField name="fullAddress" label="Full Address" />
-              <RHFTextField name="state" label="State" />
               <RHFTextField name="city" label="City" />
+              <RHFSelect fullWidth name="state" label="State">
+                {states.map((option) => (
+                  <MenuItem key={option.id} value={option.id}>
+                    {option.name}
+                  </MenuItem>
+                ))}
+              </RHFSelect>
             </Box>
 
             <Stack alignItems="center" sx={{ mt: 3 }}>
