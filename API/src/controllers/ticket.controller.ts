@@ -73,18 +73,10 @@ export class TicketController {
     })
     ticket: Omit<Ticket, 'id'>,
   ): Promise<Ticket> {
-    const userHut = await this.hutRepository.findOne({
-      where: {
-        userId: currnetUser.id,
-      },
-    });
-    if (!userHut) {
-      throw new HttpErrors.BadRequest('No Hut is assigned to this user');
-    }
     const inptData: any = {
       ...ticket,
       ticketId: generateUniqueId(),
-      hutId: userHut.id,
+      hutId: ticket.hutId,
       userId: currnetUser.id,
     };
     return this.ticketRepository.create(inptData);

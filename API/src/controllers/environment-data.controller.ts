@@ -73,16 +73,9 @@ export class EnvironmentDataController {
     })
     environmentData: Omit<EnvironmentData, 'id'>,
   ): Promise<EnvironmentData> {
-    const user = await this.userRepository.findById(currnetUser.id, {
-      include: ['hut'],
-    });
-    if (!user.hut) {
-      throw new HttpErrors.BadRequest('No hut is assigned to this user');
-    }
-
     return this.environmentDataRepository.create({
       ...environmentData,
-      hutId: user.hut.id,
+      hutId: environmentData.hutId,
     });
   }
 

@@ -67,15 +67,6 @@ export class HutController {
     })
     hut: Omit<Hut, 'id'>,
   ): Promise<Hut> {
-    const existingHut = await this.hutRepository.findOne({
-      where: {userId: hut.userId},
-    });
-    if (existingHut) {
-      throw new HttpErrors.BadRequest(
-        'This user is already assigned to another hut',
-      );
-    }
-
     const user = await this.userRepository.findById(hut.userId);
     if (!user.permissions.includes('hut_user')) {
       throw new HttpErrors.BadRequest(
