@@ -1,5 +1,6 @@
 import {Entity, model, property, hasOne, hasMany} from '@loopback/repository';
 import {Hut} from './hut.model';
+import {Cluster} from './cluster.model';
 
 @model()
 export class User extends Entity {
@@ -99,6 +100,9 @@ export class User extends Entity {
 
   @hasOne(() => Hut)
   hut: Hut;
+
+  @hasMany(() => Cluster, {keyTo: 'groupUserId'})
+  groupClusters: Cluster[];
 
   constructor(data?: Partial<User>) {
     super(data);

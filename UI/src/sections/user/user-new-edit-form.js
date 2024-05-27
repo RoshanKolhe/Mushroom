@@ -63,12 +63,12 @@ export default function UserNewEditForm({ currentUser }) {
     email: Yup.string().required('Email is required').email('Email must be a valid email address'),
     phoneNumber: Yup.string().required('Phone number is required'),
     role: Yup.string().required('Role is required'),
-    gender: Yup.string().required('Role is required'),
+    gender: Yup.string().required('Gender is required'),
     isActive: Yup.boolean(),
     dob: Yup.string().required('Date is required'),
-    fullAddress: Yup.string().required('Role is required'),
-    city: Yup.string().required('Role is required'),
-    state: Yup.string().required('Role is required'),
+    fullAddress: Yup.string().required('Full Address is required'),
+    city: Yup.string().required('City is required'),
+    state: Yup.string().required('State is required'),
   });
 
   const defaultValues = useMemo(
@@ -266,6 +266,7 @@ export default function UserNewEditForm({ currentUser }) {
                 {[
                   { value: 'hut_user', name: 'Hut Admin' },
                   { value: 'cluster_admin', name: 'Cluster Admin' },
+                  { value: 'group_admin', name: 'Group Admin' },
                 ].map((option) => {
                   if (option.value === 'cluster_admin' && isAdmin) {
                     return (

@@ -31,7 +31,6 @@ import FormProvider, {
   RHFAutocomplete,
   RHFSelect,
 } from 'src/components/hook-form';
-import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/material.css';
 import { MenuItem } from '@mui/material';
 import axiosInstance from 'src/utils/axios';
@@ -51,10 +50,18 @@ export default function ClusterNewEditForm({ currentCluster }) {
   const { filteredUsers, filteredUsersLoading, filteredUsersEmpty, refreshFilterUsers } =
     useGetUsersWithFilter('filter={"where":{"permissions":["cluster_admin"]}}');
   const [userOptions, setUserOption] = useState([]);
+  const {
+    filteredUsers: groupFilteredUsers,
+    filteredUsersLoading: groupFilteredUsersLoading,
+    filteredUsersEmpty: groupFilteredUsersEmpty,
+    refreshFilterUsers: groupRefreshFilterUsers,
+  } = useGetUsersWithFilter('filter={"where":{"permissions":["group_admin"]}}');
+  const [groupUserOptions, setGroupUserOption] = useState([]);
   const { enqueueSnackbar } = useSnackbar();
 
   const NewClusterSchema = Yup.object().shape({
     name: Yup.string().required('Name is required'),
+    groupUser: Yup.string().required('Group User is required'),
     user: Yup.string().required('User is required'),
     noOfHuts: Yup.string().required('No of huts is required'),
     totalCultivation: Yup.string().required('Total Cultivation required'),
@@ -65,6 +72,7 @@ export default function ClusterNewEditForm({ currentCluster }) {
     () => ({
       name: currentCluster?.name || '',
       user: currentCluster?.userId || '',
+      groupUser: currentCluster?.groupUserId || '',
       noOfHuts: currentCluster?.noOfHuts || '',
       totalCultivation: currentCluster?.totalCultivation || '',
       isActive: currentCluster?.isActive || true,
@@ -97,6 +105,7 @@ export default function ClusterNewEditForm({ currentCluster }) {
         totalCultivation: formData.totalCultivation,
         isActive: formData.isActive,
         userId: Number(formData.user),
+        groupUserId: Number(formData.groupUser),
       };
       if (!currentCluster) {
         await axiosInstance.post('/clusters', inputData);
@@ -126,6 +135,12 @@ export default function ClusterNewEditForm({ currentCluster }) {
     }
   }, [filteredUsers]);
 
+  useEffect(() => {
+    if (groupFilteredUsers.length) {
+      setGroupUserOption(groupFilteredUsers);
+    }
+  }, [groupFilteredUsers]);
+
   return (
     <FormProvider methods={methods} onSubmit={onSubmit}>
       <Grid container spacing={3}>
@@ -143,6 +158,13 @@ export default function ClusterNewEditForm({ currentCluster }) {
               <RHFTextField name="name" label="Cluster Name" />
               <RHFSelect fullWidth name="user" label="Cluster User">
                 {userOptions.map((option) => (
+                  <MenuItem key={option.id} value={option.id}>
+                    {`${option?.firstName} ${option?.lastName ? option?.lastName : ''}`}
+                  </MenuItem>
+                ))}
+              </RHFSelect>
+              <RHFSelect fullWidth name="groupUser" label="Group User">
+                {groupUserOptions.map((option) => (
                   <MenuItem key={option.id} value={option.id}>
                     {`${option?.firstName} ${option?.lastName ? option?.lastName : ''}`}
                   </MenuItem>

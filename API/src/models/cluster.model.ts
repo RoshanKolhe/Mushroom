@@ -47,6 +47,11 @@ export class Cluster extends Entity {
   @belongsTo(() => User)
   userId: number;
 
+  @property({
+    type: 'number',
+  })
+  groupUserId?: number;
+
   constructor(data?: Partial<Cluster>) {
     super(data);
   }

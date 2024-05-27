@@ -162,7 +162,7 @@ export default function HutNewEditForm({ currentHut }) {
                   </MenuItem>
                 ))}
               </RHFSelect>
-              <RHFSelect fullWidth name="cluster" label="Cluster User">
+              <RHFSelect fullWidth name="cluster" label="Cluster Name">
                 {clusterOptions.map((option) => (
                   <MenuItem key={option.id} value={option.id}>
                     {option.name}

@@ -57,7 +57,7 @@ export function useNavData() {
   const { t } = useLocales();
 
   const { user } = useAuthContext();
-
+  console.log(user);
   let data = [];
 
   if (user && user.permissions.includes('super_admin')) {
@@ -138,6 +138,63 @@ export function useNavData() {
   }
 
   if (user && user.permissions.includes('cluster_admin')) {
+    data = [
+      // OVERVIEW
+      {
+        subheader: t('Dashboard'),
+        items: [
+          // DASHBOARD
+          {
+            title: 'Dashboard',
+            path: paths.dashboard.root,
+            icon: ICONS.dashboard,
+          },
+          // USER
+          {
+            title: 'Manage ACL',
+            path: paths.dashboard.user.root,
+            icon: ICONS.user,
+            children: [
+              { title: t('list'), path: paths.dashboard.user.list },
+              // { title: t('create'), path: paths.dashboard.user.new },
+            ],
+          },
+          // CLUSTER
+          {
+            title: 'Manage Clusters',
+            path: paths.dashboard.cluster.root,
+            icon: ICONS.cluster,
+            children: [
+              { title: t('list'), path: paths.dashboard.cluster.list },
+              // { title: t('create'), path: paths.dashboard.cluster.new },
+            ],
+          },
+          // HUT
+          {
+            title: 'Manage Huts',
+            path: paths.dashboard.hut.root,
+            icon: ICONS.hut,
+            children: [
+              { title: t('list'), path: paths.dashboard.hut.list },
+              // { title: t('create'), path: paths.dashboard.hut.new },
+            ],
+          },
+          // TICKET
+          {
+            title: 'Manage Tickets',
+            path: paths.dashboard.ticket.root,
+            icon: ICONS.ticket,
+            children: [
+              { title: t('list'), path: paths.dashboard.ticket.list },
+              // { title: t('create'), path: paths.dashboard.ticket.new },
+            ],
+          },
+        ],
+      },
+    ];
+  }
+
+  if (user && user.permissions.includes('group_admin')) {
     data = [
       // OVERVIEW
       {

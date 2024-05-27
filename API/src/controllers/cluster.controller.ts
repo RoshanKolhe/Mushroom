@@ -67,7 +67,11 @@ export class ClusterController {
   @authenticate({
     strategy: 'jwt',
     options: {
-      required: [PermissionKeys.SUPER_ADMIN, PermissionKeys.CLUSTER_ADMIN],
+      required: [
+        PermissionKeys.SUPER_ADMIN,
+        PermissionKeys.CLUSTER_ADMIN,
+        PermissionKeys.GROUP_ADMIN,
+      ],
     },
   })
   @get('/clusters')
@@ -89,6 +93,12 @@ export class ClusterController {
     const currentUserPermission = currnetUser.permissions;
     if (currentUserPermission.includes('super_admin')) {
       return this.clusterRepository.find({...filter, include: ['user']});
+    } else if (currentUserPermission.includes('group_admin')) {
+      return this.clusterRepository.find({
+        ...filter,
+        include: ['user'],
+        where: {groupUserId: currnetUser.id},
+      });
     } else {
       return this.clusterRepository.find({
         ...filter,

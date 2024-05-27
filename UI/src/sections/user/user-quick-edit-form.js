@@ -172,6 +172,7 @@ export default function UserQuickEditForm({ currentUser, open, onClose, onRefres
               {[
                 { value: 'hut_user', name: 'Hut Admin' },
                 { value: 'cluster_admin', name: 'Cluster Admin' },
+                { value: 'group_admin', name: 'Group Admin' },
               ].map((option) => {
                 if (option.value === 'cluster_admin' && isAdmin) {
                   return (

@@ -328,7 +328,13 @@ export class UserController {
 
   @authenticate({
     strategy: 'jwt',
-    options: {required: [PermissionKeys.SUPER_ADMIN]},
+    options: {
+      required: [
+        PermissionKeys.SUPER_ADMIN,
+        PermissionKeys.CLUSTER_ADMIN,
+        PermissionKeys.GROUP_ADMIN,
+      ],
+    },
   })
   @get('/api/users/list')
   @response(200, {
@@ -538,12 +544,19 @@ export class UserController {
 
   @authenticate({
     strategy: 'jwt',
-    options: {required: [PermissionKeys.SUPER_ADMIN]},
+    options: {
+      required: [
+        PermissionKeys.SUPER_ADMIN,
+        PermissionKeys.CLUSTER_ADMIN,
+        PermissionKeys.GROUP_ADMIN,
+      ],
+    },
   })
   @get('/getDashboardCounts')
   async getDashboardCounts(
     @inject(AuthenticationBindings.CURRENT_USER) currnetUser: UserProfile,
   ): Promise<any> {
+    console.log(currnetUser.permissions);
     let totalClusters = 0;
     let totalHuts = 0;
     let totalCultivation = 0;
@@ -634,7 +647,53 @@ export class UserController {
         (total, record) => total + parseFloat(record.quantity),
         0,
       );
-    }
+    } else if (user.permissions.includes('group_admin')) {
+      const userAssignedClusters = await this.clusterRepository.find({
+        where: {
+          groupUserId: currnetUser.id,
+        },
+      });
+      totalClusters = userAssignedClusters.length;
+      const userClusterIds: any = userAssignedClusters.map(
+        cluster => cluster.id,
+      );
+      const userAssignedHuts = await this.hutRepository.find({
+        where: {
+          clusterId: {
+            inq: userClusterIds,
+          },
+        },
+      });
+      const hutIds: any = userAssignedHuts.map(hut => hut.id);
+      totalHuts = userAssignedHuts.length;
+
+      // Retrieve today's cultivation records
+      const todaysCultivationRecords =
+        await this.environmentDataRepository.find({
+          where: {
+            ...todayFilter.where,
+            hutId: {
+              inq: hutIds,
+            },
+          },
+        });
+      todaysCultivation = todaysCultivationRecords.reduce(
+        (total, record) => total + parseFloat(record.quantity),
+        0,
+      );
+      const allCultivationRecords = await this.environmentDataRepository.find({
+        where: {
+          hutId: {
+            inq: hutIds,
+          },
+        },
+      });
+
+      totalCultivation = allCultivationRecords.reduce(
+        (total, record) => total + parseFloat(record.quantity),
+        0,
+      );
+    } 
     return Promise.resolve({
       success: true,
       totalClusters,
@@ -647,7 +706,11 @@ export class UserController {
   @authenticate({
     strategy: 'jwt',
     options: {
-      required: [PermissionKeys.SUPER_ADMIN, PermissionKeys.CLUSTER_ADMIN],
+      required: [
+        PermissionKeys.SUPER_ADMIN,
+        PermissionKeys.CLUSTER_ADMIN,
+        PermissionKeys.GROUP_ADMIN,
+      ],
     },
   })
   @post('/getDayWiseCultivationData')

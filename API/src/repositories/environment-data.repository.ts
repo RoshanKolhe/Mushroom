@@ -39,8 +39,8 @@ export class EnvironmentDataRepository extends TimeStampRepositoryMixin<
   async findMissingEntries(
     startDate: string,
     endDate: string,
+    huts: any,
   ): Promise<{date: string; hutId: number}[]> {
-    const huts = await this.hutRepository.find({include: ['user', 'cluster']});
     const dateRange = this.getDateRange(startDate, endDate);
     const missingEntries: {date: string; hutId: any; hutDetails: any}[] = [];
 

@@ -97,6 +97,7 @@ export class TicketController {
         PermissionKeys.SUPER_ADMIN,
         PermissionKeys.HUT_USER,
         PermissionKeys.CLUSTER_ADMIN,
+        PermissionKeys.GROUP_ADMIN,
       ],
     },
   })
@@ -117,6 +118,7 @@ export class TicketController {
     @param.filter(Ticket) filter?: Filter<Ticket>,
   ): Promise<Ticket[]> {
     const user = await this.userRepository.findById(currnetUser.id);
+    console.log(user);
     if (user.permissions.includes('super_admin')) {
       return this.ticketRepository.find({
         ...filter,
@@ -135,6 +137,32 @@ export class TicketController {
           hutId: userHut.id,
         },
         include: ['user'],
+        order: ['createdAt DESC'],
+      });
+    } else if (user.permissions.includes('group_admin')) {
+      const userClusters = await this.clusterRepository.find({
+        where: {
+          groupUserId: currnetUser.id,
+        },
+      });
+      const userClusterIds: any = userClusters.map(cluster => cluster.id);
+      const hutsAssignToClusters = await this.hutRepository.find({
+        where: {
+          clusterId: {
+            inq: userClusterIds,
+          },
+        },
+      });
+      const hutIds: any = hutsAssignToClusters.map(hut => hut.id);
+      return this.ticketRepository.find({
+        ...filter,
+        include: ['user'],
+        where: {
+          ...((filter && filter.where) || {}),
+          hutId: {
+            inq: hutIds,
+          },
+        },
         order: ['createdAt DESC'],
       });
     } else {

@@ -21,7 +21,12 @@ import {
   HttpErrors,
 } from '@loopback/rest';
 import {EnvironmentData} from '../models';
-import {EnvironmentDataRepository, UserRepository} from '../repositories';
+import {
+  ClusterRepository,
+  EnvironmentDataRepository,
+  HutRepository,
+  UserRepository,
+} from '../repositories';
 import {inject} from '@loopback/core';
 import {authenticate, AuthenticationBindings} from '@loopback/authentication';
 import {PermissionKeys} from '../authorization/permission-keys';
@@ -32,6 +37,10 @@ export class EnvironmentDataController {
     public environmentDataRepository: EnvironmentDataRepository,
     @repository(UserRepository)
     public userRepository: UserRepository,
+    @repository(ClusterRepository)
+    public clusterRepository: ClusterRepository,
+    @repository(HutRepository)
+    public hutRepository: HutRepository,
   ) {}
 
   @authenticate({
@@ -201,6 +210,7 @@ export class EnvironmentDataController {
         PermissionKeys.SUPER_ADMIN,
         PermissionKeys.CLUSTER_ADMIN,
         PermissionKeys.HUT_USER,
+        PermissionKeys.GROUP_ADMIN,
       ],
     },
   })
@@ -234,6 +244,7 @@ export class EnvironmentDataController {
     },
   })
   async findMissingEntries(
+    @inject(AuthenticationBindings.CURRENT_USER) currnetUser: UserProfile,
     @param.query.string('startDate') startDate: string,
     @param.query.string('endDate') endDate: string,
   ): Promise<any> {
@@ -247,10 +258,56 @@ export class EnvironmentDataController {
     if (!endDate) {
       endDate = defaultEndDate;
     }
+    let huts = [];
+    if (currnetUser.permissions.includes('super_admin')) {
+      huts = await this.hutRepository.find({include: ['user', 'cluster']});
+    } else if (currnetUser.permissions.includes('cluster_admin')) {
+      const userAssignedClusters = await this.clusterRepository.find({
+        where: {
+          userId: currnetUser.id,
+        },
+      });
+      const userClusterIds: any = userAssignedClusters.map(
+        cluster => cluster.id,
+      );
+      huts = await this.hutRepository.find({
+        where: {
+          clusterId: {
+            inq: userClusterIds,
+          },
+        },
+        include: ['user', 'cluster'],
+      });
+    } else if (currnetUser.permissions.includes('group_admin')) {
+      const userAssignedClusters = await this.clusterRepository.find({
+        where: {
+          groupUserId: currnetUser.id,
+        },
+      });
+      const userClusterIds: any = userAssignedClusters.map(
+        cluster => cluster.id,
+      );
+      huts = await this.hutRepository.find({
+        where: {
+          clusterId: {
+            inq: userClusterIds,
+          },
+        },
+        include: ['user', 'cluster'],
+      });
+    } else {
+      huts = await this.hutRepository.find({
+        where: {
+          userId: currnetUser.id,
+        },
+        include: ['user', 'cluster'],
+      });
+    }
     const missingEntries =
       await this.environmentDataRepository.findMissingEntries(
         startDate,
         endDate,
+        huts,
       );
 
     return missingEntries;

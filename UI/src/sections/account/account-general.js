@@ -244,6 +244,7 @@ export default function AccountGeneral() {
                   { value: 'super_admin', name: 'Super Admin' },
                   { value: 'hut_user', name: 'Hut Admin' },
                   { value: 'cluster_admin', name: 'Cluster Admin' },
+                  { value: 'group_admin', name: 'Group Admin' },
                 ].map((option) => (
                   <MenuItem key={option.value} value={option.value}>
                     {option.name}

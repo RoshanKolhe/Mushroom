@@ -106,7 +106,9 @@ export function AuthProvider({ children }) {
     console.log(user);
     if (
       user &&
-      (user.permissions.includes('super_admin') || user.permissions.includes('cluster_admin'))
+      (user.permissions.includes('super_admin') ||
+        user.permissions.includes('cluster_admin') ||
+        user.permissions.includes('group_admin'))
     )
       setSession(accessToken);
     else throw new Error("User Doesn't have permission");
@@ -133,7 +135,9 @@ export function AuthProvider({ children }) {
     console.log(user);
     if (
       user &&
-      (user.permissions.includes('super_admin') || user.permissions.includes('cluster_admin'))
+      (user.permissions.includes('super_admin') ||
+        user.permissions.includes('cluster_admin') ||
+        user.permissions.includes('group_admin'))
     )
       setSession(accessToken);
     else throw new Error("User Doesn't have permission");
@@ -196,7 +200,7 @@ export function AuthProvider({ children }) {
       loginWithMail,
       logout,
     }),
-    [login,loginWithMail, logout, register, state.user, status]
+    [login, loginWithMail, logout, register, state.user, status]
   );
 
   return <AuthContext.Provider value={memoizedValue}>{children}</AuthContext.Provider>;

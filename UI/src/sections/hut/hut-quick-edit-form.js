@@ -71,10 +71,10 @@ export default function HutQuickEditForm({ currentHut, open, onClose, onRefreshH
       console.log(data);
       const inputData = {
         name: data.name,
-        noOfHuts: data.noOfHuts,
         totalCultivation: data.totalCultivation,
         isActive: data.isActive,
         userId: Number(data.user),
+        clusterId: Number(data.cluster),
       };
       await axiosInstance.patch(`/huts/${currentHut.id}`, inputData);
       // reset();
@@ -151,7 +151,7 @@ export default function HutQuickEditForm({ currentHut, open, onClose, onRefreshH
                 </MenuItem>
               ))}
             </RHFSelect>
-            <RHFSelect fullWidth name="cluster" label="Cluster User">
+            <RHFSelect fullWidth name="cluster" label="Cluster Name">
               {clusterOptions.map((option) => (
                 <MenuItem key={option.id} value={option.id}>
                   {option.name}

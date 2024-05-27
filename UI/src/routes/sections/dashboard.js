@@ -139,7 +139,7 @@ export const dashboardRoutes = [
           {
             path: 'list',
             element: (
-              <RolesAuthRoute roles={['super_admin', 'cluster_admin']}>
+              <RolesAuthRoute roles={['super_admin', 'cluster_admin', 'group_admin']}>
                 <ClusterListPage />
               </RolesAuthRoute>
             ),
@@ -222,7 +222,7 @@ export const dashboardRoutes = [
           {
             path: 'list',
             element: (
-              <RolesAuthRoute roles={['super_admin', 'cluster_admin']}>
+              <RolesAuthRoute roles={['super_admin', 'cluster_admin', 'group_admin']}>
                 <TicketListPage />
               </RolesAuthRoute>
             ),

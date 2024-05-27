@@ -32,9 +32,18 @@ export default function ClusterQuickEditForm({ currentCluster, open, onClose, on
 
   const [userOptions, setUserOption] = useState([]);
 
+  const {
+    filteredUsers: groupFilteredUsers,
+    filteredUsersLoading: groupFilteredUsersLoading,
+    filteredUsersEmpty: groupFilteredUsersEmpty,
+    refreshFilterUsers: groupRefreshFilterUsers,
+  } = useGetUsersWithFilter('filter={"where":{"permissions":["group_admin"]}}');
+  const [groupUserOptions, setGroupUserOption] = useState([]);
+
   const NewClusterSchema = Yup.object().shape({
     name: Yup.string().required('Name is required'),
     user: Yup.string().required('User is required'),
+    groupUser: Yup.string().required('Group User is required'),
     noOfHuts: Yup.string().required('No of huts is required'),
     totalCultivation: Yup.string().required('Total Cultivation required'),
     isActive: Yup.boolean(),
@@ -44,6 +53,7 @@ export default function ClusterQuickEditForm({ currentCluster, open, onClose, on
     () => ({
       name: currentCluster?.name || '',
       user: currentCluster?.userId || '',
+      groupUser: currentCluster?.groupUserId || '',
       noOfHuts: currentCluster?.noOfHuts || '',
       totalCultivation: currentCluster?.totalCultivation || '',
       isActive: currentCluster?.isActive ? '1' : '0' || '',
@@ -71,6 +81,7 @@ export default function ClusterQuickEditForm({ currentCluster, open, onClose, on
         totalCultivation: data.totalCultivation,
         isActive: data.isActive,
         userId: Number(data.user),
+        groupUserId: Number(data.groupUser),
       };
       await axiosInstance.patch(`/clusters/${currentCluster.id}`, inputData);
       // reset();
@@ -90,6 +101,12 @@ export default function ClusterQuickEditForm({ currentCluster, open, onClose, on
       setUserOption(filteredUsers);
     }
   }, [filteredUsers]);
+
+  useEffect(() => {
+    if (groupFilteredUsers.length) {
+      setGroupUserOption(groupFilteredUsers);
+    }
+  }, [groupFilteredUsers]);
 
   return (
     <Dialog
@@ -136,6 +153,13 @@ export default function ClusterQuickEditForm({ currentCluster, open, onClose, on
             <RHFTextField name="name" label="Cluster Name" />
             <RHFSelect fullWidth name="user" label="Cluster User">
               {userOptions.map((option) => (
+                <MenuItem key={option.id} value={option.id}>
+                  {`${option?.firstName} ${option?.lastName ? option?.lastName : ''}`}
+                </MenuItem>
+              ))}
+            </RHFSelect>
+            <RHFSelect fullWidth name="groupUser" label="Group User">
+              {groupUserOptions.map((option) => (
                 <MenuItem key={option.id} value={option.id}>
                   {`${option?.firstName} ${option?.lastName ? option?.lastName : ''}`}
                 </MenuItem>

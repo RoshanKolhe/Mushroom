@@ -84,7 +84,11 @@ export class HutController {
   @authenticate({
     strategy: 'jwt',
     options: {
-      required: [PermissionKeys.SUPER_ADMIN, PermissionKeys.CLUSTER_ADMIN],
+      required: [
+        PermissionKeys.SUPER_ADMIN,
+        PermissionKeys.CLUSTER_ADMIN,
+        PermissionKeys.GROUP_ADMIN,
+      ],
     },
   })
   @get('/huts')
@@ -110,6 +114,24 @@ export class HutController {
       const userAssignedClusters = await this.clusterRepository.find({
         where: {
           userId: currnetUser.id,
+        },
+      });
+      const userClusterIds: any = userAssignedClusters.map(
+        cluster => cluster.id,
+      );
+      const userAssignedHuts = await this.hutRepository.find({
+        where: {
+          clusterId: {
+            inq: userClusterIds,
+          },
+        },
+        include: ['user', 'cluster'],
+      });
+      return userAssignedHuts;
+    } else if (currentUserPermission.includes('group_admin')) {
+      const userAssignedClusters = await this.clusterRepository.find({
+        where: {
+          groupUserId: currnetUser.id,
         },
       });
       const userClusterIds: any = userAssignedClusters.map(
