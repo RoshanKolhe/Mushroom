@@ -2,6 +2,7 @@ import {repository} from '@loopback/repository';
 import {post, param, get, getModelSchemaRef, requestBody} from '@loopback/rest';
 import {MessagesRepository} from '../repositories';
 import {Messages} from '../models';
+import {authenticate} from '@loopback/authentication';
 
 export class MessagesController {
   constructor(
@@ -9,6 +10,9 @@ export class MessagesController {
     public messageRepository: MessagesRepository,
   ) {}
 
+  @authenticate({
+    strategy: 'jwt',
+  })
   @post('/messages', {
     responses: {
       '200': {
@@ -33,6 +37,9 @@ export class MessagesController {
     return this.messageRepository.create(message);
   }
 
+  @authenticate({
+    strategy: 'jwt',
+  })
   @get('/tickets/{id}/messages', {
     responses: {
       '200': {
