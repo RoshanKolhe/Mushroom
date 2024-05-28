@@ -55,6 +55,14 @@ export class ClusterController {
     })
     cluster: Omit<Cluster, 'id'>,
   ): Promise<Cluster> {
+    const existingCluster = await this.clusterRepository.findOne({
+      where: {userId: cluster.userId},
+    });
+    if (existingCluster) {
+      throw new HttpErrors.BadRequest(
+        'This user is already assigned to another cluster',
+      );
+    }
     const user = await this.userRepository.findById(cluster.userId);
     if (!user.permissions.includes('cluster_admin')) {
       throw new HttpErrors.BadRequest(
@@ -148,6 +156,16 @@ export class ClusterController {
     })
     cluster: Cluster,
   ): Promise<void> {
+    const existingCluster = await this.clusterRepository.findOne({
+      where: {
+        and: [{id: {neq: id}}, {userId: cluster.userId}],
+      },
+    });
+    if (existingCluster) {
+      throw new HttpErrors.BadRequest(
+        'This user is already assigned to another cluster',
+      );
+    }
     await this.clusterRepository.updateById(id, cluster);
   }
 
