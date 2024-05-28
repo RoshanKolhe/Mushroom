@@ -16,33 +16,33 @@ import uuidv4 from 'src/utils/uuidv4';
 import { sendMessage, createConversation } from 'src/api/chat';
 // components
 import Iconify from 'src/components/iconify';
+import { useAuthContext } from 'src/auth/hooks';
+import axiosInstance from 'src/utils/axios';
+import { useSnackbar } from 'notistack';
 
 // ----------------------------------------------------------------------
 
-export default function ChatMessageInput({
-  recipients,
-  onAddRecipients,
-  //
-  disabled,
-  selectedConversationId,
-}) {
+export default function ChatMessageInput({ disabled, refreshMessages, selectedConversationId }) {
+  const { enqueueSnackbar } = useSnackbar();
+
   const router = useRouter();
 
-  const { user } = useMockedUser();
+  const { user } = useAuthContext();
 
   const fileRef = useRef(null);
+
+  const [filePreview, setFilePreview] = useState(null);
 
   const [message, setMessage] = useState('');
 
   const myContact = useMemo(
     () => ({
       id: user.id,
-      role: user.role,
       email: user.email,
-      address: user.address,
-      name: user.displayName,
+      address: user.fullAddress,
+      name: user.firstName,
       lastActivity: new Date(),
-      avatarUrl: user.photoURL,
+      avatarUrl: user?.avatar?.fileUrl,
       phoneNumber: user.phoneNumber,
       status: 'online',
     }),
@@ -51,25 +51,13 @@ export default function ChatMessageInput({
 
   const messageData = useMemo(
     () => ({
-      id: uuidv4(),
       attachments: [],
-      body: message,
+      content: message,
       contentType: 'text',
-      createdAt: sub(new Date(), { minutes: 1 }),
       senderId: myContact.id,
+      ticketId: selectedConversationId,
     }),
-    [message, myContact.id]
-  );
-
-  const conversationData = useMemo(
-    () => ({
-      id: uuidv4(),
-      messages: [messageData],
-      participants: [...recipients, myContact],
-      type: recipients.length > 1 ? 'GROUP' : 'ONE_TO_ONE',
-      unreadCount: 0,
-    }),
-    [messageData, myContact, recipients]
+    [message, myContact.id, selectedConversationId]
   );
 
   const handleAttach = useCallback(() => {
@@ -85,50 +73,44 @@ export default function ChatMessageInput({
   const handleSendMessage = useCallback(
     async (event) => {
       try {
-        if (event.key === 'Enter') {
-          if (message) {
-            if (selectedConversationId) {
-              await sendMessage(selectedConversationId, messageData);
-            } else {
-              const res = await createConversation(conversationData);
-
-              router.push(`${paths.dashboard.chat}?id=${res.conversation.id}`);
-
-              onAddRecipients([]);
-            }
+        if (message) {
+          if (selectedConversationId) {
+            console.log(messageData);
+            await axiosInstance.post('/messages', messageData);
+            refreshMessages();
           }
           setMessage('');
         }
       } catch (error) {
         console.error(error);
+        enqueueSnackbar(typeof error === 'string' ? error : error.error.message, {
+          variant: 'error',
+        });
       }
     },
-    [conversationData, message, messageData, onAddRecipients, router, selectedConversationId]
+    [enqueueSnackbar, message, messageData, refreshMessages, selectedConversationId]
   );
 
   return (
     <>
       <InputBase
         value={message}
-        onKeyUp={handleSendMessage}
         onChange={handleChangeMessage}
         placeholder="Type a message"
         disabled={disabled}
-        startAdornment={
-          <IconButton>
-            <Iconify icon="eva:smiling-face-fill" />
-          </IconButton>
-        }
+        // startAdornment={
+        //   // <IconButton>
+        //   //   <Iconify icon="eva:smiling-face-fill" />
+        //   // </IconButton>
+        // }
         endAdornment={
           <Stack direction="row" sx={{ flexShrink: 0 }}>
             <IconButton onClick={handleAttach}>
               <Iconify icon="solar:gallery-add-bold" />
             </IconButton>
-            <IconButton onClick={handleAttach}>
-              <Iconify icon="eva:attach-2-fill" />
-            </IconButton>
-            <IconButton>
-              <Iconify icon="solar:microphone-bold" />
+
+            <IconButton onClick={handleSendMessage}>
+              <Iconify icon="tabler:send" />
             </IconButton>
           </Stack>
         }
@@ -140,14 +122,40 @@ export default function ChatMessageInput({
         }}
       />
 
-      <input type="file" ref={fileRef} style={{ display: 'none' }} />
+      <input
+        type="file"
+        ref={fileRef}
+        accept="image/*"
+        style={{ display: 'none' }}
+        onChange={async (e) => {
+          const file = e.target.files[0];
+          if (file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            const response = await axiosInstance.post('/files', formData);
+            const { data } = response;
+            console.log(data);
+            setFilePreview(data?.files[0]);
+
+            const inputMessage = {
+              attachments: data.files,
+              content: message,
+              contentType: 'image',
+              senderId: myContact.id,
+              ticketId: selectedConversationId,
+            };
+            await axiosInstance.post('/messages', inputMessage);
+            refreshMessages();
+            setMessage('');
+          }
+        }}
+      />
     </>
   );
 }
 
 ChatMessageInput.propTypes = {
   disabled: PropTypes.bool,
-  onAddRecipients: PropTypes.func,
-  recipients: PropTypes.array,
-  selectedConversationId: PropTypes.string,
+  selectedConversationId: PropTypes.any,
+  refreshMessages: PropTypes.func,
 };

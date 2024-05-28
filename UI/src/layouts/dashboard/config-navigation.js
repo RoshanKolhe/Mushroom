@@ -57,7 +57,6 @@ export function useNavData() {
   const { t } = useLocales();
 
   const { user } = useAuthContext();
-  console.log(user);
   let data = [];
 
   if (user && user.permissions.includes('super_admin')) {

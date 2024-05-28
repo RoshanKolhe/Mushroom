@@ -1,16 +1,11 @@
 import PropTypes from 'prop-types';
 // @mui
 import Button from '@mui/material/Button';
-import Avatar from '@mui/material/Avatar';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import TableRow from '@mui/material/TableRow';
-import Checkbox from '@mui/material/Checkbox';
 import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
-import ListItemText from '@mui/material/ListItemText';
-// hooks
-import { useBoolean } from 'src/hooks/use-boolean';
 // components
 import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
@@ -18,7 +13,7 @@ import CustomPopover, { usePopover } from 'src/components/custom-popover';
 import { ConfirmDialog } from 'src/components/custom-dialog';
 //
 import { Typography } from '@mui/material';
-import TicketQuickEditForm from './ticket-quick-edit-form';
+import { useBoolean } from 'src/hooks/use-boolean';
 
 // ----------------------------------------------------------------------
 
@@ -28,23 +23,16 @@ export default function TicketTableRow({
   onEditRow,
   onSelectRow,
   onDeleteRow,
-  onRefreshTickets,
+  onQuickEdit,
 }) {
   const { ticketId, query, description, status, user } = row;
 
   const confirm = useBoolean();
-
-  const quickEdit = useBoolean();
-
   const popover = usePopover();
 
   return (
     <>
       <TableRow hover selected={selected}>
-        {/* <TableCell padding="checkbox">
-          <Checkbox checked={selected} onClick={onSelectRow} />
-        </TableCell> */}
-
         <TableCell sx={{ whiteSpace: 'nowrap' }}>{`#${ticketId}`}</TableCell>
         <TableCell sx={{ whiteSpace: 'nowrap' }}>{`${user?.firstName} ${
           user?.lastName ? user?.lastName : ''
@@ -102,23 +90,12 @@ export default function TicketTableRow({
 
         <TableCell align="right" sx={{ px: 1, whiteSpace: 'nowrap' }}>
           <Tooltip title="Quick Edit" placement="top" arrow>
-            <IconButton color={quickEdit.value ? 'inherit' : 'default'} onClick={quickEdit.onTrue}>
+            <IconButton color="default" onClick={() => onQuickEdit(row)}>
               <Iconify icon="solar:pen-bold" />
             </IconButton>
           </Tooltip>
-
-          {/* <IconButton color={popover.open ? 'inherit' : 'default'} onClick={popover.onOpen}>
-            <Iconify icon="eva:more-vertical-fill" />
-          </IconButton> */}
         </TableCell>
       </TableRow>
-
-      <TicketQuickEditForm
-        currentTicket={row}
-        open={quickEdit.value}
-        onClose={quickEdit.onFalse}
-        onRefreshTickets={onRefreshTickets}
-      />
 
       <CustomPopover
         open={popover.open}
@@ -126,17 +103,6 @@ export default function TicketTableRow({
         arrow="right-top"
         sx={{ width: 140 }}
       >
-        {/* <MenuItem
-          onClick={() => {
-            confirm.onTrue();
-            popover.onClose();
-          }}
-          sx={{ color: 'error.main' }}
-        >
-          <Iconify icon="solar:trash-bin-trash-bold" />
-          Delete
-        </MenuItem> */}
-
         <MenuItem
           onClick={() => {
             onEditRow();
@@ -165,9 +131,9 @@ export default function TicketTableRow({
 
 TicketTableRow.propTypes = {
   onDeleteRow: PropTypes.func,
-  onRefreshTickets: PropTypes.func,
   onEditRow: PropTypes.func,
   onSelectRow: PropTypes.func,
+  onQuickEdit: PropTypes.func,
   row: PropTypes.object,
   selected: PropTypes.bool,
 };

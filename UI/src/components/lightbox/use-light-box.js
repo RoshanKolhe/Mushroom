@@ -7,10 +7,11 @@ export default function useLightBox(slides) {
 
   const handleOpen = useCallback(
     (slideUrl) => {
+      console.log(slideUrl);
       const slideIndex = slides.findIndex((slide) =>
         slide.type === 'video' ? slide.poster === slideUrl : slide.src === slideUrl
       );
-
+      console.log(slideIndex);
       setSelected(slideIndex);
     },
     [slides]

@@ -13,9 +13,20 @@ export class Messages extends Entity {
 
   @property({
     type: 'string',
+  })
+  content?: string;
+
+  @property({
+    type: 'string',
     required: true,
   })
-  content: string;
+  contentType: string;
+
+  @property({
+    type: 'array',
+    itemType: 'object',
+  })
+  attachments?: object[];
 
   @property({
     type: 'date',
@@ -36,7 +47,6 @@ export class Messages extends Entity {
   constructor(data?: Partial<Messages>) {
     super(data);
   }
-
 }
 
 export interface MessagesRelations {

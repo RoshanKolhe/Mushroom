@@ -44,6 +44,7 @@ import { useGetTickets, useGetTicketsWithFilter } from 'src/api/ticket';
 import TicketTableRow from '../ticket-table-row';
 import TicketTableToolbar from '../ticket-table-toolbar';
 import TicketTableFiltersResult from '../ticket-table-filters-result';
+import TicketQuickEditForm from '../ticket-quick-edit-form';
 
 // ----------------------------------------------------------------------
 
@@ -78,6 +79,8 @@ export default function TicketListView({ isDashboard }) {
   const { tickets, ticketsError, ticketsEmpty, refreshTickets } = useGetTicketsWithFilter(
     isDashboard ? 'filter={"where":{"status":"open"}}' : null
   );
+
+  const [selectedRow, setSelectedRow] = useState(null); // <-- Add this state
 
   const dataFiltered = applyFilter({
     inputData: tableData,
@@ -137,7 +140,6 @@ export default function TicketListView({ isDashboard }) {
 
   const handleFilterStatus = useCallback(
     (event, newValue) => {
-      console.log(newValue);
       handleFilters('status', newValue);
     },
     [handleFilters]
@@ -147,13 +149,21 @@ export default function TicketListView({ isDashboard }) {
     setFilters(defaultFilters);
   }, []);
 
-  const downlodCsvFromTableData = () =>{
+  const handleQuickEdit = useCallback((row) => {
+    setSelectedRow(row); // <-- Set the selected row for quick edit
+  }, []);
+
+  const handleCloseQuickEdit = useCallback(() => {
+    setSelectedRow(null); // <-- Clear the selected row
+  }, []);
+
+  const downlodCsvFromTableData = () => {
     const fileName = 'Cluster Management.xlsx';
     const ws = XLSX.utils.json_to_sheet(tableData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Coupon Master');
     XLSX.writeFile(wb, fileName);
-  }
+  };
 
   useEffect(() => {
     if (tickets) {
@@ -176,34 +186,20 @@ export default function TicketListView({ isDashboard }) {
               { name: 'List' },
             ]}
             action={
-              <>
-                <Button
-                  variant="contained"
-                  startIcon={<Iconify icon="carbon:download" />}
-                  color="primary"
-                  style={{
-                    backgroundColor: 'transparent',
-                    color: '#212B36',
-                    border: 'solid 1px #00554E',
-                    marginRight: '20px',
-                  }}
-                  onClick={()=>{
-                    downlodCsvFromTableData();
-                  }}
-                >
-                  Download report
-                </Button>
-                {/* <Button
-                component={RouterLink}
-                href={paths.dashboard.ticket.new}
+              <Button
                 variant="contained"
-                startIcon={<Iconify icon="mingcute:add-line" />}
+                startIcon={<Iconify icon="carbon:download" />}
                 color="primary"
-                style={{ width: '155px', backgroundColor: '#00554E' }}
+                style={{
+                  backgroundColor: 'transparent',
+                  color: '#212B36',
+                  border: 'solid 1px #00554E',
+                  marginRight: '20px',
+                }}
+                onClick={downlodCsvFromTableData}
               >
-                New Ticket
-              </Button> */}
-              </>
+                Download report
+              </Button>
             }
             sx={{
               mb: { xs: 3, md: 5 },
@@ -222,9 +218,7 @@ export default function TicketListView({ isDashboard }) {
             <TicketTableFiltersResult
               filters={filters}
               onFilters={handleFilters}
-              //
               onResetFilters={handleResetFilters}
-              //
               results={dataFiltered.length}
               sx={{ p: 2.5, pt: 0 }}
             />
@@ -282,7 +276,8 @@ export default function TicketListView({ isDashboard }) {
                         onSelectRow={() => table.onSelectRow(row.id)}
                         onDeleteRow={() => handleDeleteRow(row.id)}
                         onEditRow={() => handleEditRow(row.id)}
-                        onRefreshTickets={() => refreshTickets()}
+                        onRefreshTickets={refreshTickets}
+                        onQuickEdit={handleQuickEdit} // <-- Pass the quick edit handler
                       />
                     ))}
 
@@ -303,12 +298,20 @@ export default function TicketListView({ isDashboard }) {
             rowsPerPage={table.rowsPerPage}
             onPageChange={table.onChangePage}
             onRowsPerPageChange={table.onChangeRowsPerPage}
-            //
             dense={table.dense}
             onChangeDense={table.onChangeDense}
           />
         </Card>
       </Container>
+
+      {selectedRow && (
+        <TicketQuickEditForm
+          currentTicket={selectedRow}
+          open={Boolean(selectedRow)}
+          onClose={handleCloseQuickEdit}
+          onRefreshTickets={refreshTickets}
+        />
+      )}
 
       <ConfirmDialog
         open={confirm.value}
@@ -316,7 +319,7 @@ export default function TicketListView({ isDashboard }) {
         title="Delete"
         content={
           <>
-            Are you sure want to delete <strong> {table.selected.length} </strong> items?
+            Are you sure want to delete <strong>{table.selected.length}</strong> items?
           </>
         }
         action={

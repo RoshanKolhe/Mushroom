@@ -11,12 +11,13 @@ import { useMockedUser } from 'src/hooks/use-mocked-user';
 // components
 import Iconify from 'src/components/iconify';
 //
+import { useAuthContext } from 'src/auth/hooks';
 import { useGetMessage } from './hooks';
 
 // ----------------------------------------------------------------------
 
 export default function ChatMessageItem({ message, participants, onOpenLightbox }) {
-  const { user } = useMockedUser();
+  const { user } = useAuthContext();
 
   const { me, senderDetails, hasImage } = useGetMessage({
     message,
@@ -26,7 +27,7 @@ export default function ChatMessageItem({ message, participants, onOpenLightbox 
 
   const { firstName, avatarUrl } = senderDetails;
 
-  const { body, createdAt } = message;
+  const { content: body, attachments, createdAt } = message;
 
   const renderInfo = (
     <Typography
@@ -70,8 +71,8 @@ export default function ChatMessageItem({ message, participants, onOpenLightbox 
         <Box
           component="img"
           alt="attachment"
-          src={body}
-          onClick={() => onOpenLightbox(body)}
+          src={attachments[0].fileUrl}
+          onClick={() => onOpenLightbox(attachments[0].fileUrl)}
           sx={{
             minHeight: 220,
             borderRadius: 1.5,
@@ -139,7 +140,7 @@ export default function ChatMessageItem({ message, participants, onOpenLightbox 
           }}
         >
           {renderBody}
-          {renderActions}
+          {/* {renderActions} */}
         </Stack>
       </Stack>
     </Stack>

@@ -66,6 +66,9 @@ export const endpoints = {
     list: '/huts',
     details: (id) => `/huts/${id}`,
   },
+  messages: {
+    list: (id) => `/tickets/${id}/messages`,
+  },
   missedEntry: {
     list: '/missing-entries',
   },

@@ -15,7 +15,7 @@ export default function ChatMessageList({ messages = [], participants }) {
 
   const slides = messages
     .filter((message) => message.contentType === 'image')
-    .map((message) => ({ src: message.body }));
+    .map((message) => ({ src: message?.attachments[0]?.fileUrl }));
 
   const lightbox = useLightBox(slides);
 
@@ -28,7 +28,7 @@ export default function ChatMessageList({ messages = [], participants }) {
               key={message.id}
               message={message}
               participants={participants}
-              onOpenLightbox={() => lightbox.onOpen(message.body)}
+              onOpenLightbox={(fileUrl) => lightbox.onOpen(fileUrl)}
             />
           ))}
         </Box>

@@ -9,8 +9,8 @@ export default function useGetMessage({ message, participants, currentUserId }) 
           type: 'me',
         }
       : {
-          avatarUrl: sender?.avatarUrl,
-          firstName: sender?.name.split(' ')[0],
+          avatarUrl: sender?.avatar?.fileUrl,
+          firstName: sender?.firstName,
         };
 
   const me = senderDetails.type === 'me';

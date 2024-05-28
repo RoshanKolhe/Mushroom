@@ -1,15 +1,7 @@
-import {
-  repository,
-} from '@loopback/repository';
-import {
-  post,
-  param,
-  get,
-  getModelSchemaRef,
-  requestBody,
-} from '@loopback/rest';
-import { MessagesRepository } from '../repositories';
-import { Messages } from '../models';
+import {repository} from '@loopback/repository';
+import {post, param, get, getModelSchemaRef, requestBody} from '@loopback/rest';
+import {MessagesRepository} from '../repositories';
+import {Messages} from '../models';
 
 export class MessagesController {
   constructor(
@@ -58,10 +50,26 @@ export class MessagesController {
   })
   async findMessagesByTicketId(
     @param.path.number('id') ticketId: number,
-  ): Promise<Messages[]> {
-    return this.messageRepository.find({
+  ): Promise<any> {
+    const messages = await this.messageRepository.find({
       where: {ticketId: ticketId},
       include: ['sender'],
+    });
+    const participantsMap = new Map<number, object>();
+
+    messages.forEach((message: any) => {
+      if (message.sender && !participantsMap.has(message.sender.id)) {
+        participantsMap.set(message.sender.id, message.sender);
+      }
+    });
+
+    const participants = Array.from(participantsMap.values()).map(sender => ({
+      ...sender,
+    }));
+
+    return Promise.resolve({
+      messages: messages,
+      participants: participants,
     });
   }
 }
