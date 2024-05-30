@@ -31,6 +31,7 @@ import axiosInstance, { endpoints } from 'src/utils/axios';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/material.css';
 import { MenuItem } from '@mui/material';
+import { states } from 'src/utils/constants';
 
 // ----------------------------------------------------------------------
 
@@ -50,7 +51,6 @@ export default function AccountGeneral() {
     fullAddress: Yup.string().required('Role is required'),
     city: Yup.string().required('Role is required'),
     state: Yup.string().required('Role is required'),
-
   });
 
   const defaultValues = useMemo(
@@ -116,15 +116,22 @@ export default function AccountGeneral() {
   });
 
   const handleDrop = useCallback(
-    (acceptedFiles) => {
+    async (acceptedFiles) => {
       const file = acceptedFiles[0];
-
-      const newFile = Object.assign(file, {
-        preview: URL.createObjectURL(file),
-      });
+      console.log(file);
+      // const newFile = Object.assign(file, {
+      //   preview: URL.createObjectURL(file),
+      // });
 
       if (file) {
-        setValue('photoURL', newFile, { shouldValidate: true });
+        const formData = new FormData();
+        formData.append('file', file);
+        const response = await axiosInstance.post('/files', formData);
+        const { data } = response;
+        console.log(data);
+        setValue('avatarUrl', data?.files[0].fileUrl, {
+          shouldValidate: true,
+        });
       }
     },
     [setValue]
@@ -283,9 +290,14 @@ export default function AccountGeneral() {
                 )}
               />
               <RHFTextField name="fullAddress" label="Full Address" />
-              <RHFTextField name="state" label="State" />
+              <RHFSelect fullWidth name="state" label="State">
+                {states.map((option) => (
+                  <MenuItem key={option.id} value={option.id}>
+                    {option.name}
+                  </MenuItem>
+                ))}
+              </RHFSelect>
               <RHFTextField name="city" label="City" />
-              
             </Box>
 
             <Stack spacing={3} alignItems="flex-end" sx={{ mt: 3 }}>
