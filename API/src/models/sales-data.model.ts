@@ -19,7 +19,7 @@ export class SalesData extends Entity {
     type: 'string',
     required: true,
   })
-  user: string;
+  hsn: string;
 
   @property({
     type: 'string',
@@ -31,19 +31,36 @@ export class SalesData extends Entity {
     type: 'string',
     required: true,
   })
-  noOfSales: string;
+  description: string;
 
   @property({
     type: 'string',
     required: true,
   })
-  totalPrice: string;
+  quantity: string;
+
+  @property({
+    type: 'string',
+    required: true,
+  })
+  amount: string;
+
+  @property({
+    type: 'string',
+    required: true,
+  })
+  rate: string;
+
+  @property({
+    type: 'string',
+    required: true,
+  })
+  gstPercentage: string;
 
   @property({
     type: 'object',
-    required: true,
   })
-  invoice: object;
+  invoice?: object;
 
   @property({
     type: 'string',

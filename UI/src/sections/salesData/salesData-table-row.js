@@ -31,7 +31,7 @@ export default function SalesDataTableRow({
   onDeleteRow,
   onRefreshSalesDatas,
 }) {
-  const { orderId, user, date, noOfSales, totalPrice, invoice, status } = row;
+  const { orderId, description, date, noOfSales, totalPrice, invoice, status } = row;
 
   const confirm = useBoolean();
 
@@ -52,7 +52,7 @@ export default function SalesDataTableRow({
 
         <TableCell sx={{ whiteSpace: 'nowrap' }}>{orderId}</TableCell>
 
-        <TableCell sx={{ whiteSpace: 'nowrap' }}>{user}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{description}</TableCell>
         <TableCell sx={{ whiteSpace: 'nowrap' }}>
           {moment(date).format('DD-MM-YYYY hh:mm:ss')}
         </TableCell>

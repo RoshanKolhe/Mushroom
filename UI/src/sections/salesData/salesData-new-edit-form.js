@@ -58,12 +58,15 @@ export default function SalesDataNewEditForm({ currentSalesData }) {
   const { enqueueSnackbar } = useSnackbar();
   const [filePreview, setFilePreview] = useState(null);
   const NewSalesDataSchema = Yup.object().shape({
-    orderId: Yup.string().required('Order Id is required'),
+    orderId: Yup.string().required('Sr No Id is required'),
     date: Yup.string().required('Date is required'),
-    user: Yup.string().required('User is required'),
-    noOfSales: Yup.string().required('No of sales is required'),
-    totalPrice: Yup.string().required('Total Price of sale is required'),
-    invoice: Yup.object().required('Invoice is required'),
+    description: Yup.string().required('Description is required'),
+    quantity: Yup.string().required('Quantity is required'),
+    gstPercentage: Yup.string().required('Gst %  is required'),
+    hsn: Yup.string().required('HSN/SAC  is required'),
+    rate: Yup.string().required('rate  is required'),
+    amount: Yup.string().required('Total Price of sale is required'),
+    invoice: Yup.object().nullable(),
     status: Yup.string().required('Status is required'),
   });
 
@@ -71,9 +74,12 @@ export default function SalesDataNewEditForm({ currentSalesData }) {
     () => ({
       orderId: currentSalesData?.orderId || '',
       date: currentSalesData?.date || '',
-      user: currentSalesData?.user || '',
-      noOfSales: currentSalesData?.noOfSales || '',
-      totalPrice: currentSalesData?.totalPrice || '',
+      description: currentSalesData?.description || '',
+      gstPercentage: currentSalesData?.gstPercentage || '',
+      hsn: currentSalesData?.hsn || '',
+      quantity: currentSalesData?.quantity || '',
+      amount: currentSalesData?.amount || '',
+      rate: currentSalesData?.rate || '',
       invoice: currentSalesData?.invoice || null,
       status: currentSalesData?.status || '',
     }),
@@ -101,14 +107,17 @@ export default function SalesDataNewEditForm({ currentSalesData }) {
 
       const inputData = {
         orderId: formData.orderId,
-        user: formData.user,
+        description: formData.description,
         date: formData.date,
-        noOfSales: formData.noOfSales,
-        totalPrice: formData.totalPrice,
-        invoice: formData.invoice,
+        amount: formData.amount,
+        rate: formData.rate,
+        quantity: formData.quantity,
+        hsn: formData.hsn,
+        gstPercentage: formData.gstPercentage,
+        invoice: formData?.invoice ? formData?.invoice : {},
         status: formData.status,
       };
-
+      console.log(inputData);
       if (!currentSalesData) {
         await axiosInstance.post('/sales-data', inputData);
       } else {
@@ -150,7 +159,7 @@ export default function SalesDataNewEditForm({ currentSalesData }) {
                 sm: 'repeat(2, 1fr)',
               }}
             >
-              <RHFTextField name="orderId" label="Order Id" />
+              <RHFTextField name="orderId" label="Sr No" />
               <Controller
                 name="date"
                 control={control}
@@ -172,8 +181,8 @@ export default function SalesDataNewEditForm({ currentSalesData }) {
                 )}
               />
 
-              <RHFTextField name="user" label="User" />
-              <RHFTextField name="noOfSales" label="No of sales" />
+              <RHFTextField name="description" label="Description" />
+              <RHFTextField name="quantity" label="Quantity" />
               <div>
                 <Controller
                   name="invoice"
@@ -267,8 +276,10 @@ export default function SalesDataNewEditForm({ currentSalesData }) {
                   />
                 )}
               </div>
-
-              <RHFTextField name="totalPrice" label="Total Price of sale" />
+              <RHFTextField name="rate" label="Rate" />
+              <RHFTextField name="amount" label="Amount" />
+              <RHFTextField name="hsn" label="HSN/SAN" />
+              <RHFTextField name="gstPercentage" label="Gst Percentage" />
               <RHFSelect fullWidth name="status" label="Status">
                 {[
                   { value: 'pending', name: 'Pending' },

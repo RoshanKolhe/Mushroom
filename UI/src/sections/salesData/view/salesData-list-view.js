@@ -50,7 +50,7 @@ import SalesDataTableFiltersResult from '../salesData-table-filters-result';
 
 const TABLE_HEAD = [
   { id: 'orderId', label: 'Order ID' },
-  { id: 'user', label: 'User', width: 180 },
+  { id: 'description', label: 'Description', width: 180 },
   { id: 'date', label: 'Date', width: 180 },
   { id: 'invoice', label: 'Invoice', width: 180 },
   { id: 'status', label: 'Status', width: 180 },
