@@ -19,13 +19,13 @@ import {
 } from '@loopback/rest';
 import {Faq} from '../models';
 import {FaqRepository} from '../repositories';
-import { PermissionKeys } from '../authorization/permission-keys';
-import { authenticate } from '@loopback/authentication';
+import {PermissionKeys} from '../authorization/permission-keys';
+import {authenticate} from '@loopback/authentication';
 
 export class FaqController {
   constructor(
     @repository(FaqRepository)
-    public faqRepository : FaqRepository,
+    public faqRepository: FaqRepository,
   ) {}
 
   @authenticate({
@@ -55,7 +55,6 @@ export class FaqController {
 
   @authenticate({
     strategy: 'jwt',
-    options: {required: [PermissionKeys.SUPER_ADMIN]},
   })
   @get('/faqs')
   @response(200, {
@@ -69,9 +68,7 @@ export class FaqController {
       },
     },
   })
-  async find(
-    @param.filter(Faq) filter?: Filter<Faq>,
-  ): Promise<Faq[]> {
+  async find(@param.filter(Faq) filter?: Filter<Faq>): Promise<Faq[]> {
     return this.faqRepository.find(filter);
   }
 
@@ -90,7 +87,7 @@ export class FaqController {
   })
   async findById(
     @param.path.number('id') id: number,
-    @param.filter(Faq, {exclude: 'where'}) filter?: FilterExcludingWhere<Faq>
+    @param.filter(Faq, {exclude: 'where'}) filter?: FilterExcludingWhere<Faq>,
   ): Promise<Faq> {
     return this.faqRepository.findById(id, filter);
   }
