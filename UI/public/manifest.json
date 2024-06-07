@@ -1,6 +1,6 @@
 {
-  "name": "Minimal UI",
-  "short_name": "Minimal UI",
+  "name": "Mushroom",
+  "short_name": "Mushroom",
   "display": "standalone",
   "start_url": "/",
   "theme_color": "#000000",
