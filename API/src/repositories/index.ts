@@ -6,3 +6,4 @@ export * from './environment-data.repository';
 export * from './sales-data.repository';
 export * from './ticket.repository';
 export * from './messages.repository';
+export * from './notification.repository';

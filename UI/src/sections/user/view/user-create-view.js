@@ -23,7 +23,7 @@ export default function UserCreateView() {
             href: paths.dashboard.root,
           },
           {
-            name: 'ACL Management',
+            name: 'User Management',
             href: paths.dashboard.user.list,
           },
           { name: 'New user' },

@@ -53,6 +53,7 @@ export const endpoints = {
   },
   user: {
     list: '/api/users/list',
+    notifications: '/notifications',
     filterList: (filter) => `/api/users/list?${filter}`,
     details: (id) => `/api/users/${id}`,
     search: '/api/user/search',

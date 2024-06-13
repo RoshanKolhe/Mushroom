@@ -213,6 +213,7 @@ export class TicketController {
   ): Promise<Ticket[]> {
     const user = await this.userRepository.findById(currnetUser.id);
     if (user.permissions.includes('super_admin')) {
+      console.log('here');
       return this.ticketRepository.find({
         ...filter,
         include: ['user'],

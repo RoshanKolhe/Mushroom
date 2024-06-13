@@ -235,6 +235,10 @@ export class UserController {
                 type: 'string',
                 description: 'User phone number',
               },
+              fcmToken: {
+                type: 'string',
+                description: 'User FCM token',
+              },
             },
           },
         },
@@ -244,9 +248,10 @@ export class UserController {
       id: string;
       code: string;
       phoneNumber: string;
+      fcmToken: string;
     },
   ): Promise<any> {
-    const {id, code, phoneNumber} = requestBody;
+    const {id, code, phoneNumber, fcmToken} = requestBody;
     try {
       if (id === 'testverificationsid' && phoneNumber === '+918928470503') {
         if (code !== '000000') {
@@ -267,6 +272,12 @@ export class UserController {
             this.userService.convertToUserProfile(allUserData);
           const userData = _.omit(userProfile, 'password');
           const token = await this.jwtService.generateToken(userProfile);
+          if (fcmToken) {
+            await this.userRepository.updateById(allUserData.id, {
+              fcmToken: fcmToken,
+            });
+          }
+
           return {
             success: true,
             accessToken: token,
@@ -293,6 +304,11 @@ export class UserController {
             this.userService.convertToUserProfile(allUserData);
           const userData = _.omit(userProfile, 'password');
           const token = await this.jwtService.generateToken(userProfile);
+          if (fcmToken) {
+            await this.userRepository.updateById(allUserData.id, {
+              fcmToken: fcmToken,
+            });
+          }
           return {
             success: true,
             accessToken: token,
@@ -693,7 +709,7 @@ export class UserController {
         (total, record) => total + parseFloat(record.quantity),
         0,
       );
-    } 
+    }
     return Promise.resolve({
       success: true,
       totalClusters,

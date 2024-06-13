@@ -151,7 +151,7 @@ export default function UserListView() {
   );
 
   const downlodCsvFromTableData = () =>{
-    const fileName = 'ACL Management.xlsx';
+    const fileName = 'User Management.xlsx';
     const ws = XLSX.utils.json_to_sheet(tableData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Coupon Master');
@@ -181,10 +181,10 @@ export default function UserListView() {
     <>
       <Container maxWidth={settings.themeStretch ? false : 'lg'}>
         <CustomBreadcrumbs
-          heading="ACL Management"
+          heading="User Management"
           links={[
             { name: 'Dashboard', href: paths.dashboard.root },
-            { name: 'ACL Management', href: paths.dashboard.user.list },
+            { name: 'User Management', href: paths.dashboard.user.list },
             { name: 'List' },
           ]}
           action={

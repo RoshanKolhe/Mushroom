@@ -1,5 +1,5 @@
 import { m } from 'framer-motion';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 // @mui
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
@@ -24,27 +24,10 @@ import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
 import { varHover } from 'src/components/animate';
 //
+import { useGetNotifications } from 'src/api/user';
 import NotificationItem from './notification-item';
 
 // ----------------------------------------------------------------------
-
-const TABS = [
-  {
-    value: 'all',
-    label: 'All',
-    count: 22,
-  },
-  {
-    value: 'unread',
-    label: 'Unread',
-    count: 12,
-  },
-  {
-    value: 'archived',
-    label: 'Archived',
-    count: 10,
-  },
-];
 
 // ----------------------------------------------------------------------
 
@@ -54,20 +37,46 @@ export default function NotificationsPopover() {
   const smUp = useResponsive('up', 'sm');
 
   const [currentTab, setCurrentTab] = useState('all');
+  const {
+    notifications: allNotifications,
+    notificationsEmpty,
+    refreshNotifications,
+  } = useGetNotifications();
 
-  const handleChangeTab = useCallback((event, newValue) => {
-    setCurrentTab(newValue);
-  }, []);
+  const handleChangeTab = useCallback(
+    (event, newValue) => {
+      console.log(newValue);
+      setCurrentTab(newValue);
+      if (newValue === 'unread') {
+        setNotifications(allNotifications.filter((item) => item.isRead === false));
+      } else if (newValue === 'all') {
+        setNotifications(allNotifications);
+      }
+    },
+    [allNotifications]
+  );
 
-  const [notifications, setNotifications] = useState(_notifications);
+  const [notifications, setNotifications] = useState(allNotifications);
+  const totalUnRead = notifications.filter((item) => item.isRead === false).length;
 
-  const totalUnRead = notifications.filter((item) => item.isUnRead === true).length;
+  const [tabs, setTabs] = useState([
+    {
+      value: 'all',
+      label: 'All',
+      count: 0,
+    },
+    {
+      value: 'unread',
+      label: 'Unread',
+      count: 0,
+    },
+  ]);
 
   const handleMarkAllAsRead = () => {
     setNotifications(
       notifications.map((notification) => ({
         ...notification,
-        isUnRead: false,
+        isRead: false,
       }))
     );
   };
@@ -96,7 +105,7 @@ export default function NotificationsPopover() {
 
   const renderTabs = (
     <Tabs value={currentTab} onChange={handleChangeTab}>
-      {TABS.map((tab) => (
+      {tabs.map((tab) => (
         <Tab
           key={tab.value}
           iconPosition="end"
@@ -133,6 +142,25 @@ export default function NotificationsPopover() {
       </List>
     </Scrollbar>
   );
+
+  useEffect(() => {
+    if (allNotifications && allNotifications.length) {
+      setTabs((prevTabs) =>
+        prevTabs.map((tab) => {
+          if (tab.value === 'all') {
+            return { ...tab, count: allNotifications.length };
+          }
+          if (tab.value === 'unread') {
+            return {
+              ...tab,
+              count: allNotifications.filter((item) => item.isRead === false).length,
+            };
+          }
+          return tab;
+        })
+      );
+    }
+  }, [allNotifications]);
 
   return (
     <>
@@ -171,20 +199,20 @@ export default function NotificationsPopover() {
           sx={{ pl: 2.5, pr: 1 }}
         >
           {renderTabs}
-          <IconButton onClick={handleMarkAllAsRead}>
+          {/* <IconButton onClick={handleMarkAllAsRead}>
             <Iconify icon="solar:settings-bold-duotone" />
-          </IconButton>
+          </IconButton> */}
         </Stack>
 
         <Divider />
 
         {renderList}
 
-        <Box sx={{ p: 1 }}>
+        {/* <Box sx={{ p: 1 }}>
           <Button fullWidth size="large">
             View All
           </Button>
-        </Box>
+        </Box> */}
       </Drawer>
     </>
   );

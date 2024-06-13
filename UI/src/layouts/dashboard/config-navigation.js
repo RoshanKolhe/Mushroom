@@ -73,7 +73,7 @@ export function useNavData() {
           },
           // USER
           {
-            title: 'Manage ACL',
+            title: 'Manage Users',
             path: paths.dashboard.user.root,
             icon: ICONS.user,
             children: [
@@ -150,7 +150,7 @@ export function useNavData() {
           },
           // USER
           {
-            title: 'Manage ACL',
+            title: 'Manage Users',
             path: paths.dashboard.user.root,
             icon: ICONS.user,
             children: [
@@ -207,7 +207,7 @@ export function useNavData() {
           },
           // USER
           {
-            title: 'Manage ACL',
+            title: 'Manage Users',
             path: paths.dashboard.user.root,
             icon: ICONS.user,
             children: [

@@ -6,3 +6,4 @@ export * from './environment-data.model';
 export * from './sales-data.model';
 export * from './ticket.model';
 export * from './messages.model';
+export * from './notification.model';

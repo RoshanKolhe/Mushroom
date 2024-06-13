@@ -14,7 +14,6 @@ import {JWTService} from './services/jwt-service';
 import {MyUserService} from './services/user-service';
 import multer from 'multer';
 import {EmailService} from './services/email.service';
-import {SyncProductCron} from './services/cronjob.service';
 import {TwilioService} from './services/twilio.service';
 import {
   EmailManagerBindings,
@@ -26,6 +25,11 @@ import {
   registerAuthenticationStrategy,
 } from '@loopback/authentication';
 import {JWTStrategy} from './authentication-strategy/jwt-strategy';
+import {
+  CheckDailyEntriesAtEvening,
+  CheckDailyEntriesAtNoon,
+} from './services/cronjob.service';
+import {CronComponent} from '@loopback/cron';
 
 export {ApplicationConfig};
 
@@ -38,9 +42,10 @@ export class MushroomApplication extends BootMixin(
     // Set up the custom sequence
     this.sequence(MySequence);
 
-    //set up bindings
+    // Set up bindings
     this.setUpBinding();
     this.component(AuthenticationComponent);
+    this.component(CronComponent);
 
     this.configureFileUpload(options.fileStorageDirectory);
     registerAuthenticationStrategy(this, JWTStrategy);
@@ -71,7 +76,8 @@ export class MushroomApplication extends BootMixin(
     this.bind('service.jwt.service').toClass(JWTService);
     this.bind('service.user.service').toClass(MyUserService);
     this.bind(EmailManagerBindings.SEND_MAIL).toClass(EmailService);
-    this.bind('service.cronjob.service').toClass(SyncProductCron);
+    this.bind('service.cronjob.noon').toClass(CheckDailyEntriesAtNoon);
+    this.bind('service.cronjob.evening').toClass(CheckDailyEntriesAtEvening);
     this.bind('services.TwilioService').toClass(TwilioService);
   }
 

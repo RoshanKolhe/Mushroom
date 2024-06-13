@@ -119,6 +119,12 @@ export class User extends Entity {
   @property({
     type: 'string',
   })
+  fcmToken?: string;
+
+
+  @property({
+    type: 'string',
+  })
   otpExpireAt: string;
 
   @property({
