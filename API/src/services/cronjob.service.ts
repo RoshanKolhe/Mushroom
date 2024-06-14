@@ -66,6 +66,7 @@ export class CheckDailyEntriesAtNoon extends CronJob {
           message: `You have missed an entry for your hut (ID: ${hutId},Name:${hut.name}) on ${currentDate}.`,
           userId: user.id,
           isRead: false,
+          type: 'missedEntry',
         });
 
         // Create ticket
@@ -75,7 +76,6 @@ export class CheckDailyEntriesAtNoon extends CronJob {
           userId: user.id,
           hutId: hutId,
           ticketId: generateUniqueId(),
-          media: [],
         });
       }
     }
@@ -140,6 +140,7 @@ export class CheckDailyEntriesAtEvening extends CronJob {
           message: `You have missed an entry for your hut (ID: ${hutId},Name:${hut.name}) on ${currentDate}.`,
           userId: user.id,
           isRead: false,
+          type: 'missedEntry',
         });
 
         // Create ticket
@@ -149,7 +150,6 @@ export class CheckDailyEntriesAtEvening extends CronJob {
           userId: user.id,
           hutId: hutId,
           ticketId: generateUniqueId(),
-          media: [],
         });
       }
     }

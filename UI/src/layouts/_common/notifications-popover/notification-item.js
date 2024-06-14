@@ -13,32 +13,29 @@ import { fToNow } from 'src/utils/format-time';
 // components
 import Label from 'src/components/label';
 import FileThumbnail from 'src/components/file-thumbnail';
+import axiosInstance from 'src/utils/axios';
 
 // ----------------------------------------------------------------------
 
-export default function NotificationItem({ notification }) {
+export default function NotificationItem({ notification, notificationClick }) {
   const renderAvatar = (
     <ListItemAvatar>
-      {notification?.user?.fileUrl ? (
-        <Avatar src={notification?.user?.fileUrl} sx={{ bgcolor: 'background.neutral' }} />
-      ) : (
-        <Stack
-          alignItems="center"
-          justifyContent="center"
-          sx={{
-            width: 40,
-            height: 40,
-            borderRadius: '50%',
-            bgcolor: 'background.neutral',
-          }}
-        >
-          <Box
-            component="img"
-            src="/assets/icons/notification/ic_chat.svg"
-            sx={{ width: 24, height: 24 }}
-          />
-        </Stack>
-      )}
+      <Stack
+        alignItems="center"
+        justifyContent="center"
+        sx={{
+          width: 40,
+          height: 40,
+          borderRadius: '50%',
+          bgcolor: 'background.neutral',
+        }}
+      >
+        <Box
+          component="img"
+          src="/assets/icons/notification/ic_chat.svg"
+          sx={{ width: 24, height: 24 }}
+        />
+      </Stack>
     </ListItemAvatar>
   );
 
@@ -85,6 +82,9 @@ export default function NotificationItem({ notification }) {
         alignItems: 'flex-start',
         borderBottom: (theme) => `dashed 1px ${theme.palette.divider}`,
       }}
+      onClick={() => {
+        notificationClick(notification);
+      }}
     >
       {renderUnReadBadge}
 
@@ -97,6 +97,7 @@ export default function NotificationItem({ notification }) {
 
 NotificationItem.propTypes = {
   notification: PropTypes.object,
+  notificationClick: PropTypes.func,
 };
 
 // ----------------------------------------------------------------------

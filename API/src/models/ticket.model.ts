@@ -1,4 +1,10 @@
-import {Entity, model, property, belongsTo, hasMany} from '@loopback/repository';
+import {
+  Entity,
+  model,
+  property,
+  belongsTo,
+  hasMany,
+} from '@loopback/repository';
 import {Hut} from './hut.model';
 import {User} from './user.model';
 import {Messages} from './messages.model';
@@ -34,7 +40,7 @@ export class Ticket extends Entity {
   @property({
     type: 'array',
     itemType: 'object',
-    required: true,
+    default: [],
   })
   media: object[];
 

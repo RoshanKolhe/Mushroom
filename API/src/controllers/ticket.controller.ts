@@ -106,7 +106,7 @@ export class TicketController {
     },
   })
   async find(
-    @requestBody() ticketData:any,
+    @requestBody() ticketData: any,
     @inject(AuthenticationBindings.CURRENT_USER) currnetUser: UserProfile,
     @param.filter(Ticket) filter?: Filter<Ticket>,
   ): Promise<Ticket[]> {
@@ -183,7 +183,6 @@ export class TicketController {
     }
   }
 
-
   @authenticate({
     strategy: 'jwt',
     options: {
@@ -208,13 +207,14 @@ export class TicketController {
     },
   })
   async findAllTickets(
-    @inject(AuthenticationBindings.CURRENT_USER) currnetUser: UserProfile,
+    @inject(AuthenticationBindings.CURRENT_USER) currentUser: UserProfile,
     @param.filter(Ticket) filter?: Filter<Ticket>,
   ): Promise<Ticket[]> {
-    const user = await this.userRepository.findById(currnetUser.id);
+    const user = await this.userRepository.findById(currentUser.id);
+    let tickets: Ticket[];
+
     if (user.permissions.includes('super_admin')) {
-      console.log('here');
-      return this.ticketRepository.find({
+      tickets = await this.ticketRepository.find({
         ...filter,
         include: ['user'],
         order: ['createdAt DESC'],
@@ -222,7 +222,7 @@ export class TicketController {
     } else if (user.permissions.includes('group_admin')) {
       const userClusters = await this.clusterRepository.find({
         where: {
-          groupUserId: currnetUser.id,
+          groupUserId: currentUser.id,
         },
       });
       const userClusterIds: any = userClusters.map(cluster => cluster.id);
@@ -234,7 +234,7 @@ export class TicketController {
         },
       });
       const hutIds: any = hutsAssignToClusters.map(hut => hut.id);
-      return this.ticketRepository.find({
+      tickets = await this.ticketRepository.find({
         ...filter,
         include: ['user'],
         where: {
@@ -248,7 +248,7 @@ export class TicketController {
     } else {
       const userClusters = await this.clusterRepository.find({
         where: {
-          userId: currnetUser.id,
+          userId: currentUser.id,
         },
       });
       const userClusterIds: any = userClusters.map(cluster => cluster.id);
@@ -260,7 +260,7 @@ export class TicketController {
         },
       });
       const hutIds: any = hutsAssignToClusters.map(hut => hut.id);
-      return this.ticketRepository.find({
+      tickets = await this.ticketRepository.find({
         ...filter,
         include: ['user'],
         where: {
@@ -272,6 +272,14 @@ export class TicketController {
         order: ['createdAt DESC'],
       });
     }
+
+    // Sanitize the tickets
+    return tickets.map(ticket => {
+      if (typeof ticket.media === 'string' && ticket.media === '') {
+        ticket.media = [];
+      }
+      return ticket;
+    });
   }
 
   @authenticate({

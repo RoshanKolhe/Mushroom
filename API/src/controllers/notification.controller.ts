@@ -93,7 +93,11 @@ export class NotificationController {
   ): Promise<Notification[]> {
     const user = await this.userRepository.findById(currnetUser.id);
     if (user.permissions.includes('super_admin')) {
-      return this.notificationRepository.find({...filter, include: ['user']});
+      return this.notificationRepository.find({
+        ...filter,
+        include: ['user'],
+        order: ['createdAt DESC'],
+      });
     } else {
       return this.notificationRepository.find({
         ...filter,
@@ -101,6 +105,7 @@ export class NotificationController {
           userId: currnetUser.id,
         },
         include: ['user'],
+        order: ['createdAt DESC'],
       });
     }
   }

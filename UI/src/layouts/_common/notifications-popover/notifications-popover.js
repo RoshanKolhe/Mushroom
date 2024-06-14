@@ -25,6 +25,7 @@ import Scrollbar from 'src/components/scrollbar';
 import { varHover } from 'src/components/animate';
 //
 import { useGetNotifications } from 'src/api/user';
+import axiosInstance from 'src/utils/axios';
 import NotificationItem from './notification-item';
 
 // ----------------------------------------------------------------------
@@ -37,11 +38,14 @@ export default function NotificationsPopover() {
   const smUp = useResponsive('up', 'sm');
 
   const [currentTab, setCurrentTab] = useState('all');
+  const [totalUnRead, setTotalUnRead] = useState(0);
   const {
     notifications: allNotifications,
     notificationsEmpty,
     refreshNotifications,
   } = useGetNotifications();
+
+  console.log(allNotifications);
 
   const handleChangeTab = useCallback(
     (event, newValue) => {
@@ -57,7 +61,6 @@ export default function NotificationsPopover() {
   );
 
   const [notifications, setNotifications] = useState(allNotifications);
-  const totalUnRead = notifications.filter((item) => item.isRead === false).length;
 
   const [tabs, setTabs] = useState([
     {
@@ -72,13 +75,20 @@ export default function NotificationsPopover() {
     },
   ]);
 
-  const handleMarkAllAsRead = () => {
-    setNotifications(
-      notifications.map((notification) => ({
-        ...notification,
-        isRead: false,
-      }))
-    );
+  const handleMarkAllAsRead = async () => {
+    const inputData = {
+      isRead: true,
+    };
+    const response = await axiosInstance.patch('/notifications', inputData);
+    refreshNotifications();
+  };
+
+  const notificationClick = async (notification) => {
+    const inputData = {
+      isRead: true,
+    };
+    const response = await axiosInstance.patch(`/notifications/${notification.id}`, inputData);
+    refreshNotifications();
   };
 
   const renderHead = (
@@ -137,7 +147,11 @@ export default function NotificationsPopover() {
     <Scrollbar>
       <List disablePadding>
         {notifications.map((notification) => (
-          <NotificationItem key={notification.id} notification={notification} />
+          <NotificationItem
+            key={notification.id}
+            notification={notification}
+            notificationClick={notificationClick}
+          />
         ))}
       </List>
     </Scrollbar>
@@ -159,6 +173,8 @@ export default function NotificationsPopover() {
           return tab;
         })
       );
+      setNotifications(allNotifications)
+      setTotalUnRead(allNotifications.filter((item) => item.isRead === false).length);
     }
   }, [allNotifications]);
 

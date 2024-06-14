@@ -17,6 +17,13 @@ export class Notification extends Entity {
   message: string;
 
   @property({
+    type: 'string',
+    required: true,
+  })
+  type: string;
+
+
+  @property({
     type: 'boolean',
     default: false,
   })
