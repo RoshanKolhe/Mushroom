@@ -138,14 +138,12 @@ export default function TicketQuickEditForm({ currentTicket, open, onClose, onRe
 
   useEffect(() => {
     if (ticketMessage) {
-      console.log('here');
       if (
         ticketMessage?.messages &&
         ticketMessage?.messages?.length &&
         ticketMessage?.participants &&
         ticketMessage?.participants?.length
       ) {
-        console.log('here1');
         setMessages(ticketMessage?.messages);
         setParticipants(ticketMessage?.participants);
       }

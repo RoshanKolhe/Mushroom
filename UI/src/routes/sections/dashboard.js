@@ -42,6 +42,8 @@ const TicketEditPage = lazy(() => import('src/pages/dashboard/ticket/edit'));
 const SalesDataListPage = lazy(() => import('src/pages/dashboard/salesData/list'));
 const SalesDataCreatePage = lazy(() => import('src/pages/dashboard/salesData/new'));
 const SalesDataEditPage = lazy(() => import('src/pages/dashboard/salesData/edit'));
+// NEW NOTIFICATION
+const NewNotificationCreatePage = lazy(() => import('src/pages/dashboard/newNotification/new'));
 // ORDER
 const OrderListPage = lazy(() => import('src/pages/dashboard/order/list'));
 const OrderDetailsPage = lazy(() => import('src/pages/dashboard/order/details'));
@@ -260,6 +262,14 @@ export const dashboardRoutes = [
             ),
           },
         ],
+      },
+      {
+        path: 'sendNotification',
+        element: (
+          <RolesAuthRoute roles={['super_admin']}>
+            <NewNotificationCreatePage />
+          </RolesAuthRoute>
+        ),
       },
       {
         path: 'product',

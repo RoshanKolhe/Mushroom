@@ -17,12 +17,14 @@ import {
   del,
   requestBody,
   response,
+  HttpErrors,
 } from '@loopback/rest';
 import {Notification} from '../models';
 import {NotificationRepository, UserRepository} from '../repositories';
 import {authenticate, AuthenticationBindings} from '@loopback/authentication';
 import {PermissionKeys} from '../authorization/permission-keys';
 import {inject} from '@loopback/core';
+import {NotificationService} from '../services/notification.service';
 
 export class NotificationController {
   constructor(
@@ -30,6 +32,8 @@ export class NotificationController {
     public notificationRepository: NotificationRepository,
     @repository(UserRepository)
     public userRepository: UserRepository,
+    @inject('services.NotificationService')
+    protected notificationService: NotificationService,
   ) {}
 
   @post('/notifications')
@@ -181,5 +185,88 @@ export class NotificationController {
   })
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.notificationRepository.deleteById(id);
+  }
+
+  @post('/send-notification', {
+    responses: {
+      '200': {
+        description: 'Notification sent',
+      },
+    },
+  })
+  async sendNotification(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            required: ['userIds', 'title', 'message'],
+            properties: {
+              userIds: {
+                type: 'array',
+                items: {
+                  type: 'number', // Updated to string to handle "all" and numbers as strings
+                },
+              },
+              title: {type: 'string'},
+              message: {type: 'string'},
+            },
+          },
+        },
+      },
+    })
+    requestData: {
+      userIds: number[];
+      title: string;
+      message: string;
+    },
+  ): Promise<object> {
+    const {userIds, title, message} = requestData;
+
+    if (!title || !message) {
+      throw new HttpErrors.BadRequest('title, and message are required');
+    }
+
+    let users;
+    if (userIds && userIds.length === 0) {
+      users = await this.userRepository.find();
+    } else {
+      const numericUserIds = userIds
+        .filter(id => typeof id === 'number' || !isNaN(Number(id)))
+        .map(Number);
+      users = await this.userRepository.find({
+        where: {id: {inq: numericUserIds}},
+      });
+    }
+
+    const responses = [];
+    for (const user of users) {
+      try {
+        const userToken = user.fcmToken;
+        if (!userToken) {
+          responses.push({
+            userId: user.id,
+            success: false,
+            error: `User with ID ${user.id} does not have a valid FCM token`,
+          });
+          continue;
+        }
+
+        const response = await this.notificationService.sendNotification(
+          userToken,
+          title,
+          message,
+        );
+        responses.push({userId: user.id, success: true, response});
+      } catch (error) {
+        responses.push({
+          userId: user.id,
+          success: false,
+          error: error.message,
+        });
+      }
+    }
+
+    return {results: responses};
   }
 }

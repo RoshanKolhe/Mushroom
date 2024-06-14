@@ -131,6 +131,13 @@ export function useNavData() {
               { title: t('create'), path: paths.dashboard.salesData.new },
             ],
           },
+          // New Notification
+          {
+            title: 'New Notification',
+            path: paths.dashboard.sendNotification.new,
+            icon: ICONS.salesData,
+            children: [{ title: t('create'), path: paths.dashboard.sendNotification.new }],
+          },
         ],
       },
     ];

@@ -90,5 +90,8 @@ export const paths = {
       new: `${ROOTS.DASHBOARD}/salesData/new`,
       edit: (id) => `${ROOTS.DASHBOARD}/salesData/${id}/edit`,
     },
+    sendNotification: {
+      new: `${ROOTS.DASHBOARD}/sendNotification`,
+    },
   },
 };

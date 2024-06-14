@@ -45,7 +45,6 @@ export default function NotificationsPopover() {
     refreshNotifications,
   } = useGetNotifications();
 
-  console.log(allNotifications);
 
   const handleChangeTab = useCallback(
     (event, newValue) => {

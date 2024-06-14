@@ -30,6 +30,7 @@ import {
   CheckDailyEntriesAtNoon,
 } from './services/cronjob.service';
 import {CronComponent} from '@loopback/cron';
+import {NotificationService} from './services/notification.service';
 
 export {ApplicationConfig};
 
@@ -79,6 +80,7 @@ export class MushroomApplication extends BootMixin(
     this.bind('service.cronjob.noon').toClass(CheckDailyEntriesAtNoon);
     this.bind('service.cronjob.evening').toClass(CheckDailyEntriesAtEvening);
     this.bind('services.TwilioService').toClass(TwilioService);
+    this.bind('services.NotificationService').toClass(NotificationService);
   }
 
   protected configureFileUpload(destination?: string) {
