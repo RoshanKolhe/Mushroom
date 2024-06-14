@@ -164,8 +164,16 @@ export class NotificationController {
       },
     })
     notification: Notification,
-  ): Promise<void> {
-    await this.notificationRepository.updateById(id, notification);
+  ): Promise<any> {
+    try {
+      await this.notificationRepository.updateById(id, notification);
+      return Promise.resolve({
+        success: true,
+        messsage: 'notification updated successfully',
+      });
+    } catch (err) {
+      throw err;
+    }
   }
 
   @put('/notifications/{id}')

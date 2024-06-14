@@ -14,6 +14,8 @@ import { useResponsive } from 'src/hooks/use-responsive';
 import Logo from 'src/components/logo';
 import SvgColor from 'src/components/svg-color';
 import { useSettingsContext } from 'src/components/settings';
+import { useAuthContext } from 'src/auth/hooks';
+
 //
 import { HEADER, NAV } from '../config-layout';
 import {
@@ -29,6 +31,10 @@ import {
 
 export default function Header({ onOpenNav }) {
   const theme = useTheme();
+
+  const { user: userData } = useAuthContext();
+
+  console.log(userData);
 
   const settings = useSettingsContext();
 
@@ -63,7 +69,7 @@ export default function Header({ onOpenNav }) {
       >
         {/* <LanguagePopover /> */}
 
-        <NotificationsPopover />
+        {userData?.permissions.includes('super_admin') ? <NotificationsPopover /> : null}
 
         {/* <ContactsPopover /> */}
 
