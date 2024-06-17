@@ -20,12 +20,22 @@ import { paths } from 'src/routes/paths';
 
 // ----------------------------------------------------------------------
 
-export default function TicketTableToolbar({ isDashboard, filters, onFilters }) {
+export default function TicketTableToolbar({ isDashboard, filters, onFilters, statusOptions }) {
   const popover = usePopover();
 
   const handleFilterName = useCallback(
     (event) => {
       onFilters('name', event.target.value);
+    },
+    [onFilters]
+  );
+
+  const handleFilterStatus = useCallback(
+    (event) => {
+      onFilters(
+        'status',
+        typeof event.target.value === 'string' ? event.target.value.split(',') : event.target.value
+      );
     },
     [onFilters]
   );
@@ -46,6 +56,39 @@ export default function TicketTableToolbar({ isDashboard, filters, onFilters }) 
               pr: { xs: 2.5, md: 1 },
             }}
           >
+            <FormControl
+              sx={{
+                flexShrink: 0,
+                width: { xs: 1, md: 200 },
+              }}
+            >
+              <InputLabel>Status</InputLabel>
+
+              <Select
+                multiple
+                value={filters.status}
+                onChange={handleFilterStatus}
+                input={<OutlinedInput label="Status" />}
+                renderValue={(selected) => selected.map((value) => value).join(', ')}
+                MenuProps={{
+                  PaperProps: {
+                    sx: { maxHeight: 240 },
+                  },
+                }}
+              >
+                {statusOptions.map((option) => (
+                  <MenuItem key={option} value={option}>
+                    <Checkbox
+                      disableRipple
+                      size="small"
+                      checked={filters.status.includes(option)}
+                    />
+                    {option}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
             <Stack direction="row" alignItems="center" spacing={2} flexGrow={1} sx={{ width: 1 }}>
               <TextField
                 fullWidth
@@ -141,4 +184,5 @@ TicketTableToolbar.propTypes = {
   filters: PropTypes.object,
   isDashboard: PropTypes.any,
   onFilters: PropTypes.func,
+  statusOptions: PropTypes.array,
 };

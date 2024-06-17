@@ -20,7 +20,7 @@ import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hook';
 import { RouterLink } from 'src/routes/components';
 // _mock
-import { _roles } from 'src/_mock';
+import { _roles, _satus } from 'src/_mock';
 // hooks
 import { useBoolean } from 'src/hooks/use-boolean';
 // components
@@ -59,6 +59,7 @@ const TABLE_HEAD = [
 
 const defaultFilters = {
   name: '',
+  status: [],
 };
 
 // ----------------------------------------------------------------------
@@ -212,6 +213,7 @@ export default function TicketListView({ isDashboard }) {
             filters={filters}
             onFilters={handleFilters}
             isDashboard={isDashboard}
+            statusOptions={_satus}
           />
 
           {canReset && (
@@ -346,7 +348,12 @@ TicketListView.propTypes = {
 // ----------------------------------------------------------------------
 
 function applyFilter({ inputData, comparator, filters }) {
-  const { name } = filters;
+  const { name, status } = filters;
+  const statusMapping = {
+    open: 'Open',
+    closed: 'Closed',
+    rejected: 'Rejected',
+  };
   const stabilizedThis = inputData.map((el, index) => [el, index]);
   stabilizedThis.sort((a, b) => {
     const order = comparator(a[0], b[0]);
@@ -359,6 +366,12 @@ function applyFilter({ inputData, comparator, filters }) {
   if (name) {
     inputData = inputData.filter(
       (ticket) => ticket.ticketId.toLowerCase().indexOf(name.toLowerCase()) !== -1
+    );
+  }
+
+  if (status.length) {
+    inputData = inputData.filter((user) =>
+      status.map((s) => s.toLowerCase()).includes(user.status.toLowerCase())
     );
   }
 

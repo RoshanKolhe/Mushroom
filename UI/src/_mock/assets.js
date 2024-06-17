@@ -238,7 +238,8 @@ export const _phoneNumbers = [
 
 // ----------------------------------------------------------------------
 
-export const _roles = ['Hut User', 'Cluster Admin','Group Admin'];
+export const _roles = ['Hut User', 'Cluster Admin', 'Group Admin'];
+export const _satus = ['Open', 'Rejected', 'Closed'];
 
 // ----------------------------------------------------------------------
 
