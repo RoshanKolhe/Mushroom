@@ -150,13 +150,13 @@ export default function UserListView() {
     [router]
   );
 
-  const downlodCsvFromTableData = () =>{
+  const downlodCsvFromTableData = () => {
     const fileName = 'User Management.xlsx';
     const ws = XLSX.utils.json_to_sheet(tableData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Coupon Master');
     XLSX.writeFile(wb, fileName);
-  }
+  };
 
   const handleFilterStatus = useCallback(
     (event, newValue) => {
@@ -199,7 +199,7 @@ export default function UserListView() {
                   border: 'solid 1px #00554E',
                   marginRight: '20px',
                 }}
-                onClick={()=>{
+                onClick={() => {
                   downlodCsvFromTableData();
                 }}
               >
@@ -315,7 +315,6 @@ export default function UserListView() {
                     )
                   }
                   showCheckbox={false}
-
                 />
 
                 <TableBody>
@@ -395,6 +394,7 @@ function applyFilter({ inputData, comparator, filters }) {
   const roleMapping = {
     hut_user: 'Hut User',
     cluster_admin: 'Cluster Admin',
+    group_admin: 'Group Admin',
   };
   stabilizedThis.sort((a, b) => {
     const order = comparator(a[0], b[0]);

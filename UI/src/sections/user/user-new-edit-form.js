@@ -58,13 +58,16 @@ export default function UserNewEditForm({ currentUser }) {
 
   const { enqueueSnackbar } = useSnackbar();
 
+  const days = Array.from({ length: 31 }, (_, i) => ({
+    value: (i + 1).toString(),
+    name: (i + 1).toString(),
+  }));
+
   const [validationSchema, setValidationSchema] = useState(
     Yup.object().shape({
       firstName: Yup.string().required('First Name is required'),
       lastName: Yup.string().required('Last Name is required'),
-      email: Yup.string()
-        .required('Email is required')
-        .email('Email must be a valid email address'),
+      email: Yup.string().email('Email must be a valid email address'),
       phoneNumber: Yup.string().required('Phone number is required'),
       role: Yup.string().required('Role is required'),
       gender: Yup.string().required('Gender is required'),
@@ -73,8 +76,8 @@ export default function UserNewEditForm({ currentUser }) {
       fullAddress: Yup.string().required('Full Address is required'),
       city: Yup.string().required('City is required'),
       state: Yup.string().required('State is required'),
-      userType: Yup.string().required('User Type is required'),
-      investmentType: Yup.string().required('Investment Type is required'),
+      userType: Yup.string(),
+      investmentType: Yup.string(),
       shgName: Yup.string(),
       emiStartDate: Yup.string(),
       emiAmount: Yup.string(),
@@ -119,7 +122,7 @@ export default function UserNewEditForm({ currentUser }) {
     handleSubmit,
     formState: { isSubmitting, errors },
   } = methods;
-
+  console.log(errors);
   const values = watch();
   const onSubmit = handleSubmit(async (formData) => {
     try {
@@ -205,7 +208,34 @@ export default function UserNewEditForm({ currentUser }) {
         prevSchema.concat(Yup.object().shape({ shgName: Yup.string() }))
       );
     }
-  }, [values.userType]);
+
+    if (values.role !== 'hut_user') {
+      console.log('here');
+      setValidationSchema((prevSchema) =>
+        prevSchema.concat(
+          Yup.object().shape({
+            email: Yup.string()
+              .required('Email is required')
+              .email('Email must be a valid email address'),
+            userType: Yup.string(),
+            investmentType: Yup.string(),
+          })
+        )
+      );
+    } else {
+      setValidationSchema((prevSchema) =>
+        prevSchema.concat(
+          Yup.object().shape({
+            email: Yup.string().email('Email must be a valid email address'),
+            userType: Yup.string().required('User Type is required'),
+            investmentType: Yup.string().required('Investment Type is required'),
+          })
+        )
+      );
+    }
+  }, [values.userType, values.role]);
+
+  console.log(values);
 
   useEffect(() => {
     if (values.investmentType === 'bankLoan') {
@@ -374,27 +404,31 @@ export default function UserNewEditForm({ currentUser }) {
                   />
                 )}
               />
-              <RHFSelect fullWidth name="userType" label="User Type">
-                {[
-                  { value: 'individual', name: 'Individual' },
-                  { value: 'shg', name: 'SHG ( Self Hep Group)' },
-                ].map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.name}
-                  </MenuItem>
-                ))}
-              </RHFSelect>
+              {values.role === 'hut_user' ? (
+                <RHFSelect fullWidth name="userType" label="User Type">
+                  {[
+                    { value: 'individual', name: 'Individual' },
+                    { value: 'shg', name: 'SHG ( Self Hep Group)' },
+                  ].map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.name}
+                    </MenuItem>
+                  ))}
+                </RHFSelect>
+              ) : null}
               {values.userType === 'shg' ? <RHFTextField name="shgName" label="SHG Name" /> : null}
-              <RHFSelect fullWidth name="investmentType" label="Investment Type">
-                {[
-                  { value: 'bankLoan', name: 'Bank Loan' },
-                  { value: 'selfFinanace', name: 'Self Finance' },
-                ].map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.name}
-                  </MenuItem>
-                ))}
-              </RHFSelect>
+              {values.role === 'hut_user' ? (
+                <RHFSelect fullWidth name="investmentType" label="Investment Type">
+                  {[
+                    { value: 'bankLoan', name: 'Bank Loan' },
+                    { value: 'selfFinanace', name: 'Self Finance' },
+                  ].map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.name}
+                    </MenuItem>
+                  ))}
+                </RHFSelect>
+              ) : null}
               {values.investmentType === 'bankLoan' ? (
                 <>
                   <Controller
@@ -419,11 +453,7 @@ export default function UserNewEditForm({ currentUser }) {
                   />
                   <RHFTextField name="emiAmount" label="Emi Amount" />
                   <RHFSelect fullWidth name="emiDate" label="Emi Date">
-                    {[
-                      { value: '1', name: '1' },
-                      { value: '2', name: '2' },
-                      { value: '3', name: '3' },
-                    ].map((option) => (
+                    {days.map((option) => (
                       <MenuItem key={option.value} value={option.value}>
                         {option.name}
                       </MenuItem>

@@ -64,15 +64,13 @@ export class User extends Entity {
 
   @property({
     type: 'string',
-    required: true,
   })
-  userType: string;
+  userType?: string;
 
   @property({
     type: 'string',
-    required: true,
   })
-  investmentType: string;
+  investmentType?: string;
 
   @property({
     type: 'string',

@@ -151,14 +151,14 @@ export default function ClusterQuickEditForm({ currentCluster, open, onClose, on
 
             <Box sx={{ display: { xs: 'none', sm: 'block' } }} />
             <RHFTextField name="name" label="Cluster Name" />
-            <RHFSelect fullWidth name="user" label="Cluster User">
+            <RHFSelect fullWidth name="user" label="Cluster Admin">
               {userOptions.map((option) => (
                 <MenuItem key={option.id} value={option.id}>
                   {`${option?.firstName} ${option?.lastName ? option?.lastName : ''}`}
                 </MenuItem>
               ))}
             </RHFSelect>
-            <RHFSelect fullWidth name="groupUser" label="Group User">
+            <RHFSelect fullWidth name="groupUser" label="Group Admin">
               {groupUserOptions.map((option) => (
                 <MenuItem key={option.id} value={option.id}>
                   {`${option?.firstName} ${option?.lastName ? option?.lastName : ''}`}

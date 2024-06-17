@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import * as Yup from 'yup';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
@@ -30,23 +30,36 @@ import { states } from 'src/utils/constants';
 export default function UserQuickEditForm({ currentUser, open, onClose, onRefreshUsers }) {
   const { enqueueSnackbar } = useSnackbar();
 
+  const days = Array.from({ length: 31 }, (_, i) => ({
+    value: (i + 1).toString(),
+    name: (i + 1).toString(),
+  }));
+
   const { user: userData } = useAuthContext();
 
   const isAdmin = userData ? userData.permissions.includes('super_admin') : false;
 
-  const NewUserSchema = Yup.object().shape({
-    firstName: Yup.string().required('First Name is required'),
-    lastName: Yup.string().required('Last Name is required'),
-    email: Yup.string().required('Email is required').email('Email must be a valid email address'),
-    phoneNumber: Yup.string().required('Phone number is required'),
-    role: Yup.string().required('Role is required'),
-    gender: Yup.string().required('Role is required'),
-    isActive: Yup.boolean(),
-    dob: Yup.string().required('Date is required'),
-    fullAddress: Yup.string().required('Role is required'),
-    city: Yup.string().required('Role is required'),
-    state: Yup.string().required('Role is required'),
-  });
+  const [validationSchema, setValidationSchema] = useState(
+    Yup.object().shape({
+      firstName: Yup.string().required('First Name is required'),
+      lastName: Yup.string().required('Last Name is required'),
+      email: Yup.string().email('Email must be a valid email address'),
+      phoneNumber: Yup.string().required('Phone number is required'),
+      role: Yup.string().required('Role is required'),
+      gender: Yup.string().required('Gender is required'),
+      isActive: Yup.boolean(),
+      dob: Yup.string().required('Date is required'),
+      fullAddress: Yup.string().required('Full Address is required'),
+      city: Yup.string().required('City is required'),
+      state: Yup.string().required('State is required'),
+      userType: Yup.string(),
+      investmentType: Yup.string(),
+      shgName: Yup.string(),
+      emiStartDate: Yup.string(),
+      emiAmount: Yup.string(),
+      emiDate: Yup.string(),
+    })
+  );
 
   const defaultValues = useMemo(
     () => ({
@@ -62,27 +75,36 @@ export default function UserQuickEditForm({ currentUser, open, onClose, onRefres
       fullAddress: currentUser?.fullAddress || '',
       city: currentUser?.city || '',
       state: currentUser?.state || '',
+      shgName: currentUser?.shgName || '',
+      userType: currentUser?.userType || '',
+      investmentType: currentUser?.investmentType || '',
+      emiStartDate: currentUser?.emiStartDate || '',
+      emiAmount: currentUser?.emiAmount || '',
+      emiDate: currentUser?.emiDate || '',
     }),
     [currentUser]
   );
 
   const methods = useForm({
-    resolver: yupResolver(NewUserSchema),
+    resolver: yupResolver(validationSchema),
     defaultValues,
   });
 
   const {
     reset,
+    watch,
     control,
+    setValue,
     handleSubmit,
-    formState: { isSubmitting },
+    formState: { isSubmitting, errors },
   } = methods;
+
+  const values = watch();
 
   const onSubmit = handleSubmit(async (data) => {
     try {
       console.log(data);
       const inputData = {
-        phoneNumber: data.phoneNumber,
         firstName: data.firstName,
         lastName: data.lastName,
         permissions: [data.role],
@@ -93,6 +115,12 @@ export default function UserQuickEditForm({ currentUser, open, onClose, onRefres
         fullAddress: data.fullAddress,
         city: data.city,
         state: data.state,
+        userType: data.userType,
+        shgName: data.shgName,
+        investmentType: data.investmentType,
+        emiStartDate: data.emiStartDate,
+        emiAmount: data.emiAmount,
+        emiDate: data.emiDate,
       };
       await axiosInstance.patch(`/api/users/${currentUser.id}`, inputData);
       // reset();
@@ -103,6 +131,51 @@ export default function UserQuickEditForm({ currentUser, open, onClose, onRefres
       console.error(error);
     }
   });
+
+  useEffect(() => {
+    if (currentUser) {
+      reset(defaultValues);
+    }
+  }, [currentUser, defaultValues, reset]);
+
+  useEffect(() => {
+    if (values.userType === 'shg') {
+      setValidationSchema((prevSchema) =>
+        prevSchema.concat(
+          Yup.object().shape({ shgName: Yup.string().required('SHG Name is required') })
+        )
+      );
+    } else {
+      setValidationSchema((prevSchema) =>
+        prevSchema.concat(Yup.object().shape({ shgName: Yup.string() }))
+      );
+    }
+
+    if (values.role !== 'hut_user') {
+      console.log('here');
+      setValidationSchema((prevSchema) =>
+        prevSchema.concat(
+          Yup.object().shape({
+            email: Yup.string()
+              .required('Email is required')
+              .email('Email must be a valid email address'),
+            userType: Yup.string(),
+            investmentType: Yup.string(),
+          })
+        )
+      );
+    } else {
+      setValidationSchema((prevSchema) =>
+        prevSchema.concat(
+          Yup.object().shape({
+            email: Yup.string().email('Email must be a valid email address'),
+            userType: Yup.string().required('User Type is required'),
+            investmentType: Yup.string().required('Investment Type is required'),
+          })
+        )
+      );
+    }
+  }, [values.userType, values.role]);
 
   return (
     <Dialog
@@ -220,15 +293,72 @@ export default function UserQuickEditForm({ currentUser, open, onClose, onRefres
                 />
               )}
             />
-            <RHFTextField name="fullAddress" label="Full Address" />
-            <RHFTextField name="city" label="City" />
-            <RHFSelect fullWidth name="state" label="State">
-                {states.map((option) => (
-                  <MenuItem key={option.id} value={option.id}>
+            {values.role === 'hut_user' ? (
+              <RHFSelect fullWidth name="userType" label="User Type">
+                {[
+                  { value: 'individual', name: 'Individual' },
+                  { value: 'shg', name: 'SHG ( Self Hep Group)' },
+                ].map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
                     {option.name}
                   </MenuItem>
                 ))}
               </RHFSelect>
+            ) : null}
+            {values.userType === 'shg' ? <RHFTextField name="shgName" label="SHG Name" /> : null}
+            {values.role === 'hut_user' ? (
+              <RHFSelect fullWidth name="investmentType" label="Investment Type">
+                {[
+                  { value: 'bankLoan', name: 'Bank Loan' },
+                  { value: 'selfFinanace', name: 'Self Finance' },
+                ].map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.name}
+                  </MenuItem>
+                ))}
+              </RHFSelect>
+            ) : null}
+            {values.investmentType === 'bankLoan' ? (
+              <>
+                <Controller
+                  name="emiStartDate"
+                  control={control}
+                  render={({ field, fieldState: { error } }) => (
+                    <DatePicker
+                      label="EMI Start Date"
+                      value={new Date(field.value)}
+                      onChange={(newValue) => {
+                        field.onChange(newValue);
+                      }}
+                      slotProps={{
+                        textField: {
+                          fullWidth: true,
+                          error: !!error,
+                          helperText: error?.message,
+                        },
+                      }}
+                    />
+                  )}
+                />
+                <RHFTextField name="emiAmount" label="Emi Amount" />
+                <RHFSelect fullWidth name="emiDate" label="Emi Date">
+                  {days.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.name}
+                    </MenuItem>
+                  ))}
+                </RHFSelect>
+              </>
+            ) : null}
+            <RHFTextField name="fullAddress" label="Full Address" />
+            <RHFTextField name="city" label="City" />
+            <RHFSelect fullWidth name="state" label="State">
+              {states.map((option) => (
+                <MenuItem key={option.id} value={option.id}>
+                  {option.name}
+                </MenuItem>
+              ))}
+            </RHFSelect>
           </Box>
         </DialogContent>
 
