@@ -231,6 +231,17 @@ export default function CultivaionCard() {
                 }}
               />
             </Grid>
+            <Grid item xs={12} md={3}>
+              <AppWidgetSummary
+                title="Temprature"
+                percent={2.6}
+                total={cultivationData?.avgTemperature}
+                chart={{
+                  colors: [theme.palette.info.light, theme.palette.info.main],
+                  series: cultivationData?.weeklyAverageTemperature,
+                }}
+              />
+            </Grid>
           </Grid>
         </Stack>
       </Card>

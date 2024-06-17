@@ -110,7 +110,7 @@ export default function UserTableToolbar({
         open={popover.open}
         onClose={popover.onClose}
         arrow="right-top"
-        sx={{ width: 140 }}
+        sx={{ width: 200 }}
       >
         {/* <MenuItem
           onClick={() => {
@@ -136,7 +136,7 @@ export default function UserTableToolbar({
           }}
         >
           <Iconify icon="solar:export-bold" />
-          Dummy Excel
+          Excel Data Format
         </MenuItem>
       </CustomPopover>
     </>

@@ -742,6 +742,7 @@ export class UserController {
     console.log(dates);
     let avgMoisture = 0;
     let avgHumidity = 0;
+    let avgTemperature = 0;
     let totalCultivation = 0;
     const startOfDay = new Date(
       selectedDate.getFullYear(),
@@ -763,11 +764,13 @@ export class UserController {
     hutEnvironmentData.forEach(res => {
       avgMoisture += Number(res.moisture);
       avgHumidity += Number(res.humidity);
+      avgTemperature += Number(res.temprature); // Add this line
       totalCultivation += Number(res.quantity);
     });
     if (hutEnvironmentData.length > 0) {
       avgMoisture /= hutEnvironmentData.length;
       avgHumidity /= hutEnvironmentData.length;
+      avgTemperature /= hutEnvironmentData.length; // Add this line
     }
 
     const weeksHutEnvironmentData = await this.environmentDataRepository.find({
@@ -789,6 +792,7 @@ export class UserController {
     return {
       avgMoisture,
       avgHumidity,
+      avgTemperature, // Add this line
       totalCultivation,
       ...allWeeklyData,
     };
@@ -800,6 +804,7 @@ export class UserController {
   ): {
     weeklyAverageMoisture: number[];
     weeklyAverageHumidity: number[];
+    weeklyAverageTemperature: number[]; // Add this line
     totalWeeklyCultivation: number[];
   } {
     const {startDate, endDate} = dateRange;
@@ -809,6 +814,7 @@ export class UserController {
     // Initialize arrays to store daily averages and total cultivation
     const dailyAverageMoisture: number[] = [];
     const dailyAverageHumidity: number[] = [];
+    const dailyAverageTemperature: number[] = []; // Add this line
     const dailyTotalCultivation: number[] = [];
 
     // Iterate through each day within the date range
@@ -823,13 +829,17 @@ export class UserController {
         );
       });
 
-      // Calculate the average moisture and humidity for the current day
+      // Calculate the average moisture, humidity, and temperature for the current day
       const totalMoisture = dailyData.reduce(
         (sum, entry) => sum + Number(entry.moisture),
         0,
       );
       const totalHumidity = dailyData.reduce(
         (sum, entry) => sum + Number(entry.humidity),
+        0,
+      );
+      const totalTemperature = dailyData.reduce(
+        (sum, entry) => sum + Number(entry.temprature), // Add this line
         0,
       );
       const totalCultivation = dailyData.reduce(
@@ -840,10 +850,13 @@ export class UserController {
         dailyData.length > 0 ? totalMoisture / dailyData.length : 0;
       const averageHumidity =
         dailyData.length > 0 ? totalHumidity / dailyData.length : 0;
+      const averageTemperature =
+        dailyData.length > 0 ? totalTemperature / dailyData.length : 0; // Add this line
 
       // Add the daily averages and total cultivation to the result arrays
       dailyAverageMoisture.push(averageMoisture);
       dailyAverageHumidity.push(averageHumidity);
+      dailyAverageTemperature.push(averageTemperature); // Add this line
       dailyTotalCultivation.push(totalCultivation);
 
       // Move to the next day
@@ -853,10 +866,10 @@ export class UserController {
     return {
       weeklyAverageMoisture: dailyAverageMoisture,
       weeklyAverageHumidity: dailyAverageHumidity,
+      weeklyAverageTemperature: dailyAverageTemperature, // Add this line
       totalWeeklyCultivation: dailyTotalCultivation,
     };
   }
-
   // @authenticate({
   //   strategy: 'jwt',
   // })
