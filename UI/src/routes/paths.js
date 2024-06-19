@@ -59,6 +59,7 @@ export const paths = {
       profile: `${ROOTS.DASHBOARD}/user/profile`,
       // account: `${ROOTS.DASHBOARD}/user/account`,
       edit: (id) => `${ROOTS.DASHBOARD}/user/${id}/edit`,
+      view: (id) => `${ROOTS.DASHBOARD}/user/${id}/view`,
     },
     cluster: {
       root: `${ROOTS.DASHBOARD}/cluster/list`,

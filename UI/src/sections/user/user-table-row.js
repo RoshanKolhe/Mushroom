@@ -25,12 +25,13 @@ export default function UserTableRow({
   row,
   selected,
   onEditRow,
+  onViewRow,
   onSelectRow,
   onDeleteRow,
   onRefreshUsers,
   isAdmin,
 }) {
-  const { firstName,lastName, avatar, permissions, isActive, email, phoneNumber } = row;
+  const { firstName, lastName, avatar, permissions, isActive, email, phoneNumber } = row;
 
   const confirm = useBoolean();
 
@@ -78,6 +79,15 @@ export default function UserTableRow({
                   onClick={quickEdit.onTrue}
                 >
                   <Iconify icon="solar:pen-bold" />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="View User" placement="top" arrow>
+                <IconButton
+                  onClick={() => {
+                    onViewRow();
+                  }}
+                >
+                  <Iconify icon="solar:eye-bold" />
                 </IconButton>
               </Tooltip>
 
@@ -143,6 +153,7 @@ UserTableRow.propTypes = {
   onDeleteRow: PropTypes.func,
   onRefreshUsers: PropTypes.func,
   onEditRow: PropTypes.func,
+  onViewRow: PropTypes.func,
   onSelectRow: PropTypes.func,
   row: PropTypes.object,
   selected: PropTypes.bool,

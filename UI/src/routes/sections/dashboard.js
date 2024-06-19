@@ -59,6 +59,7 @@ const UserListPage = lazy(() => import('src/pages/dashboard/user/list'));
 const UserAccountPage = lazy(() => import('src/pages/dashboard/user/account'));
 const UserCreatePage = lazy(() => import('src/pages/dashboard/user/new'));
 const UserEditPage = lazy(() => import('src/pages/dashboard/user/edit'));
+const UserViewPage = lazy(() => import('src/pages/dashboard/user/view'));
 // BLOG
 const BlogPostsPage = lazy(() => import('src/pages/dashboard/post/list'));
 const BlogPostPage = lazy(() => import('src/pages/dashboard/post/details'));
@@ -127,6 +128,14 @@ export const dashboardRoutes = [
             element: (
               <RolesAuthRoute roles={['super_admin', 'cluster_admin']}>
                 <UserEditPage />
+              </RolesAuthRoute>
+            ),
+          },
+          {
+            path: ':id/view',
+            element: (
+              <RolesAuthRoute roles={['super_admin', 'cluster_admin']}>
+                <UserViewPage />
               </RolesAuthRoute>
             ),
           },

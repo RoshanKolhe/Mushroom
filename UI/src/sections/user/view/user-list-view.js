@@ -150,6 +150,13 @@ export default function UserListView() {
     [router]
   );
 
+  const handleViewRow = useCallback(
+    (id) => {
+      router.push(paths.dashboard.user.view(id));
+    },
+    [router]
+  );
+
   const downlodCsvFromTableData = () => {
     const fileName = 'User Management.xlsx';
     const ws = XLSX.utils.json_to_sheet(tableData);
@@ -331,6 +338,7 @@ export default function UserListView() {
                         onSelectRow={() => table.onSelectRow(row.id)}
                         onDeleteRow={() => handleDeleteRow(row.id)}
                         onEditRow={() => handleEditRow(row.id)}
+                        onViewRow={() => handleViewRow(row.id)}
                         onRefreshUsers={() => refreshUsers()}
                         isAdmin={isAdmin}
                       />
