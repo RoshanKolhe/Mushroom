@@ -49,6 +49,7 @@ const ICONS = {
   ecommerce: icon('ic_ecommerce'),
   analytics: icon('ic_analytics'),
   dashboard: icon('ic_dashboard'),
+  notification: icon('ic_notification'),
 };
 
 // ----------------------------------------------------------------------
@@ -135,7 +136,7 @@ export function useNavData() {
           {
             title: 'New Notification',
             path: paths.dashboard.sendNotification.new,
-            icon: ICONS.salesData,
+            icon: ICONS.notification,
             children: [{ title: t('create'), path: paths.dashboard.sendNotification.new }],
           },
         ],

@@ -49,7 +49,7 @@ import ClusterTableFiltersResult from '../cluster-table-filters-result';
 
 const TABLE_HEAD = [
   { id: 'name', label: 'Cluster Name' },
-  { id: 'user', label: 'Cluster User', width: 180 },
+  { id: 'user', label: 'Cluster Admin', width: 180 },
   { id: 'noIfHuts', label: 'No of huts', width: 180 },
   { id: 'totalCultivation', label: 'Total Cultivation', width: 100 },
   { id: 'isActive', label: 'Status', width: 180 },
