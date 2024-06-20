@@ -30,6 +30,7 @@ const ICONS = {
   faq: icon('ic_faq'),
   ticket: icon('ic-tickets'),
   salesData: icon('ic_salesData'),
+  mushroomType: icon('ic_mushroomType'),
   file: icon('ic_file'),
   lock: icon('ic_lock'),
   tour: icon('ic_tour'),
@@ -136,7 +137,7 @@ export function useNavData() {
           {
             title: 'Manage Mushroom Type',
             path: paths.dashboard.mushroomType.root,
-            icon: ICONS.salesData,
+            icon: ICONS.mushroomType,
             children: [
               { title: t('list'), path: paths.dashboard.mushroomType.list },
               { title: t('create'), path: paths.dashboard.mushroomType.new },
