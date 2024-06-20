@@ -39,21 +39,26 @@ import {
   TablePaginationCustom,
 } from 'src/components/table';
 //
-import { useGetSalesDatas } from 'src/api/salesData';
+import { useGetMushroomTypes } from 'src/api/mushroomType';
 import axiosInstance from 'src/utils/axios';
 import { useSnackbar } from 'src/components/snackbar';
-import SalesDataTableRow from '../salesData-table-row';
-import SalesDataTableToolbar from '../salesData-table-toolbar';
-import SalesDataTableFiltersResult from '../salesData-table-filters-result';
+import MushroomTypeTableRow from '../mushroomType-table-row';
+import MushroomTypeTableToolbar from '../mushroomType-table-toolbar';
+import MushroomTypeTableFiltersResult from '../mushroomType-table-filters-result';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'orderId', label: 'Order ID' },
-  { id: 'description', label: 'Description', width: 180 },
-  { id: 'date', label: 'Date', width: 180 },
-  { id: 'invoice', label: 'Invoice', width: 180 },
-  { id: 'status', label: 'Status', width: 180 },
+  { id: 'name', label: 'Name' },
+  { id: 'minimumHumidity', label: 'Minimum Humidity', width: 180 },
+  { id: 'maximumHumidity', label: 'Maximum Humidity', width: 180 },
+  { id: 'minimumMoisture', label: 'Minimum Moisture', width: 180 },
+  { id: 'maximumMoisture', label: 'Maximum Moisture', width: 180 },
+  { id: 'minimumTemprature', label: 'Maximum Temprature', width: 180 },
+  { id: 'maximumTemprature', label: 'Maximum Temprature', width: 180 },
+  { id: 'maxRow', label: 'Rows', width: 180 },
+  { id: 'maxColumn', label: 'Columns', width: 180 },
+  { id: 'colors', label: 'Colors', width: 180 },
   { id: '', width: 88 },
 ];
 
@@ -63,7 +68,7 @@ const defaultFilters = {
 
 // ----------------------------------------------------------------------
 
-export default function SalesDataListView() {
+export default function MushroomTypeListView() {
   const table = useTable();
 
   const settings = useSettingsContext();
@@ -77,7 +82,8 @@ export default function SalesDataListView() {
 
   const [filters, setFilters] = useState(defaultFilters);
 
-  const { salesDatas, salesDatasLoading, salesDatasEmpty, refreshSalesDatas } = useGetSalesDatas();
+  const { mushroomTypes, mushroomTypesLoading, mushroomTypesEmpty, refreshMushroomTypes } =
+    useGetMushroomTypes();
 
   const dataFiltered = applyFilter({
     inputData: tableData,
@@ -110,19 +116,17 @@ export default function SalesDataListView() {
   const handleDeleteRow = useCallback(
     async (id) => {
       try {
-        await axiosInstance.delete(`/sales-data/${id}`);
-        enqueueSnackbar('Sales data entry deleted successfully', {
-          variant: 'success',
-        });
-        refreshSalesDatas();
+        await axiosInstance.delete(`/mushroom-types/${id}`);
+        enqueueSnackbar('Mushroom Type Deleted Successfully');
+        refreshMushroomTypes();
       } catch (error) {
         console.error(error);
-        enqueueSnackbar(typeof error === 'string' ? error : error?.error?.message, {
+        enqueueSnackbar(typeof error === 'string' ? error : error.error.message, {
           variant: 'error',
         });
       }
     },
-    [enqueueSnackbar, refreshSalesDatas]
+    [enqueueSnackbar, refreshMushroomTypes]
   );
 
   const handleDeleteRows = useCallback(() => {
@@ -138,7 +142,7 @@ export default function SalesDataListView() {
 
   const handleEditRow = useCallback(
     (id) => {
-      router.push(paths.dashboard.salesData.edit(id));
+      router.push(paths.dashboard.mushroomType.edit(id));
     },
     [router]
   );
@@ -164,19 +168,19 @@ export default function SalesDataListView() {
   };
 
   useEffect(() => {
-    if (salesDatas) {
-      setTableData(salesDatas);
+    if (mushroomTypes) {
+      setTableData(mushroomTypes);
     }
-  }, [salesDatas]);
+  }, [mushroomTypes]);
 
   return (
     <>
       <Container maxWidth={settings.themeStretch ? false : 'lg'}>
         <CustomBreadcrumbs
-          heading="Manage Sales Data"
+          heading="Manage Mushroom Types"
           links={[
             { name: 'Dashboard', href: paths.dashboard.root },
-            { name: 'Manage Sales Data', href: paths.dashboard.salesData.list },
+            { name: 'Manage Mushroom Types', href: paths.dashboard.mushroomType.list },
             { name: 'List' },
           ]}
           action={
@@ -199,13 +203,13 @@ export default function SalesDataListView() {
               </Button>
               <Button
                 component={RouterLink}
-                href={paths.dashboard.salesData.new}
+                href={paths.dashboard.mushroomType.new}
                 variant="contained"
                 startIcon={<Iconify icon="mingcute:add-line" />}
                 color="primary"
-                style={{ width: '155px', backgroundColor: '#00554E' }}
+                style={{ width: '200px', backgroundColor: '#00554E' }}
               >
-                New Sales Data
+                New Mushroom Type
               </Button>
             </>
           }
@@ -215,10 +219,10 @@ export default function SalesDataListView() {
         />
 
         <Card>
-          <SalesDataTableToolbar filters={filters} onFilters={handleFilters} />
+          <MushroomTypeTableToolbar filters={filters} onFilters={handleFilters} />
 
           {canReset && (
-            <SalesDataTableFiltersResult
+            <MushroomTypeTableFiltersResult
               filters={filters}
               onFilters={handleFilters}
               //
@@ -265,7 +269,6 @@ export default function SalesDataListView() {
                     )
                   }
                   showCheckbox={false}
-
                 />
 
                 <TableBody>
@@ -275,14 +278,14 @@ export default function SalesDataListView() {
                       table.page * table.rowsPerPage + table.rowsPerPage
                     )
                     .map((row) => (
-                      <SalesDataTableRow
+                      <MushroomTypeTableRow
                         key={row.id}
                         row={row}
                         selected={table.selected.includes(row.id)}
                         onSelectRow={() => table.onSelectRow(row.id)}
                         onDeleteRow={() => handleDeleteRow(row.id)}
                         onEditRow={() => handleEditRow(row.id)}
-                        onRefreshSalesDatas={() => refreshSalesDatas()}
+                        onRefreshMushroomTypes={() => refreshMushroomTypes()}
                       />
                     ))}
 
@@ -351,7 +354,7 @@ function applyFilter({ inputData, comparator, filters }) {
 
   if (name) {
     inputData = inputData.filter(
-      (salesData) => salesData.orderId.toLowerCase().indexOf(name.toLowerCase()) !== -1
+      (mushroomType) => mushroomType.name.toLowerCase().indexOf(name.toLowerCase()) !== -1
     );
   }
 

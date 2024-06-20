@@ -132,6 +132,16 @@ export function useNavData() {
               { title: t('create'), path: paths.dashboard.salesData.new },
             ],
           },
+          // MUSHROOM TYPE
+          {
+            title: 'Manage Mushroom Type',
+            path: paths.dashboard.mushroomType.root,
+            icon: ICONS.salesData,
+            children: [
+              { title: t('list'), path: paths.dashboard.mushroomType.list },
+              { title: t('create'), path: paths.dashboard.mushroomType.new },
+            ],
+          },
           // New Notification
           {
             title: 'New Notification',

@@ -91,6 +91,12 @@ export const paths = {
       new: `${ROOTS.DASHBOARD}/salesData/new`,
       edit: (id) => `${ROOTS.DASHBOARD}/salesData/${id}/edit`,
     },
+    mushroomType: {
+      root: `${ROOTS.DASHBOARD}/mushroomType`,
+      list: `${ROOTS.DASHBOARD}/mushroomType/list`,
+      new: `${ROOTS.DASHBOARD}/mushroomType/new`,
+      edit: (id) => `${ROOTS.DASHBOARD}/mushroomType/${id}/edit`,
+    },
     sendNotification: {
       new: `${ROOTS.DASHBOARD}/sendNotification`,
     },

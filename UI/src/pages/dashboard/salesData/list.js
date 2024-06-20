@@ -8,7 +8,7 @@ export default function SalesDataListPage() {
   return (
     <>
       <Helmet>
-        <title> Dashboard: SalesData List</title>
+        <title> Dashboard: Sales Data List</title>
       </Helmet>
 
       <SalesDataListView />

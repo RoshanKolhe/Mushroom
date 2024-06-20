@@ -81,6 +81,10 @@ export const endpoints = {
     list: '/sales-data',
     details: (id) => `/sales-data/${id}`,
   },
+  mushroomType: {
+    list: '/mushroom-types',
+    details: (id) => `/mushroom-types/${id}`,
+  },
   ticket: {
     list: '/tickets-with-filter',
     details: (id) => `/tickets/${id}`,

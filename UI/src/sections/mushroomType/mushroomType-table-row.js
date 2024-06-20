@@ -19,19 +19,30 @@ import Iconify from 'src/components/iconify';
 import CustomPopover, { usePopover } from 'src/components/custom-popover';
 import { ConfirmDialog } from 'src/components/custom-dialog';
 //
-import SalesDataQuickEditForm from './salesData-quick-edit-form';
+import MushroomTypeQuickEditForm from './mushroomType-quick-edit-form';
 
 // ----------------------------------------------------------------------
 
-export default function SalesDataTableRow({
+export default function MushroomTypeTableRow({
   row,
   selected,
   onEditRow,
   onSelectRow,
   onDeleteRow,
-  onRefreshSalesDatas,
+  onRefreshMushroomTypes,
 }) {
-  const { orderId, description, date, noOfSales, totalPrice, invoice, status } = row;
+  const {
+    name,
+    minimumHumidity,
+    maximumHumidity,
+    minimumMoisture,
+    maximumMoisture,
+    minimumTemprature,
+    maximumTemprature,
+    maxRow,
+    maxColumn,
+    colors,
+  } = row;
 
   const confirm = useBoolean();
 
@@ -50,38 +61,18 @@ export default function SalesDataTableRow({
           <Checkbox checked={selected} onClick={onSelectRow} />
         </TableCell> */}
 
-        <TableCell sx={{ whiteSpace: 'nowrap' }}>{orderId}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{name}</TableCell>
 
-        <TableCell sx={{ whiteSpace: 'nowrap' }}>{description}</TableCell>
-        <TableCell sx={{ whiteSpace: 'nowrap' }}>
-          {moment(date).format('DD-MM-YYYY hh:mm:ss')}
-        </TableCell>
-        <TableCell sx={{ whiteSpace: 'nowrap' }}>
-          <Button
-            variant="contained"
-            color="primary"
-            style={{ backgroundColor: '#00554E' }}
-            onClick={() => {
-              handleView(invoice.fileUrl);
-            }}
-          >
-            View
-          </Button>
-        </TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{minimumHumidity}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{maximumHumidity}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{minimumMoisture}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{maximumMoisture}</TableCell>
 
-        <TableCell>
-          <Label
-            variant="soft"
-            color={
-              (status === 'completed' && 'success') ||
-              (status === 'pending' && 'warning') ||
-              (status === 'rejected' && 'error') ||
-              'default'
-            }
-          >
-            {status}
-          </Label>
-        </TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{minimumTemprature}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{maximumTemprature}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{maxRow}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{maxColumn}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{colors.toString()}</TableCell>
 
         <TableCell align="right" sx={{ px: 1, whiteSpace: 'nowrap' }}>
           <Tooltip title="Quick Edit" placement="top" arrow>
@@ -96,11 +87,11 @@ export default function SalesDataTableRow({
         </TableCell>
       </TableRow>
 
-      <SalesDataQuickEditForm
-        currentSalesData={row}
+      <MushroomTypeQuickEditForm
+        currentMushroomType={row}
         open={quickEdit.value}
         onClose={quickEdit.onFalse}
-        onRefreshSalesDatas={onRefreshSalesDatas}
+        onRefreshMushroomTypes={onRefreshMushroomTypes}
       />
 
       <CustomPopover
@@ -153,9 +144,9 @@ export default function SalesDataTableRow({
   );
 }
 
-SalesDataTableRow.propTypes = {
+MushroomTypeTableRow.propTypes = {
   onDeleteRow: PropTypes.func,
-  onRefreshSalesDatas: PropTypes.func,
+  onRefreshMushroomTypes: PropTypes.func,
   onEditRow: PropTypes.func,
   onSelectRow: PropTypes.func,
   row: PropTypes.object,

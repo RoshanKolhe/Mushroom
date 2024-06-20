@@ -42,6 +42,10 @@ const TicketEditPage = lazy(() => import('src/pages/dashboard/ticket/edit'));
 const SalesDataListPage = lazy(() => import('src/pages/dashboard/salesData/list'));
 const SalesDataCreatePage = lazy(() => import('src/pages/dashboard/salesData/new'));
 const SalesDataEditPage = lazy(() => import('src/pages/dashboard/salesData/edit'));
+// Mushroom Type
+const MushroomTypeListPage = lazy(() => import('src/pages/dashboard/mushroomType/list'));
+const MushroomTypeCreatePage = lazy(() => import('src/pages/dashboard/mushroomType/new'));
+const MushroomTypeEditPage = lazy(() => import('src/pages/dashboard/mushroomType/edit'));
 // NEW NOTIFICATION
 const NewNotificationCreatePage = lazy(() => import('src/pages/dashboard/newNotification/new'));
 // ORDER
@@ -267,6 +271,36 @@ export const dashboardRoutes = [
             element: (
               <RolesAuthRoute roles={['super_admin']}>
                 <SalesDataEditPage />
+              </RolesAuthRoute>
+            ),
+          },
+        ],
+      },
+      {
+        path: 'mushroomType',
+        children: [
+          { element: <MushroomTypeListPage />, index: true },
+          {
+            path: 'list',
+            element: (
+              <RolesAuthRoute roles={['super_admin']}>
+                <MushroomTypeListPage />
+              </RolesAuthRoute>
+            ),
+          },
+          {
+            path: 'new',
+            element: (
+              <RolesAuthRoute roles={['super_admin']}>
+                <MushroomTypeCreatePage />
+              </RolesAuthRoute>
+            ),
+          },
+          {
+            path: ':id/edit',
+            element: (
+              <RolesAuthRoute roles={['super_admin']}>
+                <MushroomTypeEditPage />
               </RolesAuthRoute>
             ),
           },
