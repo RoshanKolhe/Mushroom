@@ -369,6 +369,5 @@ function applyFilter({ inputData, comparator, filters }) {
       return clusterId.some((cluster) => cluster.id === hut.clusterId);
     });
   }
-  console.log(inputData);
   return inputData;
 }

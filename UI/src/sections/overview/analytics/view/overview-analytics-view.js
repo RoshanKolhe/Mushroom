@@ -11,6 +11,7 @@ import { HutListView } from 'src/sections/hut/view';
 import { useGetDashboardCounts } from 'src/api/user';
 import AnalyticsWidgetSummary from '../analytics-widget-summary';
 import CultivaionCard from '../cultivation-card';
+import ClusterCultivaionCard from '../cluster-cultivation-card';
 // ----------------------------------------------------------------------
 
 export default function OverviewAnalyticsView() {
@@ -67,6 +68,10 @@ export default function OverviewAnalyticsView() {
 
         <Grid xs={12} sm={12} md={12}>
           <CultivaionCard />
+        </Grid>
+
+        <Grid xs={12} sm={12} md={12}>
+          <ClusterCultivaionCard />
         </Grid>
 
         <Grid xs={12} sm={12} md={12}>

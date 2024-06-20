@@ -940,4 +940,78 @@ export class UserController {
 
     return mushroomQuantities;
   }
+
+  // @authenticate({
+  //   strategy: 'jwt',
+  //   options: {
+  //     required: [
+  //       PermissionKeys.SUPER_ADMIN,
+  //       PermissionKeys.CLUSTER_ADMIN,
+  //       PermissionKeys.GROUP_ADMIN,
+  //     ],
+  //   },
+  // })
+  @post('/getClusterWiseCultivationData')
+  async getClusterWiseCultivationData(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            required: ['clusterId', 'startDate', 'endDate'],
+            properties: {
+              clusterId: {type: 'number'},
+              startDate: {type: 'string', format: 'date-time'},
+              endDate: {type: 'string', format: 'date-time'},
+            },
+          },
+        },
+      },
+    })
+    requestData: {
+      clusterId: number;
+      startDate: string;
+      endDate: string;
+    },
+  ): Promise<any> {
+    const {clusterId, startDate, endDate} = requestData;
+
+    // Fetch all huts under the given cluster
+    const huts = await this.hutRepository.find({
+      where: {clusterId: clusterId},
+    });
+
+    if (huts.length === 0) {
+      throw new HttpErrors.NotFound('No huts found under this cluster.');
+    }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    let totalCultivation = 0;
+
+    // Loop through each hut to get the environment data
+    for (const hut of huts) {
+      const hutEnvironmentData = await this.environmentDataRepository.find({
+        where: {
+          hutId: hut.id,
+          date: {
+            between: [start.toISOString(), end.toISOString()] as [
+              string,
+              string,
+            ],
+          },
+        },
+      });
+
+      // Calculate total cultivation
+      hutEnvironmentData.forEach(entry => {
+        totalCultivation += Number(entry.quantity);
+      });
+    }
+
+    return {
+      totalCultivation,
+    };
+  }
 }
