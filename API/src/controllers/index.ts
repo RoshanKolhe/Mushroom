@@ -11,3 +11,4 @@ export * from './ticket-hut.controller';
 export * from './ticket-user.controller';
 export * from './messages.controller';
 export * from './notification.controller';
+export * from './mushroom-type.controller';

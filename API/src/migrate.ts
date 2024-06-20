@@ -18,6 +18,7 @@ export async function migrate(args: string[]) {
       'Ticket',
       'Messages',
       'Notification',
+      'MushroomType',
     ],
   });
 

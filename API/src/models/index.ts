@@ -7,3 +7,4 @@ export * from './sales-data.model';
 export * from './ticket.model';
 export * from './messages.model';
 export * from './notification.model';
+export * from './mushroom-type.model';
