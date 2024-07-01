@@ -100,5 +100,9 @@ export const paths = {
     sendNotification: {
       new: `${ROOTS.DASHBOARD}/sendNotification`,
     },
+    cultivationEntries: {
+      root : `${ROOTS.DASHBOARD}/cultivationEntries`,
+      list: `${ROOTS.DASHBOARD}/cultivationEntries/list`,
+    },
   },
 };

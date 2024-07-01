@@ -35,7 +35,7 @@ export default function OverviewAnalyticsView() {
           <AnalyticsWidgetSummary
             title="Total Cultivation"
             total={`${dashboardCounts?.totalCultivation}Kg` || '0'}
-            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_bag.png" />}
+            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_total cultivation.png" />}
             color="info"
           />
         </Grid>
@@ -44,7 +44,7 @@ export default function OverviewAnalyticsView() {
           <AnalyticsWidgetSummary
             title="Today’s Cultivation"
             total={`${dashboardCounts?.todaysCultivation}Kg` || '0'}
-            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_mushroom.png" />}
+            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_Daily_Cultivation.png" />}
           />
         </Grid>
 
@@ -53,7 +53,7 @@ export default function OverviewAnalyticsView() {
             title="Total Clusters"
             total={`${dashboardCounts?.totalClusters}` || '0'}
             color="warning"
-            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_cluster.png" />}
+            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_cluster1.png" />}
           />
         </Grid>
 
@@ -62,7 +62,7 @@ export default function OverviewAnalyticsView() {
             title="Total Huts"
             total={`${dashboardCounts?.totalHuts}` || '0'}
             color="error"
-            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_hut.png" />}
+            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_hut1.png" />}
           />
         </Grid>
 

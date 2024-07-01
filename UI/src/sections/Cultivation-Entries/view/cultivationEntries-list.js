@@ -1,14 +1,16 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import isEqual from 'lodash/isEqual';
+import PropTypes from 'prop-types';
 import { useState, useCallback, useEffect } from 'react';
 // @mui
 import { alpha } from '@mui/material/styles';
 import Tab from '@mui/material/Tab';
+import * as XLSX from 'xlsx';
+
 import Tabs from '@mui/material/Tabs';
 import Card from '@mui/material/Card';
 import Table from '@mui/material/Table';
 import Button from '@mui/material/Button';
-import * as XLSX from 'xlsx';
 import Tooltip from '@mui/material/Tooltip';
 import Container from '@mui/material/Container';
 import TableBody from '@mui/material/TableBody';
@@ -19,11 +21,10 @@ import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hook';
 import { RouterLink } from 'src/routes/components';
 // _mock
-import { _userList, _roles, USER_STATUS_OPTIONS } from 'src/_mock';
+import { _roles } from 'src/_mock';
 // hooks
 import { useBoolean } from 'src/hooks/use-boolean';
 // components
-import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
 import { ConfirmDialog } from 'src/components/custom-dialog';
@@ -40,59 +41,50 @@ import {
   TablePaginationCustom,
 } from 'src/components/table';
 //
-import { useGetUsers, useGetUsersWithFilter } from 'src/api/user';
+import { useGetCultivationEntries } from 'src/api/cultivationEntries';
 import { useAuthContext } from 'src/auth/hooks';
-import UserTableRow from '../user-table-row';
-import UserTableToolbar from '../user-table-toolbar';
-import UserTableFiltersResult from '../user-table-filters-result';
+import axiosInstance, { endpoints } from 'src/utils/axios';
+import CultivationEntryTableRow from '../cultivation-entries-row';
+import CultivationEntryTableToolbar from '../cultivation-entries-toolbar';
+import CultivationEntryTableFiltersResult from '../cultivation-entry-filter-result';
 
 // ----------------------------------------------------------------------
 
-const STATUS_OPTIONS = [{ value: 'all', label: 'All' }, ...USER_STATUS_OPTIONS];
-
 const TABLE_HEAD = [
-  { id: 'name', label: 'Name' },
-  { id: 'phoneNumber', label: 'Phone Number', width: 180 },
-  { id: 'role', label: 'Role', width: 180 },
-  { id: 'status', label: 'Status', width: 100 },
+  { id: 'name', label: 'Hut Name' },
+  { id: 'user', label: 'Hut User', width: 180 },
+  { id: 'cluster', label: 'Cluster Name', width: 180 },
+  { id: 'totalCultivation', label: 'Total Cultivation', width: 100 },
+  { id: 'isActive', label: 'Status', width: 180 },
+
   { id: '', width: 88 },
 ];
 
 const defaultFilters = {
   name: '',
-  role: [],
-  status: 'all',
+  clusterId: [],
 };
 
 // ----------------------------------------------------------------------
 
-export default function UserListView() {
+export default function CultivationEntriesListView({ isDashboard }) {
   const table = useTable();
 
   const settings = useSettingsContext();
-
-  const router = useRouter();
-
-  const confirm = useBoolean();
 
   const { user: userData } = useAuthContext();
 
   const isAdmin = userData ? userData.permissions.includes('super_admin') : false;
 
+  const router = useRouter();
+
+  const confirm = useBoolean();
+
   const [tableData, setTableData] = useState([]);
 
   const [filters, setFilters] = useState(defaultFilters);
 
-  const {
-    filteredUsers: users,
-    filteredUsersLoadingusersLoading,
-    filteredUsersEmpty: usersEmpty,
-    refreshFilterUsers: refreshUsers,
-  } = useGetUsersWithFilter(
-    userData && userData.permissions.includes('cluster_admin')
-      ? 'filter={"where":{"permissions":["hut_user"]}}'
-      : null
-  );
+  const { cultivationEntries, refreshCultivationEntries } = useGetCultivationEntries();
 
   const dataFiltered = applyFilter({
     inputData: tableData,
@@ -145,25 +137,10 @@ export default function UserListView() {
 
   const handleEditRow = useCallback(
     (id) => {
-      router.push(paths.dashboard.user.edit(id));
+      router.push(paths.dashboard.hut.edit(id));
     },
     [router]
   );
-
-  const handleViewRow = useCallback(
-    (id) => {
-      router.push(paths.dashboard.user.view(id));
-    },
-    [router]
-  );
-
-  const downlodCsvFromTableData = () => {
-    const fileName = 'User Management.xlsx';
-    const ws = XLSX.utils.json_to_sheet(tableData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Coupon Master');
-    XLSX.writeFile(wb, fileName);
-  };
 
   const handleFilterStatus = useCallback(
     (event, newValue) => {
@@ -177,106 +154,89 @@ export default function UserListView() {
     setFilters(defaultFilters);
   }, []);
 
-  useEffect(() => {
-    if (users) {
-      const updatedUsers = users.filter((obj) => !obj.permissions.includes('super_admin'));
-      setTableData(updatedUsers);
+  const downlodCsvFromTableData = () => {
+    const fileName = 'Cluster Management.xlsx';
+    const ws = XLSX.utils.json_to_sheet(tableData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Coupon Master');
+    XLSX.writeFile(wb, fileName);
+  };
+
+  const fetchCultivationEntries = async () => {
+    const URL = endpoints.cultivativationEntries.list;
+    try{
+        const response = await axiosInstance.post(URL);
+        setTableData(response?.data);
+        console.log('data',tableData)
+    }catch(error){
+        console.error(error);
     }
-  }, [users]);
+  }
+
+  useEffect(() => {
+    fetchCultivationEntries();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); 
+
+  console.log('tableData',tableData);
 
   return (
     <>
-      <Container maxWidth={settings.themeStretch ? false : 'lg'}>
-        <CustomBreadcrumbs
-          heading="User Management"
-          links={[
-            { name: 'Dashboard', href: paths.dashboard.root },
-            { name: 'User Management', href: paths.dashboard.user.list },
-            { name: 'List' },
-          ]}
-          action={
-            <>
-              <Button
-                variant="contained"
-                startIcon={<Iconify icon="carbon:download" />}
-                color="primary"
-                style={{
-                  backgroundColor: 'transparent',
-                  color: '#212B36',
-                  border: 'solid 1px #00554E',
-                  marginRight: '20px',
-                }}
-                onClick={() => {
-                  downlodCsvFromTableData();
-                }}
-              >
-                Download report
-              </Button>
-              {isAdmin ? (
+      <Container
+        maxWidth={settings.themeStretch ? false : 'lg'}
+        style={isDashboard ? { padding: 0, maxWidth: 'initial' } : {}}
+      >
+        {!isDashboard ? (
+          <CustomBreadcrumbs
+            heading="Manage Cultivation Entries"
+            links={[
+              { name: 'Dashboard', href: paths.dashboard.root },
+              { name: 'Manage Cultivation Entries', href: paths.dashboard.hut.list },
+              { name: 'List' },
+            ]}
+            action={
+              <>
                 <Button
-                  component={RouterLink}
-                  href={paths.dashboard.user.new}
                   variant="contained"
-                  startIcon={<Iconify icon="mingcute:add-line" />}
+                  startIcon={<Iconify icon="carbon:download" />}
                   color="primary"
-                  style={{ width: '155px', backgroundColor: '#00554E' }}
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: '#212B36',
+                    border: 'solid 1px #00554E',
+                    marginRight: '20px',
+                  }}
+                  onClick={() => {
+                    downlodCsvFromTableData();
+                  }}
                 >
-                  New User
+                  Download report
                 </Button>
-              ) : null}
-            </>
-          }
-          sx={{
-            mb: { xs: 3, md: 5 },
-          }}
-        />
+                {isAdmin ? (
+                  <Button
+                    component={RouterLink}
+                    href={paths.dashboard.hut.new}
+                    variant="contained"
+                    startIcon={<Iconify icon="mingcute:add-line" />}
+                    color="primary"
+                    style={{ width: '155px', backgroundColor: '#00554E' }}
+                  >
+                    New Hut
+                  </Button>
+                ) : null}
+              </>
+            }
+            sx={{
+              mb: { xs: 3, md: 5 },
+            }}
+          />
+        ) : null}
 
         <Card>
-          <Tabs
-            value={filters.status}
-            onChange={handleFilterStatus}
-            sx={{
-              px: 2.5,
-              boxShadow: (theme) => `inset 0 -2px 0 0 ${alpha(theme.palette.grey[500], 0.08)}`,
-            }}
-          >
-            {STATUS_OPTIONS.map((tab) => (
-              <Tab
-                key={tab.value}
-                iconPosition="end"
-                value={tab.value}
-                label={tab.label}
-                icon={
-                  <Label
-                    variant={
-                      ((tab.value === 'all' || tab.value === filters.status) && 'filled') || 'soft'
-                    }
-                    color={
-                      (tab.value === '1' && 'success') ||
-                      (tab.value === '0' && 'error') ||
-                      'default'
-                    }
-                  >
-                    {tab.value === 'all' && tableData.length}
-                    {tab.value === '1' && tableData.filter((user) => user.isActive).length}
-
-                    {tab.value === '0' && tableData.filter((user) => !user.isActive).length}
-                  </Label>
-                }
-              />
-            ))}
-          </Tabs>
-
-          <UserTableToolbar
-            filters={filters}
-            onFilters={handleFilters}
-            //
-            roleOptions={_roles}
-            tableData={tableData}
-          />
+          <CultivationEntryTableToolbar filters={filters} onFilters={handleFilters} isDashboard={isDashboard} />
 
           {canReset && (
-            <UserTableFiltersResult
+            <CultivationEntryTableFiltersResult
               filters={filters}
               onFilters={handleFilters}
               //
@@ -332,15 +292,14 @@ export default function UserListView() {
                       table.page * table.rowsPerPage + table.rowsPerPage
                     )
                     .map((row) => (
-                      <UserTableRow
+                      <CultivationEntryTableRow
                         key={row.id}
                         row={row}
                         selected={table.selected.includes(row.id)}
                         onSelectRow={() => table.onSelectRow(row.id)}
                         onDeleteRow={() => handleDeleteRow(row.id)}
                         onEditRow={() => handleEditRow(row.id)}
-                        onViewRow={() => handleViewRow(row.id)}
-                        onRefreshUsers={() => refreshUsers()}
+                        onRefreshHuts={() => refreshCultivationEntries()}
                         isAdmin={isAdmin}
                       />
                     ))}
@@ -395,16 +354,14 @@ export default function UserListView() {
   );
 }
 
+CultivationEntriesListView.propTypes = {
+  isDashboard: PropTypes.any,
+};
 // ----------------------------------------------------------------------
 
 function applyFilter({ inputData, comparator, filters }) {
-  const { name, status, role } = filters;
+  const { name, clusterId } = filters;
   const stabilizedThis = inputData.map((el, index) => [el, index]);
-  const roleMapping = {
-    hut_user: 'Hut User',
-    cluster_admin: 'Cluster Admin',
-    group_admin: 'Group Admin',
-  };
   stabilizedThis.sort((a, b) => {
     const order = comparator(a[0], b[0]);
     if (order !== 0) return order;
@@ -415,26 +372,15 @@ function applyFilter({ inputData, comparator, filters }) {
 
   if (name) {
     inputData = inputData.filter(
-      (user) => user.fullName.toLowerCase().indexOf(name.toLowerCase()) !== -1
+      (hut) => hut.name.toLowerCase().indexOf(name.toLowerCase()) !== -1
     );
   }
 
-  if (status !== 'all') {
-    inputData = inputData.filter((user) => (status === '1' ? user.isActive : !user.isActive));
+  if (clusterId.length) {
+    inputData = inputData.filter((hut) => {
+      console.log(hut);
+      return clusterId.some((cluster) => cluster.id === hut.clusterId);
+    });
   }
-
-  if (role.length) {
-    inputData = inputData.filter(
-      (user) =>
-        user.permissions &&
-        user.permissions.some((userRole) => {
-          console.log(userRole);
-          const mappedRole = roleMapping[userRole];
-          console.log('Mapped Role:', mappedRole); // Check the mapped role
-          return mappedRole && role.includes(mappedRole);
-        })
-    );
-  }
-
   return inputData;
 }

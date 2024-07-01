@@ -3,6 +3,7 @@ export const states = [
     id: '64801d78b256d628c606f57c',
     state_id: 1,
     name: 'ANDAMAN AND NICOBAR ISLANDS',
+    
     code: 'ANI',
     country: 'India',
     gstCode: 35,

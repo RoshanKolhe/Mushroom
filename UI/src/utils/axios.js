@@ -58,6 +58,7 @@ export const endpoints = {
     details: (id) => `/api/users/${id}`,
     search: '/api/user/search',
     getDashboradCounts: '/getDashboardCounts',
+    multipleUpload: '/multiple-register',
   },
   cluster: {
     list: '/clusters',
@@ -66,6 +67,9 @@ export const endpoints = {
   hut: {
     list: '/huts',
     details: (id) => `/huts/${id}`,
+  },
+  cultivativationEntries : {
+    list : '/environment-data',
   },
   messages: {
     list: (id) => `/tickets/${id}/messages`,

@@ -105,9 +105,9 @@ export class User extends Entity {
 
   @property({
     type: 'boolean',
-    required: true,
+    default: false, // Set default value to false
   })
-  isActive: boolean;
+  isActive?: boolean; 
 
   @property({
     type: 'string',

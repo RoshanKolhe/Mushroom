@@ -19,8 +19,8 @@ import {
   response,
   HttpErrors,
 } from '@loopback/rest';
-import {Cluster} from '../models';
-import {ClusterRepository, UserRepository} from '../repositories';
+import {Hut,Cluster} from '../models';
+import {ClusterRepository, UserRepository, HutRepository} from '../repositories';
 import {authenticate, AuthenticationBindings} from '@loopback/authentication';
 import {PermissionKeys} from '../authorization/permission-keys';
 import {inject} from '@loopback/core';
@@ -31,6 +31,8 @@ export class ClusterController {
     public clusterRepository: ClusterRepository,
     @repository(UserRepository)
     public userRepository: UserRepository,
+    @repository(HutRepository)
+    public hutRepository: HutRepository,
   ) {}
 
   @authenticate({
@@ -53,7 +55,7 @@ export class ClusterController {
         },
       },
     })
-    cluster: Omit<Cluster, 'id'>,
+    cluster: Omit<Cluster, 'id'> & {noOfHuts : string},
   ): Promise<Cluster> {
     const existingCluster = await this.clusterRepository.findOne({
       where: {userId: cluster.userId},
@@ -69,7 +71,19 @@ export class ClusterController {
         'only user with cluster admin permission can be assign to cluster',
       );
     }
-    return this.clusterRepository.create(cluster);
+    const newCluster = await this.clusterRepository.create(cluster);
+
+    const numberOfHuts = Number(cluster.noOfHuts);
+
+    const huts = Array.from({length : numberOfHuts},(_, i) => ({
+      name: `Hut ${i + 1}`,
+      clusterId: newCluster.id,
+      totalCultivation : newCluster.totalCultivation,
+      isActive : false,
+    }));
+
+    await this.hutRepository.createAll(huts);
+    return newCluster;
   }
 
   @authenticate({

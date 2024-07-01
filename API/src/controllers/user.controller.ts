@@ -47,6 +47,7 @@ import {MushroomDataSource} from '../datasources';
 import {all} from 'axios';
 import {getStartAndEndDateOfWeek} from '../utils/constants';
 import Response from 'twilio/lib/http/response';
+import Content from 'twilio/lib/rest/Content';
 
 export class UserController {
   constructor(
@@ -73,6 +74,79 @@ export class UserController {
     private twilioService: TwilioService,
   ) {}
 
+  @post('/multiple-register', {
+    responses: {
+      '200': {
+        description: 'Users',
+        content: {
+          schema: {
+            type: 'array',
+            items: getJsonSchemaRef(User),
+          },
+        },
+      },
+    },
+  })
+  async multipleRegister(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: {
+            type: 'array',
+            items: getModelSchemaRef(User, {
+              exclude: ['id'],
+            }),
+          },
+        },
+      },
+    })
+    usersData: Omit<User, 'id'>[],
+  ) {
+    const repo = new DefaultTransactionalRepository(User, this.dataSource);
+    const tx = await repo.beginTransaction(IsolationLevel.READ_COMMITTED);
+    try {
+      // Filter out users that are invalid or already exist
+      const validUsersData = [];
+      for (const userData of usersData) {
+        const user = await this.userRepository.findOne({
+          where: {
+            or: [{phoneNumber: userData.phoneNumber}],
+          },
+        });
+        if (user) {
+          // Log or handle already existing user
+          console.log(`User with phone number ${userData.phoneNumber} already exists`);
+          continue;
+        }
+  
+        try {
+          validateCredentialsForPhoneLogin(userData.phoneNumber);
+          validUsersData.push(userData);
+        } catch (err) {
+          // Log or handle invalid phone number
+          console.log(`Invalid phone number ${userData.phoneNumber}: ${err.message}`);
+        }
+      }
+      
+      if (validUsersData.length === 0) {
+        throw new HttpErrors.BadRequest('No valid users to register');
+      }
+  
+      const savedUsers = await this.userRepository.createAll(validUsersData, {
+        transaction: tx,
+      });
+      await tx.commit();
+      return Promise.resolve({
+        success: true,
+        usersData: savedUsers,
+        message: `Users registered successfully`,
+      });
+    } catch (err) {
+      await tx.rollback();
+      throw err;
+    }
+  }
+  
   @post('/register', {
     responses: {
       '200': {

@@ -48,6 +48,8 @@ const MushroomTypeCreatePage = lazy(() => import('src/pages/dashboard/mushroomTy
 const MushroomTypeEditPage = lazy(() => import('src/pages/dashboard/mushroomType/edit'));
 // NEW NOTIFICATION
 const NewNotificationCreatePage = lazy(() => import('src/pages/dashboard/newNotification/new'));
+// MANAGE CULTIVATION ENTRIES
+const CultivationEntries = lazy(() => import('src/sections/Cultivation-Entries/view/cultivationEntries-list'));
 // ORDER
 const OrderListPage = lazy(() => import('src/pages/dashboard/order/list'));
 const OrderDetailsPage = lazy(() => import('src/pages/dashboard/order/details'));
@@ -313,6 +315,13 @@ export const dashboardRoutes = [
             <NewNotificationCreatePage />
           </RolesAuthRoute>
         ),
+      },
+      {
+        path: 'cultivationEntries',
+        children: [
+          { element: <CultivationEntries />, index: true },
+          { path: 'list', element: <CultivationEntries /> },
+        ],
       },
       {
         path: 'product',
