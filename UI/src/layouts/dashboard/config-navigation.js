@@ -149,7 +149,10 @@ export function useNavData() {
             title: 'Manage Cultivation Entries',
             path: paths.dashboard.cultivationEntries.root,
             icon: ICONS.cultivation,
-            children: [{ title: t('list'), path: paths.dashboard.cultivationEntries.list }],
+            children: [
+              { title: t('list'), path: paths.dashboard.cultivationEntries.list },
+              { title: t('create'), path: paths.dashboard.cultivationEntries.new },
+            ],
           },
           // New Notification
           {

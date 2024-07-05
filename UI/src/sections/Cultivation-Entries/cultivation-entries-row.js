@@ -16,6 +16,7 @@ import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
 import CustomPopover, { usePopover } from 'src/components/custom-popover';
 import { ConfirmDialog } from 'src/components/custom-dialog';
+import CultivationQuickEditForm from './cultivation-new-edit-form';
 //
 
 // ----------------------------------------------------------------------
@@ -26,7 +27,7 @@ export default function CultivationEntryTableRow({
   onEditRow,
   onSelectRow,
   onDeleteRow,
-  onRefreshHuts,
+  onRefreshCultivations,
   isAdmin,
 }) {
   const {mushroomType,  hut, quantity, moisture, temprature, changedColor, longitude, latitude, date, time } = row;
@@ -34,7 +35,10 @@ export default function CultivationEntryTableRow({
   const {name} = hut;
   const confirm = useBoolean();
 
+
   const { name: mushroomTypeName } = mushroomType;
+  
+  const quickEdit = useBoolean();
 
 
   const popover = usePopover();
@@ -59,7 +63,7 @@ export default function CultivationEntryTableRow({
         <TableCell sx={{ whiteSpace: 'nowrap' }}>{date}</TableCell>
         <TableCell sx={{ whiteSpace: 'nowrap' }}>{time}</TableCell>
 
-        {/* <TableCell align="right" sx={{ px: 1, whiteSpace: 'nowrap' }}>
+        <TableCell align="right" sx={{ px: 1, whiteSpace: 'nowrap' }}>
           {isAdmin ? (
             <>
               <Tooltip title="Quick Edit" placement="top" arrow>
@@ -75,15 +79,15 @@ export default function CultivationEntryTableRow({
               </IconButton>
             </>
           ) : null}
-        </TableCell> */}
+        </TableCell>
       </TableRow>
-{/* 
-      <HutQuickEditForm
-        currentHut={row}
+
+      <CultivationQuickEditForm
+        currentCultivation={row}
         open={quickEdit.value}
         onClose={quickEdit.onFalse}
-        onRefreshHuts={onRefreshHuts}
-      /> */}
+        onRefreshCultivations={onRefreshCultivations}
+      />
 
       <CustomPopover
         open={popover.open}
@@ -130,7 +134,7 @@ export default function CultivationEntryTableRow({
 
 CultivationEntryTableRow.propTypes = {
   onDeleteRow: PropTypes.func,
-  onRefreshHuts: PropTypes.func,
+  onRefreshCultivations: PropTypes.func,
   onEditRow: PropTypes.func,
   onSelectRow: PropTypes.func,
   row: PropTypes.object,

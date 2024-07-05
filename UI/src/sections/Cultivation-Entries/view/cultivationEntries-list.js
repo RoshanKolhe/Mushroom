@@ -216,18 +216,18 @@ export default function CultivationEntriesListView({ isDashboard }) {
                 >
                   Download report
                 </Button>
-                {/* {isAdmin ? (
+                {isAdmin ? (
                   <Button
                     component={RouterLink}
-                    href={paths.dashboard.hut.new}
+                    href={paths.dashboard.cultivationEntries.new}
                     variant="contained"
                     startIcon={<Iconify icon="mingcute:add-line" />}
                     color="primary"
                     style={{ width: '155px', backgroundColor: '#00554E' }}
                   >
-                    New Hut
+                    New  Entries
                   </Button>
-                ) : null} */}
+                ) : null}
               </>
             }
             sx={{

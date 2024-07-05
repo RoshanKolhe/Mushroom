@@ -103,6 +103,8 @@ export const paths = {
     cultivationEntries: {
       root : `${ROOTS.DASHBOARD}/cultivationEntries`,
       list: `${ROOTS.DASHBOARD}/cultivationEntries/list`,
+      new: `${ROOTS.DASHBOARD}/cultivationEntries/new`,
+      edit: (id) => `${ROOTS.DASHBOARD}/cultivationEntries/${id}/edit`,
     },
   },
 };

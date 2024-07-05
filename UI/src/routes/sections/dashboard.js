@@ -49,7 +49,8 @@ const MushroomTypeEditPage = lazy(() => import('src/pages/dashboard/mushroomType
 // NEW NOTIFICATION
 const NewNotificationCreatePage = lazy(() => import('src/pages/dashboard/newNotification/new'));
 // MANAGE CULTIVATION ENTRIES
-const CultivationEntries = lazy(() => import('src/sections/Cultivation-Entries/view/cultivationEntries-list'));
+const CultivationListPage = lazy(() => import('src/pages/dashboard/cultivation/list'));
+const CultivationCreatePage = lazy(() => import('src/pages/dashboard/cultivation/new'))
 // ORDER
 const OrderListPage = lazy(() => import('src/pages/dashboard/order/list'));
 const OrderDetailsPage = lazy(() => import('src/pages/dashboard/order/details'));
@@ -319,8 +320,24 @@ export const dashboardRoutes = [
       {
         path: 'cultivationEntries',
         children: [
-          { element: <CultivationEntries />, index: true },
-          { path: 'list', element: <CultivationEntries /> },
+          { element: <CultivationListPage />, index: true },
+          { path: 'list', element: <CultivationListPage /> },
+          {
+            path: 'new',
+            element: (
+              <RolesAuthRoute roles={['super_admin']}>
+                <CultivationCreatePage />
+              </RolesAuthRoute>
+            ),
+          },
+          {
+            path: ':id/edit',
+            element: (
+              <RolesAuthRoute roles={['super_admin']}>
+                <HutEditPage />
+              </RolesAuthRoute>
+            ),
+          },
         ],
       },
       {
