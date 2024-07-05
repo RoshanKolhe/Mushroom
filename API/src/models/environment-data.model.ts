@@ -1,5 +1,6 @@
 import {Entity, model, property, belongsTo} from '@loopback/repository';
 import {Hut} from './hut.model';
+import {MushroomType} from './mushroom-type.model';
 
 @model()
 export class EnvironmentData extends Entity {
@@ -53,12 +54,6 @@ export class EnvironmentData extends Entity {
   humidity: string;
 
   @property({
-    type: 'string',
-    required: true,
-  })
-  mushroomType: string;
-
-  @property({
     type: 'boolean',
     default: false,
   })
@@ -103,6 +98,9 @@ export class EnvironmentData extends Entity {
 
   @belongsTo(() => Hut)
   hutId: number;
+
+  @belongsTo(() => MushroomType, {name: 'mushroomType'})
+  mushroomTypeId: number;
 
   constructor(data?: Partial<EnvironmentData>) {
     super(data);

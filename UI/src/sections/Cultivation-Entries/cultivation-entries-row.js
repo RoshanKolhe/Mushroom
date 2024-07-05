@@ -29,10 +29,12 @@ export default function CultivationEntryTableRow({
   onRefreshHuts,
   isAdmin,
 }) {
-  const { mushroomType, hut, quantity, moisture, temprature, changedColor, longitude, latitude, date, time } = row;
+  const {mushroomType,  hut, quantity, moisture, temprature, changedColor, longitude, latitude, date, time } = row;
 
   const {name} = hut;
   const confirm = useBoolean();
+
+  const { name: mushroomTypeName } = mushroomType;
 
 
   const popover = usePopover();
@@ -44,7 +46,7 @@ export default function CultivationEntryTableRow({
           <Checkbox checked={selected} onClick={onSelectRow} />
         </TableCell> */}
 
-        <TableCell sx={{ whiteSpace: 'nowrap' }}>{mushroomType}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{mushroomTypeName}</TableCell>
 
         <TableCell sx={{ whiteSpace: 'nowrap' }}>{name}</TableCell>
 

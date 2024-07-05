@@ -5,9 +5,10 @@ import {
   BelongsToAccessor,
 } from '@loopback/repository';
 import {MushroomDataSource} from '../datasources';
-import {EnvironmentData, EnvironmentDataRelations, Hut} from '../models';
+import {EnvironmentData, EnvironmentDataRelations, Hut, MushroomType} from '../models';
 import {TimeStampRepositoryMixin} from '../mixins/timestamp-repository-mixin';
 import {HutRepository} from './hut.repository';
+import {MushroomTypeRepository} from './mushroom-type.repository';
 
 export class EnvironmentDataRepository extends TimeStampRepositoryMixin<
   EnvironmentData,
@@ -25,13 +26,17 @@ export class EnvironmentDataRepository extends TimeStampRepositoryMixin<
     typeof EnvironmentData.prototype.id
   >;
 
+  public readonly mushroomType: BelongsToAccessor<MushroomType, typeof EnvironmentData.prototype.id>;
+
   constructor(
     @inject('datasources.mushroom') dataSource: MushroomDataSource,
     @repository.getter('HutRepository')
     protected hutRepositoryGetter: Getter<HutRepository>,
-    @repository(HutRepository) protected hutRepository: HutRepository,
+    @repository(HutRepository) protected hutRepository: HutRepository, @repository.getter('MushroomTypeRepository') protected mushroomTypeRepositoryGetter: Getter<MushroomTypeRepository>,
   ) {
     super(EnvironmentData, dataSource);
+    this.mushroomType = this.createBelongsToAccessorFor('mushroomType', mushroomTypeRepositoryGetter,);
+    this.registerInclusionResolver('mushroomType', this.mushroomType.inclusionResolver);
     this.hut = this.createBelongsToAccessorFor('hut', hutRepositoryGetter);
     this.registerInclusionResolver('hut', this.hut.inclusionResolver);
   }

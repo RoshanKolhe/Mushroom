@@ -12,3 +12,4 @@ export * from './ticket-user.controller';
 export * from './messages.controller';
 export * from './notification.controller';
 export * from './mushroom-type.controller';
+export * from './environment-data-mushroom-type.controller';

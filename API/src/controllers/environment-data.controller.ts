@@ -3,10 +3,11 @@ import {
   CountSchema,
   Filter,
   FilterExcludingWhere,
+  relation,
   repository,
   Where,
 } from '@loopback/repository';
-import {UserProfile} from '@loopback/security';
+import { UserProfile } from '@loopback/security';
 
 import {
   post,
@@ -20,17 +21,17 @@ import {
   response,
   HttpErrors,
 } from '@loopback/rest';
-import {EnvironmentData} from '../models';
+import { EnvironmentData } from '../models';
 import {
   ClusterRepository,
   EnvironmentDataRepository,
   HutRepository,
   UserRepository,
 } from '../repositories';
-import {inject} from '@loopback/core';
-import {authenticate, AuthenticationBindings} from '@loopback/authentication';
-import {PermissionKeys} from '../authorization/permission-keys';
-import {request} from 'http';
+import { inject } from '@loopback/core';
+import { authenticate, AuthenticationBindings } from '@loopback/authentication';
+import { PermissionKeys } from '../authorization/permission-keys';
+import { request } from 'http';
 
 export class EnvironmentDataController {
   constructor(
@@ -42,7 +43,7 @@ export class EnvironmentDataController {
     public clusterRepository: ClusterRepository,
     @repository(HutRepository)
     public hutRepository: HutRepository,
-  ) {}
+  ) { }
 
   @authenticate({
     strategy: 'jwt',
@@ -57,7 +58,7 @@ export class EnvironmentDataController {
   @post('/create-environment-data')
   @response(200, {
     description: 'EnvironmentData model instance',
-    content: {'application/json': {schema: getModelSchemaRef(EnvironmentData)}},
+    content: { 'application/json': { schema: getModelSchemaRef(EnvironmentData) } },
   })
   async create(
     @inject(AuthenticationBindings.CURRENT_USER) currnetUser: UserProfile,
@@ -96,7 +97,7 @@ export class EnvironmentDataController {
       'application/json': {
         schema: {
           type: 'array',
-          items: getModelSchemaRef(EnvironmentData, {includeRelations: true}),
+          items: getModelSchemaRef(EnvironmentData, { includeRelations: true }),
         },
       },
     },
@@ -115,9 +116,12 @@ export class EnvironmentDataController {
         {
           relation: 'hut',
           scope: {
-            include: [{relation: 'cluster'}],
+            include: [{ relation: 'cluster' }],
           },
         },
+        {
+          relation: 'mushroomType'
+        }
       ],
     };
 
@@ -147,13 +151,13 @@ export class EnvironmentDataController {
     description: 'EnvironmentData model instance',
     content: {
       'application/json': {
-        schema: getModelSchemaRef(EnvironmentData, {includeRelations: true}),
+        schema: getModelSchemaRef(EnvironmentData, { includeRelations: true }),
       },
     },
   })
   async findById(
     @param.path.number('id') id: number,
-    @param.filter(EnvironmentData, {exclude: 'where'})
+    @param.filter(EnvironmentData, { exclude: 'where' })
     filter?: FilterExcludingWhere<EnvironmentData>,
   ): Promise<EnvironmentData> {
     return this.environmentDataRepository.findById(id, filter);
@@ -178,7 +182,7 @@ export class EnvironmentDataController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(EnvironmentData, {partial: true}),
+          schema: getModelSchemaRef(EnvironmentData, { partial: true }),
         },
       },
     })
@@ -228,12 +232,12 @@ export class EnvironmentDataController {
               items: {
                 type: 'object',
                 properties: {
-                  date: {type: 'string'},
+                  date: { type: 'string' },
                   hut: {
                     type: 'object',
                     properties: {
-                      id: {type: 'number'},
-                      name: {type: 'string'},
+                      id: { type: 'number' },
+                      name: { type: 'string' },
                       // Include other Hut properties as needed
                     },
                   },
@@ -250,7 +254,7 @@ export class EnvironmentDataController {
     @param.query.string('startDate') startDate: string,
     @param.query.string('endDate') endDate: string,
   ): Promise<any> {
-    const {startDate: defaultStartDate, endDate: defaultEndDate} =
+    const { startDate: defaultStartDate, endDate: defaultEndDate } =
       this.getDefaultDates();
 
     // Set default values if not provided
@@ -262,7 +266,7 @@ export class EnvironmentDataController {
     }
     let huts = [];
     if (currnetUser.permissions.includes('super_admin')) {
-      huts = await this.hutRepository.find({include: ['user', 'cluster']});
+      huts = await this.hutRepository.find({ include: ['user', 'cluster'] });
     } else if (currnetUser.permissions.includes('cluster_admin')) {
       const userAssignedClusters = await this.clusterRepository.find({
         where: {
