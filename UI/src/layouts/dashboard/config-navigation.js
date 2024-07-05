@@ -50,6 +50,7 @@ const ICONS = {
   ecommerce: icon('ic_ecommerce'),
   analytics: icon('ic_analytics'),
   dashboard: icon('ic_dashboard'),
+  cultivation: icon('ic_field'),
   notification: icon('ic_notification'),
 };
 
@@ -143,6 +144,13 @@ export function useNavData() {
               { title: t('create'), path: paths.dashboard.mushroomType.new },
             ],
           },
+          // Manage cultivation entries
+          {
+            title: 'Manage Cultivation Entries',
+            path: paths.dashboard.cultivationEntries.root,
+            icon: ICONS.cultivation,
+            children: [{ title: t('list'), path: paths.dashboard.cultivationEntries.list }],
+          },
           // New Notification
           {
             title: 'New Notification',
@@ -150,12 +158,7 @@ export function useNavData() {
             icon: ICONS.notification,
             children: [{ title: t('create'), path: paths.dashboard.sendNotification.new }],
           },
-          {
-            title: 'Manage Cultivation Entries',
-            path: paths.dashboard.cultivationEntries.root,
-            icon: ICONS.notification,
-            children: [{ title: t('list'), path: paths.dashboard.cultivationEntries.list }],
-          },
+          
         ],
       },
     ];

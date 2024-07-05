@@ -1,30 +1,39 @@
 import PropTypes from 'prop-types';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 // @mui
 import Stack from '@mui/material/Stack';
 import MenuItem from '@mui/material/MenuItem';
-import Checkbox from '@mui/material/Checkbox';
 import TextField from '@mui/material/TextField';
-import InputLabel from '@mui/material/InputLabel';
-import IconButton from '@mui/material/IconButton';
 import FormControl from '@mui/material/FormControl';
-import OutlinedInput from '@mui/material/OutlinedInput';
 import InputAdornment from '@mui/material/InputAdornment';
 import Select from '@mui/material/Select';
 // components
 import Iconify from 'src/components/iconify';
 import CustomPopover, { usePopover } from 'src/components/custom-popover';
-import { Button, Typography } from '@mui/material';
+import { Button, Grid, Typography } from '@mui/material';
 import { RouterLink } from 'src/routes/components';
 import { paths } from 'src/routes/paths';
 import { useGetClusters } from 'src/api/cluster';
+import axiosInstance from 'src/utils/axios';
 
 // ----------------------------------------------------------------------
 
 export default function CultivationEntryTableToolbar({ isDashboard, filters, onFilters }) {
   const popover = usePopover();
+  const [huts, setHuts] = useState([{ id: 'all', name: 'All Huts' }]);
+  const [clusters, setClusters] = useState([{ id: 'all', name: 'All Clusters' }]);
 
-  const { clusters, clustersLoading, clustersEmpty, refreshClusters } = useGetClusters();
+  const initialFilterData = useMemo(
+    () => ({
+      cluster: 'all',
+      hut: 'all',
+    }),
+    []
+  );
+
+  const [filterData, setFilterData] = useState(initialFilterData);
+
+  const { clusters: clustersData, clustersLoading } = useGetClusters();
 
   const handleFilterName = useCallback(
     (event) => {
@@ -33,13 +42,56 @@ export default function CultivationEntryTableToolbar({ isDashboard, filters, onF
     [onFilters]
   );
 
-  const handleFilterHuts = useCallback(
-    (event) => {
-      console.log(event);
-      onFilters('clusterId', event.target.value);
-    },
-    [onFilters]
-  );
+  const handleChange = (event) => {
+    const clusterId = event.target.value;
+    setFilterData((prev) => ({
+      ...prev,
+      cluster: clusterId,
+      hut: 'all',
+    }));
+    if (clusterId === 'all') {
+      setHuts([{ id: 'all', name: 'All Huts' }]);
+      onFilters('hutId', -1);
+    } else {
+      setHuts([]);
+      getHuts(clusterId);
+    }
+  };
+
+  const getHuts = async (clusterID) => {
+    const { data } = await axiosInstance.get(`/huts?filter={"where":{"clusterId":${clusterID}}}`);
+    if (data) {
+      setHuts(data);
+      if (data.length > 0) {
+        setFilterData((prev) => ({
+          ...prev,
+          hut: data[0].id,
+        }));
+        onFilters('hutId', data[0].id);
+      }
+    }
+  };
+
+  const handleHutChange = (event) => {
+    setFilterData((prev) => ({
+      ...prev,
+      hut: event.target.value,
+    }));
+    onFilters('hutId', event.target.value);
+  };
+
+  useEffect(() => {
+    if (!clustersLoading && clustersData.length > 0) {
+      setClusters([{ id: 'all', name: 'All Clusters' }, ...clustersData]);
+    }
+  }, [clustersData, clustersLoading]);
+
+  useEffect(() => {
+    if (filterData.cluster !== 'all') {
+      getHuts(filterData.cluster);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterData.cluster]);
 
   return (
     <>
@@ -57,60 +109,49 @@ export default function CultivationEntryTableToolbar({ isDashboard, filters, onF
               pr: { xs: 2.5, md: 1 },
             }}
           >
-            <FormControl
-              sx={{
-                flexShrink: 0,
-                width: { xs: 1, md: 200 },
-              }}
-            >
-              <InputLabel>Clusters</InputLabel>
-
-              <Select
-                multiple
-                value={filters.clusterId}
-                onChange={handleFilterHuts}
-                input={<OutlinedInput label="Clusters" />}
-                renderValue={(selected) => selected.map((value) => value.name).join(', ')}
-                MenuProps={{
-                  PaperProps: {
-                    sx: { maxHeight: 240 },
-                  },
-                }}
-              >
-                {clusters &&
-                  clusters.length &&
-                  clusters.length > 0 &&
-                  clusters.map((option) => (
-                    <MenuItem key={option.id} value={option}>
-                      <Checkbox
-                        disableRipple
-                        size="small"
-                        checked={filters.clusterId.some((obj) => obj.id === option.id)}
-                      />
-                      {option.name}
-                    </MenuItem>
-                  ))}
-              </Select>
-            </FormControl>
-            <Stack direction="row" alignItems="center" spacing={2} flexGrow={1} sx={{ width: 1 }}>
-              <TextField
-                fullWidth
-                value={filters.name}
-                onChange={handleFilterName}
-                placeholder="Search..."
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled' }} />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-
-              {/* <IconButton onClick={popover.onOpen}>
-            <Iconify icon="eva:more-vertical-fill" />
-          </IconButton> */}
-            </Stack>
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={6} md={3}>
+                <FormControl fullWidth>
+                  <Select value={filterData.cluster} onChange={handleChange}>
+                    {clusters.map((option) => (
+                      <MenuItem key={option.id} value={option.id}>
+                        {option.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6} md={3}>
+                <FormControl fullWidth>
+                  <Select
+                    value={filterData.hut}
+                    onChange={handleHutChange}
+                    style={{ fontWeight: '700' }}
+                  >
+                    {huts.map((option) => (
+                      <MenuItem key={option.id} value={option.id}>
+                        {option.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Stack direction="row" alignItems="flex-end" spacing={2} flexGrow={1} sx={{ width: 'auto', marginLeft: '16px' }}>
+                <TextField
+                  fullWidth
+                  value={filters.name}
+                  onChange={handleFilterName}
+                  placeholder="Search..."
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled' }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Stack>
+            </Grid>
           </Stack>
 
           <CustomPopover
@@ -119,29 +160,17 @@ export default function CultivationEntryTableToolbar({ isDashboard, filters, onF
             arrow="right-top"
             sx={{ width: 140 }}
           >
-            <MenuItem
-              onClick={() => {
-                popover.onClose();
-              }}
-            >
+            <MenuItem onClick={popover.onClose}>
               <Iconify icon="solar:printer-minimalistic-bold" />
               Print
             </MenuItem>
 
-            <MenuItem
-              onClick={() => {
-                popover.onClose();
-              }}
-            >
+            <MenuItem onClick={popover.onClose}>
               <Iconify icon="solar:import-bold" />
               Import
             </MenuItem>
 
-            <MenuItem
-              onClick={() => {
-                popover.onClose();
-              }}
-            >
+            <MenuItem onClick={popover.onClose}>
               <Iconify icon="solar:export-bold" />
               Export
             </MenuItem>

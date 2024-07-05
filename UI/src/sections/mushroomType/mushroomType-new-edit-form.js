@@ -1,64 +1,28 @@
-/* eslint-disable jsx-a11y/label-has-associated-control */
-/* eslint-disable no-unused-vars */
 import PropTypes from 'prop-types';
 import * as Yup from 'yup';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Chip from '@mui/material/Chip';
-
-// @mui
 import LoadingButton from '@mui/lab/LoadingButton';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import Button from '@mui/material/Button';
-import Switch from '@mui/material/Switch';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import Grid from '@mui/material/Unstable_Grid2';
-import Typography from '@mui/material/Typography';
-
-import FormControlLabel from '@mui/material/FormControlLabel';
-// utils
-import { fData } from 'src/utils/format-number';
-// routes
+import { format, isValid } from 'date-fns';
+import axiosInstance from 'src/utils/axios';
+import { useSnackbar } from 'src/components/snackbar';
+import FormProvider, { RHFTextField, RHFAutocomplete } from 'src/components/hook-form';
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hook';
-// assets
-import { countries } from 'src/assets/data';
-// components
-import Label from 'src/components/label';
-import { useSnackbar } from 'src/components/snackbar';
-import FormProvider, {
-  RHFSwitch,
-  RHFTextField,
-  RHFUploadAvatar,
-  RHFAutocomplete,
-  RHFSelect,
-} from 'src/components/hook-form';
-import PhoneInput from 'react-phone-input-2';
-import 'react-phone-input-2/lib/material.css';
-import { MenuItem } from '@mui/material';
-import axiosInstance from 'src/utils/axios';
-import { useGetUsers, useGetUsersWithFilter } from 'src/api/user';
-import { useGetClusters } from 'src/api/cluster';
-import { Icon } from '@iconify/react';
-import zipPlaceholder from '../../assets/placeholders/zip.png';
+import moment from 'moment';
 
-// ----------------------------------------------------------------------
-
-const classes = {
-  labelStyle: {
-    '&.react-tel-input .special-label': {
-      color: 'red !important',
-    },
-  },
-};
 export default function MushroomTypeNewEditForm({ currentMushroomType }) {
   const router = useRouter();
-
   const { enqueueSnackbar } = useSnackbar();
   const [filePreview, setFilePreview] = useState(null);
+
   const NewMushroomTypeSchema = Yup.object().shape({
     name: Yup.string().required('Mushroom Name is required'),
     minimumHumidity: Yup.string().required('Minimum Humidity is required'),
@@ -70,6 +34,10 @@ export default function MushroomTypeNewEditForm({ currentMushroomType }) {
     maxRow: Yup.string().required('Max Row is required'),
     maxColumn: Yup.string().required('Max Column is required'),
     colors: Yup.array().min(1, 'At least one color is required').required('Colors are required'),
+    morningStartTime: Yup.string().required('Please enter the time'),
+    morningEndTime: Yup.string().required('Please enter the time'),
+    eveningStartTime: Yup.string().required('Please enter the time'),
+    eveningEndTime: Yup.string().required('Please enter the time'),
   });
 
   const defaultValues = useMemo(
@@ -84,6 +52,10 @@ export default function MushroomTypeNewEditForm({ currentMushroomType }) {
       maxRow: currentMushroomType?.maxRow || '',
       maxColumn: currentMushroomType?.maxColumn || null,
       colors: currentMushroomType?.colors || [],
+      morningStartTime: new Date(currentMushroomType?.morningStartTime) || null,
+      morningEndTime: new Date(currentMushroomType?.morningEndTime) || null,
+      eveningStartTime: new Date(currentMushroomType?.eveningStartTime) || null,
+      eveningEndTime: new Date(currentMushroomType?.eveningEndTime) || null,
     }),
     [currentMushroomType]
   );
@@ -93,48 +65,46 @@ export default function MushroomTypeNewEditForm({ currentMushroomType }) {
     defaultValues,
   });
 
-  const {
-    reset,
-    watch,
-    control,
-    setValue,
-    handleSubmit,
-    formState: { isSubmitting, errors },
-  } = methods;
-
-  const values = watch();
-  const onSubmit = handleSubmit(async (formData) => {
-    try {
-      console.log(formData);
-      const inputData = {
-        ...formData,
-      };
-      if (!currentMushroomType) {
-        await axiosInstance.post('/mushroom-types', inputData);
-      } else {
-        await axiosInstance.patch(`/mushroom-types/${currentMushroomType.id}`, inputData);
-      }
-      reset();
-      enqueueSnackbar(currentMushroomType ? 'Update success!' : 'Create success!');
-      router.push(paths.dashboard.mushroomType.list);
-    } catch (error) {
-      console.error(error);
-      enqueueSnackbar(typeof error === 'string' ? error : error.error.message, {
-        variant: 'error',
-      });
-    }
-  });
-
-  const getFileExtension = (fileName) => {
-    console.log(fileName);
-    fileName.split('.').pop().toLowerCase();
-  };
+  const { reset, watch, control, handleSubmit, formState: { isSubmitting, errors } } = methods;
 
   useEffect(() => {
     if (currentMushroomType) {
       reset(defaultValues);
     }
   }, [currentMushroomType, defaultValues, reset]);
+
+  function formatTimeToHHMMAMPM(date) {
+    console.log('date',date);
+    return moment(date).format('h:mm A');
+  }
+
+  const onSubmit = handleSubmit(async (formData) => {
+    try {
+      console.log(formData);
+      const inputData = {
+        ...formData,
+        morningStartTime: formatTimeToHHMMAMPM(formData.morningStartTime),
+        morningEndTime: formatTimeToHHMMAMPM(formData.morningEndTime),
+        eveningStartTime: formatTimeToHHMMAMPM(formData.eveningStartTime),
+        eveningEndTime: formatTimeToHHMMAMPM(formData.eveningEndTime),
+      };
+
+      if (!currentMushroomType) {
+        await axiosInstance.post('/mushroom-types', inputData);
+      } else {
+        await axiosInstance.patch(`/mushroom-types/${currentMushroomType.id}`, inputData);
+      }
+
+      reset();
+      enqueueSnackbar(currentMushroomType ? 'Update success!' : 'Create success!');
+      router.push(paths.dashboard.mushroomType.list);
+    } catch (error) {
+      console.error(error);
+      enqueueSnackbar(typeof error === 'string' ? error : error.message, {
+        variant: 'error',
+      });
+    }
+  });
 
   return (
     <FormProvider methods={methods} onSubmit={onSubmit}>
@@ -183,6 +153,86 @@ export default function MushroomTypeNewEditForm({ currentMushroomType }) {
                       variant="soft"
                     />
                   ))
+                }
+              />
+              <Controller
+                name="morningStartTime"
+                control={control}
+                render={({ field, fieldState: { error } }) =>
+                  <TimePicker
+                    label="Morning Start Time"
+                    value={field.value ? new Date(field.value) : null}
+                    onChange={(newValue) => {
+                      field.onChange(newValue);
+                    }}
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        error: !!error,
+                        helperText: error?.message,
+                      },
+                    }}
+                  />
+                }
+              />
+              <Controller
+                name="morningEndTime"
+                control={control}
+                render={({ field, fieldState: { error } }) =>
+                  <TimePicker
+                    label="Morning End Time"
+                    value={field.value ? new Date(field.value) : null}
+                    onChange={(newValue) => {
+                      field.onChange(newValue);
+                    }}
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        error: !!error,
+                        helperText: error?.message,
+                      },
+                    }}
+                  />
+                }
+              />
+              <Controller
+                name="eveningStartTime"
+                control={control}
+                render={({ field, fieldState: { error } }) =>
+                  <TimePicker
+                    label="Evening Start Time"
+                    value={field.value ? new Date(field.value) : null}
+                    onChange={(newValue) => {
+                      field.onChange(newValue);
+                    }}
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        error: !!error,
+                        helperText: error?.message,
+                      },
+                    }}
+                  />
+                }
+              />
+              <Controller
+                name="eveningEndTime"
+                control={control}
+                render={({ field, fieldState: { error } }) =>
+                  <TimePicker
+                    label="Evening End Time"
+                    value={field.value ? new Date(field.value) : null}
+                    onChange={(newValue) => {
+                      field.onChange(newValue);
+                    }}
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        error: !!error,
+                        helperText: error?.message,
+                      },
+                    }}
+                  />
                 }
               />
             </Box>

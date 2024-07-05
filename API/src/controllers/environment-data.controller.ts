@@ -104,25 +104,31 @@ export class EnvironmentDataController {
   async find(
     @requestBody()
     environmentData: any,
-    @inject(AuthenticationBindings.CURRENT_USER) currnetUser: UserProfile,
+    @inject(AuthenticationBindings.CURRENT_USER) currentUser: UserProfile,
     @param.filter(EnvironmentData) filter?: Filter<EnvironmentData>,
   ): Promise<EnvironmentData[]> {
-    const currentUserPermission = currnetUser.permissions;
-    if (currentUserPermission.includes('super_admin')) {
-      return this.environmentDataRepository.find(filter);
-    } else {
-      // const user = await this.userRepository.findById(currnetUser.id, {
-      //   include: ['hut'],
-      // });
-      // if (!user.hut) {
-      //   throw new HttpErrors.BadRequest('No hut is assigned to this user');
-      // }
-      return this.environmentDataRepository.find({
-        ...filter,
-        where: {
-          hutId: environmentData.hutId,
+    const currentUserPermission = currentUser.permissions;
+
+    const finalFilter = {
+      ...filter,
+      include: [
+        {
+          relation: 'hut',
+          scope: {
+            include: [{relation: 'cluster'}],
+          },
         },
-      });
+      ],
+    };
+
+    if (currentUserPermission.includes('super_admin')) {
+      return this.environmentDataRepository.find(finalFilter);
+    } else {
+      finalFilter.where = {
+        ...finalFilter.where,
+        hutId: environmentData.hutId,
+      };
+      return this.environmentDataRepository.find(finalFilter);
     }
   }
 

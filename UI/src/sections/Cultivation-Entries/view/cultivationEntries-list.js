@@ -51,18 +51,22 @@ import CultivationEntryTableFiltersResult from '../cultivation-entry-filter-resu
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'name', label: 'Hut Name' },
-  { id: 'user', label: 'Hut User', width: 180 },
-  { id: 'cluster', label: 'Cluster Name', width: 180 },
-  { id: 'totalCultivation', label: 'Total Cultivation', width: 100 },
-  { id: 'isActive', label: 'Status', width: 180 },
-
+  { id: 'mashroomType', label: 'Mashroom Type' },
+  { id: 'hutName', label: 'Hut Name', width: 180 },
+  { id: 'quantity', label: 'Quantity', width: 180 },
+  { id: 'moisture', label: 'Moisture', width: 100 },
+  { id: 'temprature', label: 'Temprature', width: 100 },
+  { id: 'changedColor', label: 'Changed Color', width: 100 },
+  { id: 'longitude', label: 'Longitude', width: 100 },
+  { id: 'latitude', label: 'Latitude', width: 100 },
+  { id: 'date', label: 'Date', width: 100 },
+  { id: 'time', label: 'Time', width: 100 },
   { id: '', width: 88 },
 ];
 
 const defaultFilters = {
   name: '',
-  clusterId: [],
+  hutId : -1,
 };
 
 // ----------------------------------------------------------------------
@@ -155,7 +159,7 @@ export default function CultivationEntriesListView({ isDashboard }) {
   }, []);
 
   const downlodCsvFromTableData = () => {
-    const fileName = 'Cluster Management.xlsx';
+    const fileName = 'Cultivation Entries.xlsx';
     const ws = XLSX.utils.json_to_sheet(tableData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Coupon Master');
@@ -212,7 +216,7 @@ export default function CultivationEntriesListView({ isDashboard }) {
                 >
                   Download report
                 </Button>
-                {isAdmin ? (
+                {/* {isAdmin ? (
                   <Button
                     component={RouterLink}
                     href={paths.dashboard.hut.new}
@@ -223,7 +227,7 @@ export default function CultivationEntriesListView({ isDashboard }) {
                   >
                     New Hut
                   </Button>
-                ) : null}
+                ) : null} */}
               </>
             }
             sx={{
@@ -360,7 +364,7 @@ CultivationEntriesListView.propTypes = {
 // ----------------------------------------------------------------------
 
 function applyFilter({ inputData, comparator, filters }) {
-  const { name, clusterId } = filters;
+  const { name, hutId } = filters;
   const stabilizedThis = inputData.map((el, index) => [el, index]);
   stabilizedThis.sort((a, b) => {
     const order = comparator(a[0], b[0]);
@@ -372,15 +376,19 @@ function applyFilter({ inputData, comparator, filters }) {
 
   if (name) {
     inputData = inputData.filter(
-      (hut) => hut.name.toLowerCase().indexOf(name.toLowerCase()) !== -1
+      (cultivationEntry) => cultivationEntry.hut.name.toLowerCase().indexOf(name.toLowerCase()) !== -1
     );
   }
 
-  if (clusterId.length) {
-    inputData = inputData.filter((hut) => {
-      console.log(hut);
-      return clusterId.some((cluster) => cluster.id === hut.clusterId);
+  if (hutId && hutId !== -1) {
+    inputData = inputData.filter((cultivationEntries) => {
+      console.log(hutId)
+      return hutId === cultivationEntries.hut.id;
     });
+  }
+
+  if(hutId === -1){
+    return inputData
   }
   return inputData;
 }

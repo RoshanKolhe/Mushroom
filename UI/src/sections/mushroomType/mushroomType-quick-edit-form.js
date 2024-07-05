@@ -23,9 +23,12 @@ import FormProvider, { RHFAutocomplete, RHFSelect, RHFTextField } from 'src/comp
 import axiosInstance from 'src/utils/axios';
 import { useGetUsersWithFilter } from 'src/api/user';
 import { useGetClusters } from 'src/api/cluster';
-import { DatePicker } from '@mui/x-date-pickers';
+import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { Icon } from '@iconify/react';
+import { format, isValid, parse, parseISO } from 'date-fns';
+import moment from 'moment';
 import zipPlaceholder from '../../assets/placeholders/zip.png';
+
 
 // ----------------------------------------------------------------------
 
@@ -37,6 +40,10 @@ export default function MushroomTypeQuickEditForm({
 }) {
   const { enqueueSnackbar } = useSnackbar();
   const [filePreview, setFilePreview] = useState(null);
+  // const [morningStartTime, setMorningStartTime] = useState(currentMushroomType?.morningStartTime ? parseISO(currentMushroomType?.morningStartTime) : undefined);
+  // const [morningEndTime, setMorningEndTime] = useState(currentMushroomType?.morningEndTime ? parseISO(currentMushroomType?.morningEndTime) : undefined);
+  // const [eveningStartTime, setEveningStartTime] = useState(currentMushroomType?.eveningStartTime ? parseISO(currentMushroomType?.eveningStartTime) : undefined);
+  // const [eveningEndTime, setEveningEndTime] = useState(currentMushroomType?.eveningEndTime ? parseISO(currentMushroomType?.eveningEndTime) : undefined);
 
   const NewMushroomTypeSchema = Yup.object().shape({
     name: Yup.string().required('Mushroom Name is required'),
@@ -49,6 +56,10 @@ export default function MushroomTypeQuickEditForm({
     maxRow: Yup.string().required('Max Row is required'),
     maxColumn: Yup.string().required('Max Column is required'),
     colors: Yup.array().min(1, 'At least one color is required').required('Colors are required'),
+    morningStartTime: Yup.string().required('Please enter the time'),
+    morningEndTime: Yup.string().required('Please enter the time'),
+    eveningStartTime: Yup.string().required('Please enter the time'),
+    eveningEndTime: Yup.string().required('Please enter the time'),
   });
 
   const defaultValues = useMemo(
@@ -63,9 +74,15 @@ export default function MushroomTypeQuickEditForm({
       maxRow: currentMushroomType?.maxRow || '',
       maxColumn: currentMushroomType?.maxColumn || null,
       colors: currentMushroomType?.colors || [],
+      morningStartTime: currentMushroomType?.morningStartTime ? parse(currentMushroomType.morningStartTime, 'hh:mm a', new Date()) : null,
+      morningEndTime: currentMushroomType?.morningEndTime ? parse(currentMushroomType.morningEndTime,'hh:mm a', new Date() ) : null,
+      eveningStartTime: currentMushroomType?.eveningStartTime ? parse(currentMushroomType.eveningStartTime,'hh:mm a', new Date()) : null,
+      eveningEndTime: currentMushroomType?.eveningEndTime ? parse(currentMushroomType.eveningEndTime,'hh:mm a', new Date()) : null,
     }),
     [currentMushroomType]
   );
+
+  console.log('defaultValues',defaultValues);
 
   const methods = useForm({
     resolver: yupResolver(NewMushroomTypeSchema),
@@ -81,11 +98,19 @@ export default function MushroomTypeQuickEditForm({
     formState: { isSubmitting, errors },
   } = methods;
 
+  function formatTimeToHHMMAMPM(date) {
+    return moment(date).format('h:mm A');
+  }
+
   const onSubmit = handleSubmit(async (data) => {
     try {
       console.log(data);
       const inputData = {
         ...data,
+        morningStartTime: formatTimeToHHMMAMPM(data.morningStartTime),
+        morningEndTime: formatTimeToHHMMAMPM(data.morningEndTime),
+        eveningStartTime: formatTimeToHHMMAMPM(data.eveningStartTime),
+        eveningEndTime: formatTimeToHHMMAMPM(data.eveningEndTime),
       };
 
       await axiosInstance.patch(`/mushroom-types/${currentMushroomType.id}`, inputData);
@@ -164,6 +189,86 @@ export default function MushroomTypeQuickEditForm({
                 ))
               }
             />
+              <Controller
+                name="morningStartTime"
+                control={control}
+                render={({ field, fieldState: { error } }) =>
+                  <TimePicker
+                    label="Morning Start Time"
+                    value={field.value ? field.value : null}
+                    onChange={(newValue) => {
+                      field.onChange(newValue);
+                    }}
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        error: !!error,
+                        helperText: error?.message,
+                      },
+                    }}
+                  />
+                }
+              />
+              <Controller
+                name="morningEndTime"
+                control={control}
+                render={({ field, fieldState: { error } }) =>
+                  <TimePicker
+                    label="Morning End Time"
+                    value={field.value ? field.value : null}
+                    onChange={(newValue) => {
+                      field.onChange(newValue);
+                    }}
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        error: !!error,
+                        helperText: error?.message,
+                      },
+                    }}
+                  />
+                }
+              />
+              <Controller
+                name="eveningStartTime"
+                control={control}
+                render={({ field, fieldState: { error } }) =>
+                  <TimePicker
+                    label="Evening Start Time"
+                    value={field.value ? field.value : null}
+                    onChange={(newValue) => {
+                      field.onChange(newValue);
+                    }}
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        error: !!error,
+                        helperText: error?.message,
+                      },
+                    }}
+                  />
+                }
+              />
+              <Controller
+                name="eveningEndTime"
+                control={control}
+                render={({ field, fieldState: { error } }) =>
+                  <TimePicker
+                    label="Evening End Time"
+                    value={field.value ? field.value : null}
+                    onChange={(newValue) => {
+                      field.onChange(newValue);
+                    }}
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        error: !!error,
+                        helperText: error?.message,
+                      },
+                    }}
+                  />
+                }
+              />
           </Box>
         </DialogContent>
 

@@ -5,7 +5,7 @@ import { useAuthContext } from 'src/auth/hooks';
 
 export function RolesAuthRoute({ children, roles }) {
   const { user } = useAuthContext();
-  const userRoles = user.permissions;
+  const userRoles = user?.permissions;
   const canAccess = userRoles.some((userRole) => roles.includes(userRole));
 
   if (canAccess) return <>{children}</>;

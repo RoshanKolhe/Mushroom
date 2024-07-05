@@ -70,6 +70,30 @@ export class MushroomType extends Entity {
   colors?: string[];
 
   @property({
+    type: 'string',
+    required: true,
+  })
+  morningStartTime: String;
+
+  @property({
+    type: 'string',
+    required: true,
+  })
+  morningEndTime: String;
+
+  @property({
+    type: 'string',
+    required: true,
+  })
+  eveningStartTime: String;
+
+  @property({
+    type: 'string',
+    required: true,
+  })
+  eveningEndTime: String;
+
+  @property({
     type: 'date',
   })
   createdAt?: Date;

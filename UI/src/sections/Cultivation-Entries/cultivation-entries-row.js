@@ -29,8 +29,9 @@ export default function CultivationEntryTableRow({
   onRefreshHuts,
   isAdmin,
 }) {
-  const { name, user, cluster, isActive, totalCultivation } = row;
+  const { mushroomType, hut, quantity, moisture, temprature, changedColor, longitude, latitude, date, time } = row;
 
+  const {name} = hut;
   const confirm = useBoolean();
 
 
@@ -43,23 +44,18 @@ export default function CultivationEntryTableRow({
           <Checkbox checked={selected} onClick={onSelectRow} />
         </TableCell> */}
 
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{mushroomType}</TableCell>
+
         <TableCell sx={{ whiteSpace: 'nowrap' }}>{name}</TableCell>
 
-        <TableCell sx={{ whiteSpace: 'nowrap' }}>{`${user?.firstName} ${
-          user?.lastName ? user?.lastName : ''
-        }`}</TableCell>
-
-        <TableCell sx={{ whiteSpace: 'nowrap' }}>{cluster?.name}</TableCell>
-        <TableCell sx={{ whiteSpace: 'nowrap' }}>{totalCultivation}</TableCell>
-
-        <TableCell>
-          <Label
-            variant="soft"
-            color={(isActive && 'success') || (isActive && 'error') || 'default'}
-          >
-            {isActive ? 'Active' : 'In-Active'}
-          </Label>
-        </TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{quantity}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{moisture}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{temprature}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{changedColor}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{longitude}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{latitude}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{date}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{time}</TableCell>
 
         {/* <TableCell align="right" sx={{ px: 1, whiteSpace: 'nowrap' }}>
           {isAdmin ? (
