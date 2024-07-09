@@ -1,3 +1,4 @@
+/* eslint-disable react/no-this-in-sfc */
 import PropTypes from 'prop-types';
 import * as Yup from 'yup';
 import { useEffect, useMemo, useState } from 'react';
@@ -56,10 +57,42 @@ export default function MushroomTypeQuickEditForm({
     maxRow: Yup.string().required('Max Row is required'),
     maxColumn: Yup.string().required('Max Column is required'),
     colors: Yup.array().min(1, 'At least one color is required').required('Colors are required'),
-    morningStartTime: Yup.string().required('Please enter the time'),
-    morningEndTime: Yup.string().required('Please enter the time'),
-    eveningStartTime: Yup.string().required('Please enter the time'),
-    eveningEndTime: Yup.string().required('Please enter the time'),
+    morningStartTime: Yup.string()
+    .required('Please enter the time')
+    .test('is-morning-start-time-valid', 'Start time must be before end time for mornings', function(value) {
+      const { morningEndTime } = this.parent;
+      if (value && morningEndTime) {
+        return value < morningEndTime;
+      }
+      return true; // Return true if the field is empty
+    }),
+  morningEndTime: Yup.string()
+    .required('Please enter the time')
+    .test('is-morning-end-time-valid', 'End time must be after start time for mornings', function(value) {
+      const { morningStartTime } = this.parent;
+      if (value && morningStartTime) {
+        return value > morningStartTime;
+      }
+      return true; // Return true if the field is empty
+    }),
+  eveningStartTime: Yup.string()
+    .required('Please enter the time')
+    .test('is-evening-start-time-valid', 'Start time must be before end time for evenings', function(value) {
+      const { eveningEndTime } = this.parent;
+      if (value && eveningEndTime) {
+        return value < eveningEndTime;
+      }
+      return true; // Return true if the field is empty
+    }),
+  eveningEndTime: Yup.string()
+    .required('Please enter the time')
+    .test('is-evening-end-time-valid', 'End time must be after start time for evenings', function(value) {
+      const { eveningStartTime } = this.parent;
+      if (value && eveningStartTime) {
+        return value > eveningStartTime;
+      }
+      return true; // Return true if the field is empty
+    }),
   });
 
   const defaultValues = useMemo(

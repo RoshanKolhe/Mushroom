@@ -27,11 +27,13 @@ import {
   EnvironmentDataRepository,
   HutRepository,
   UserRepository,
+  MushroomTypeRepository,
 } from '../repositories';
 import { inject } from '@loopback/core';
 import { authenticate, AuthenticationBindings } from '@loopback/authentication';
 import { PermissionKeys } from '../authorization/permission-keys';
 import { request } from 'http';
+import { error } from 'console';
 
 export class EnvironmentDataController {
   constructor(
@@ -43,6 +45,8 @@ export class EnvironmentDataController {
     public clusterRepository: ClusterRepository,
     @repository(HutRepository)
     public hutRepository: HutRepository,
+    @repository(MushroomTypeRepository)
+    public mushroomTypeRepository: MushroomTypeRepository,
   ) { }
 
   @authenticate({
@@ -74,6 +78,55 @@ export class EnvironmentDataController {
     })
     environmentData: Omit<EnvironmentData, 'id'>,
   ): Promise<EnvironmentData> {
+
+    const mushroomTypeData = await this.mushroomTypeRepository.findById(environmentData.mushroomTypeId);
+
+    // checking humidity level is valid or not
+    if(Number(environmentData.humidity)<Number(mushroomTypeData.minimumHumidity) || Number(environmentData.humidity)>Number(mushroomTypeData.maximumHumidity)){
+      // throw new HttpErrors.BadRequest(`Humidity level for this mushroom type should be in between ${mushroomTypeData.minimumHumidity} - ${mushroomTypeData.maximumHumidity}`);
+    }
+
+    // checking moisture level is valid or not
+    if(Number(environmentData.moisture)<Number(mushroomTypeData.minimumMoisture) || Number(environmentData.moisture)>Number(mushroomTypeData.maximumMoisture)){
+      // throw new HttpErrors.BadRequest(`Moisture level for this mushroom type should be in between ${mushroomTypeData.minimumMoisture} - ${mushroomTypeData.maximumMoisture}`);
+    }
+
+    // checking temperature range is valid or not
+    if(Number(environmentData.temprature)<Number(mushroomTypeData.minimumTemprature) || Number(environmentData.temprature)>Number(mushroomTypeData.maximumTemprature)){
+      // throw new HttpErrors.BadRequest(`Temprature for this mushroom type should be in between ${mushroomTypeData.minimumTemprature} - ${mushroomTypeData.maximumTemprature}`);
+    }
+
+    function convertTimeToDate(time: String): Date {
+      const [timePart, period] = time.split(' ');
+      let [hours, minutes] = timePart.split(':').map(Number);
+      if (period === 'PM' && hours !== 12) {
+        hours += 12;
+      }
+      if (period === 'AM' && hours === 12) {
+        hours = 0;
+      }
+      const date = new Date();
+      date.setHours(hours, minutes, 0, 0);
+      return date;
+    }
+
+    const providedTime = convertTimeToDate(environmentData.time);
+    const morningStartTime = convertTimeToDate(mushroomTypeData.morningStartTime);
+    const morningEndTime = convertTimeToDate(mushroomTypeData.morningEndTime);
+    const eveningStartTime = convertTimeToDate(mushroomTypeData.eveningStartTime);
+    const eveningEndTime = convertTimeToDate(mushroomTypeData.eveningEndTime);
+  
+    if (
+      (providedTime >= morningStartTime && providedTime <= morningEndTime) ||
+      (providedTime >= eveningStartTime && providedTime <= eveningEndTime)
+    ) {
+      // Time is valid
+    } else {
+      throw new HttpErrors.BadRequest(
+        `Time should be within morning (${mushroomTypeData.morningStartTime} - ${mushroomTypeData.morningEndTime}) or evening (${mushroomTypeData.eveningStartTime} - ${mushroomTypeData.eveningEndTime}) slots`
+      );
+    }
+
     return this.environmentDataRepository.create({
       ...environmentData,
       hutId: environmentData.hutId,
@@ -188,6 +241,53 @@ export class EnvironmentDataController {
     })
     environmentData: EnvironmentData,
   ): Promise<void> {
+    const mushroomTypeData = await this.mushroomTypeRepository.findById(environmentData.mushroomTypeId);
+
+    // checking humidity level is valid or not
+    if(Number(environmentData.humidity)<Number(mushroomTypeData.minimumHumidity) || Number(environmentData.humidity)>Number(mushroomTypeData.maximumHumidity)){
+      // throw new HttpErrors.BadRequest(`Humidity level for this mushroom type should be in between ${mushroomTypeData.minimumHumidity} - ${mushroomTypeData.maximumHumidity}`);
+    }
+
+    // checking moisture level is valid or not
+    if(Number(environmentData.moisture)<Number(mushroomTypeData.minimumMoisture) || Number(environmentData.moisture)>Number(mushroomTypeData.maximumMoisture)){
+      // throw new HttpErrors.BadRequest(`Moisture level for this mushroom type should be in between ${mushroomTypeData.minimumMoisture} - ${mushroomTypeData.maximumMoisture}`);
+    }
+
+    // checking temperature range is valid or not
+    if(Number(environmentData.temprature)<Number(mushroomTypeData.minimumTemprature) || Number(environmentData.temprature)>Number(mushroomTypeData.maximumTemprature)){
+      // throw new HttpErrors.BadRequest(`Temprature for this mushroom type should be in between ${mushroomTypeData.minimumTemprature} - ${mushroomTypeData.maximumTemprature}`);
+    }
+
+    function convertTimeToDate(time: String): Date {
+      const [timePart, period] = time.split(' ');
+      let [hours, minutes] = timePart.split(':').map(Number);
+      if (period === 'PM' && hours !== 12) {
+        hours += 12;
+      }
+      if (period === 'AM' && hours === 12) {
+        hours = 0;
+      }
+      const date = new Date();
+      date.setHours(hours, minutes, 0, 0);
+      return date;
+    }
+
+    const providedTime = convertTimeToDate(environmentData.time);
+    const morningStartTime = convertTimeToDate(mushroomTypeData.morningStartTime);
+    const morningEndTime = convertTimeToDate(mushroomTypeData.morningEndTime);
+    const eveningStartTime = convertTimeToDate(mushroomTypeData.eveningStartTime);
+    const eveningEndTime = convertTimeToDate(mushroomTypeData.eveningEndTime);
+  
+    if (
+      (providedTime >= morningStartTime && providedTime <= morningEndTime) ||
+      (providedTime >= eveningStartTime && providedTime <= eveningEndTime)
+    ) {
+      // Time is valid
+    } else {
+      throw new HttpErrors.BadRequest(
+        `Time should be within morning (${mushroomTypeData.morningStartTime} - ${mushroomTypeData.morningEndTime}) or evening (${mushroomTypeData.eveningStartTime} - ${mushroomTypeData.eveningEndTime}) slots`
+      );
+    }
     await this.environmentDataRepository.updateById(id, environmentData);
   }
 

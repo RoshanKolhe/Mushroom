@@ -10,23 +10,23 @@ import CultivationNewEditForm from '../cultivation-new-edit-form';
 
 // ----------------------------------------------------------------------
 
-export default function CultivationCreateView() {
+export default function MushroomTypeCreateView() {
   const settings = useSettingsContext();
 
   return (
     <Container maxWidth={settings.themeStretch ? false : 'lg'}>
       <CustomBreadcrumbs
-        heading="Create a new cultivation"
+        heading="Add a New Cultivation Entry"
         links={[
           {
             name: 'Dashboard',
             href: paths.dashboard.root,
           },
           {
-            name: 'Manage Cultivation',
-            href: paths.dashboard.hut.list,
+            name: 'Manage Cultivation Entries',
+            href: paths.dashboard.cultivationEntries.list,
           },
-          { name: 'New Cultivation Entry' },
+          { name: 'New entry' },
         ]}
         sx={{
           mb: { xs: 3, md: 5 },

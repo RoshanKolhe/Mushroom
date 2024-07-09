@@ -195,7 +195,7 @@ export default function CultivationEntriesListView({ isDashboard }) {
             heading="Manage Cultivation Entries"
             links={[
               { name: 'Dashboard', href: paths.dashboard.root },
-              { name: 'Manage Cultivation Entries', href: paths.dashboard.hut.list },
+              { name: 'Manage Cultivation Entries', href: paths.dashboard.cultivationEntries.list },
               { name: 'List' },
             ]}
             action={
@@ -303,7 +303,7 @@ export default function CultivationEntriesListView({ isDashboard }) {
                         onSelectRow={() => table.onSelectRow(row.id)}
                         onDeleteRow={() => handleDeleteRow(row.id)}
                         onEditRow={() => handleEditRow(row.id)}
-                        onRefreshHuts={() => refreshCultivationEntries()}
+                        onRefreshCultivations={() => refreshCultivationEntries()}
                         isAdmin={isAdmin}
                       />
                     ))}

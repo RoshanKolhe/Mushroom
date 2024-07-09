@@ -16,7 +16,7 @@ import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
 import CustomPopover, { usePopover } from 'src/components/custom-popover';
 import { ConfirmDialog } from 'src/components/custom-dialog';
-import CultivationQuickEditForm from './cultivation-new-edit-form';
+import CultivationQuickEditForm from './cultivation-quick-edit-form';
 //
 
 // ----------------------------------------------------------------------
@@ -83,10 +83,10 @@ export default function CultivationEntryTableRow({
       </TableRow>
 
       <CultivationQuickEditForm
-        currentCultivation={row}
+        currentCultivationEntry={row}
         open={quickEdit.value}
         onClose={quickEdit.onFalse}
-        onRefreshCultivations={onRefreshCultivations}
+        onRefreshCultivationEntry={onRefreshCultivations}
       />
 
       <CustomPopover

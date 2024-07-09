@@ -42,7 +42,7 @@ export default function CultivationEditView() {
         }}
       />
 
-      <CultivationNewEditForm currentCultivation={currentCultivation} />
+      {/* <CultivationNewEditForm currentCultivation={currentCultivation} /> */}
     </Container>
   );
 }
